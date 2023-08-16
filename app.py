@@ -6,6 +6,7 @@ import string
 from nltk.corpus import stopwords
 import nltk
 from nltk.stem.porter import PorterStemmer
+from application_list import application_list
 
 ps = PorterStemmer()
 app = Flask(__name__)
@@ -40,8 +41,22 @@ tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
 model = pickle.load(open('model.pkl', 'rb'))
 X = ""
 
-@app.route('/', methods=['POST', 'GET'])
+
+@app.context_processor
+def inject_global_navbar_brand():
+    navbar_brand = "<span>Infobeans</span> POCs"
+    return dict(navbar_brand=navbar_brand)
+
+
+@app.route('/')
+def home_page():
+    return render_template('home.html',application_list=application_list)
+
+
+@app.route('/spam-detection', methods=['POST', 'GET'])
 def investor():
+    navbar_brand = "Spam <span>Detection</span>"
+    result_message = '';
     if request.method == 'POST':
         result = request.form.get('message')
         print(result)
@@ -52,11 +67,13 @@ def investor():
         result = model.predict(vector_input)[0]
         # 4. Display
         if result == 1:
-            X = "Spam"
+            result_message = "Spam"
         else:
-            X = "Not Spam"
+            result_message = "Not Spam"
 
-    return render_template('basic.html', result=X)
+    result = result_message
+
+    return render_template('spam-ham-detection.html', **locals())
 
 
 if __name__ == '__main__':

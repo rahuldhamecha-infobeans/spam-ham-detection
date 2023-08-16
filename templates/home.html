@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html' %}
+
+{% block page_title %}
+    Investor ChatBots
+{% endblock %}
+
+{% block body_block %}
+
+<!-- contact form start -->
+<section class="contact-form-wrap section">
+    <div class="container-fluid home-pocs" >
+        <div class="row d-flex justify-content-center mb-3">
+            <div>
+                <h1 class="text-center">Infobeans POCs</h1>
+                <div class="divider"></div>
+            </div>
+        </div>
+        <div class="row p-5">
+            {% for application in application_list %}
+                <div class="col-md-6 col-xl-4 col-lg-4 col-sm-12 col-12 mt-4 mb-4">
+                <div class="poc-item">
+                  <div class="img">
+                    <img src="{{ url_for('static',filename=application.image_path) }}" class="img-fluid" alt="">
+                  </div>
+                  <div class="details position-relative">
+                    <a href="{{ url_for(application.route) }}" class="stretched-link">
+                      <h3 class="navbar-brand">{{ application.title|safe }}</h3>
+                    </a>
+                  </div>
+                </div>
+              </div><!-- End Service Item -->
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

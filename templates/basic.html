@@ -68,7 +68,7 @@
                <!--  {% include 'inc/error_mess.html' %} -->
                  <form id="contact-form" class="contact__form" method="post" action="/">
                  <!-- form message -->
-                 
+
                     <!-- end message -->
                     <h5 class="">Write Your Text Here                  </h5>
                     <div class="form-group-2 mb-4">
@@ -89,7 +89,7 @@
                    <div class="form-group-2 mb-4">
                        <textarea disabled id="msgarea2" name="message_output" class="form-control" rows="10" placeholder="">{% if result %}{{result}}{% endif %}</textarea>
                    </div>
-                   
+
            </div>
         </div>
     </div>
@@ -97,7 +97,7 @@
    
     </div>
 
-    <!-- 
+    <!--
     Essential Scripts
     =====================================-->
 <script>
@@ -106,7 +106,7 @@ function eraseText() {
     document.getElementById("msgarea2").value = "";
 }
 </script>
-    
+
     
 
     <!-- Main jQuery -->
@@ -121,10 +121,5 @@ function eraseText() {
     <!-- Counterup -->
     <script src="{{ url_for('static', filename='assets/plugins/counterup/jquery.waypoints.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/plugins/counterup/jquery.counterup.min.js') }}"></script>
-
-
-
-  
-        
   </body>
   </html>

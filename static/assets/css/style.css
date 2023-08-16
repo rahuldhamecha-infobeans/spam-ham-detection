@@ -1489,3 +1489,91 @@ h3.quote::before {
   text-align: center;
   margin-bottom: 60px !important;
 }
+
+.card{
+  border-radius: 20px !important;
+}
+
+.divider {
+    max-width:100px;
+    width:auto;
+    height: 3px;
+    background: #f00;
+    margin: 0 auto;
+    margin-top: 11px;
+}
+
+:root{
+  --color-white:#ffffff;
+  --color-white-rgb: rgb(255,255,255);
+  --color-black-rgb: rgb(0,0,0);
+  --color-primary: #ff0000;
+  --color-default : #ff0000;
+}
+
+/*--------------------------------------------------------------
+# Services Section
+--------------------------------------------------------------*/
+.home-pocs .img {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.home-pocs .img img {
+  transition: 0.6s;
+}
+
+.home-pocs .details {
+  padding: 20px 30px;
+  margin: -60px 30px 0 30px;
+  transition: all ease-in-out 0.3s;
+  background: var(--color-white);
+  position: relative;
+  /*background: rgba(var(--color-white-rgb), 0.9);*/
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0px 0 25px rgba(var(--color-black-rgb), 0.1);
+}
+
+.home-pocs .details .icon {
+  margin: 0;
+  width: 72px;
+  height: 72px;
+  background: var(--color-primary);
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--color-white);
+  font-size: 28px;
+  transition: ease-in-out 0.3s;
+  position: absolute;
+  top: -36px;
+  left: calc(50% - 36px);
+  border: 6px solid var(--color-white);
+}
+
+.home-pocs .details p {
+  line-height: 24px;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.home-pocs .poc-item:hover .details h3 {
+  color: var(--color-primary);
+}
+
+.home-pocs .poc-item:hover .details .icon {
+  background: var(--color-white);
+  border: 2px solid var(--color-primary);
+}
+
+.home-pocs .poc-item:hover .details .icon i {
+  color: var(--color-primary);
+}
+
+.home-pocs .poc-item:hover .img img {
+  transform: scale(1.2);
+}
+

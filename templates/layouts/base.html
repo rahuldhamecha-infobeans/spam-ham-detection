@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="megakit,business,company,agency,multipurpose,modern,bootstrap4">
+  <meta name="author" content="infobeans.com">
+  <title> {% block page_title %}INVESTORS CHATBOT{% endblock %} | Infobeans Technologies</title>
+  {# Include Theme Styles #}
+  {% include 'layouts/styles.html' %}
+  {# Include Theme Styles #}
+
+  {# Start block for custom page wise style #}
+  {% block head_styles %}
+  {% endblock %}
+  {# End block for custom page wise style #}
+
+</head>
+
+<body>
+
+{# Include Header #}
+    {% include 'layouts/header.html' %}
+{# Include Header #}
+
+<div class="main-wrapper ">
+    {% block body_block %}
+        <section class="contact-form-wrap section">
+            <div class="container-fluid" >
+                <div class="row p-5">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                Default Template
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endblock %}
+</div>
+
+{# Include Footer #}
+{% include 'layouts/footer.html' %}
+{# Include Footer #}
+
+{# Include Theme Scripts #}
+{% include 'layouts/scripts.html' %}
+{# Include Theme Scripts #}
+
+{# Start block for custom page wise script #}
+{% block body_scripts %}
+{% endblock %}
+{# End block for custom page wise script #}
+
+</body>
+</html>
