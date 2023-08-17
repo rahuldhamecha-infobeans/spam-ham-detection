@@ -1,0 +1,81 @@
+{% extends 'layouts/base.html' %}
+
+{% block page_title %}
+Mood Based Songs Recommendations
+{% endblock %}
+
+{% block body_block %}
+<section class="contact-form-wrap section">
+    <div class="container-fluid">
+        <div class="row p-5" id="body">
+            <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
+                <h2 class="mb-4 heading-align">InfoBeans : Mood Based Song
+                </h2>
+                <h2> Recommendations</h2>
+            </div>
+            <div class="col-lg-5 col-md-12 col-sm-12">
+                <h5 class="">Emotion Detector</h5>
+                <img class="outer-shadow" id="bg" class="center img-fluid" src="{{ url_for('video_feed') }}" />
+            </div>
+            <div class="col-lg-7 col-md-12 col-sm-12">
+                <h5 class="">Recommend Songs</h5>
+                <div  id="ResultArea">
+                </div>
+            </div>
+
+                
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+<!--
+#########################################################
+##########          Essential Scripts          ##########
+#########################################################
+-->
+<script>
+    function eraseText() {
+        document.getElementById("msgarea").value = "";
+        document.getElementById("msgarea2").value = "";
+    }
+</script>
+<script type=text/javascript>
+
+// Constantly Update Table
+    setInterval(function() {
+        $.getJSON('/t', function(data) {
+            CreateHtmlTable(data);
+            console.log(data,"DATA");
+          });
+        return false;
+    }, 300);
+
+    function CreateHtmlTable(data) {
+      //Clear result div
+      $("#ResultArea").html("");
+      //Crate table html tag
+      var table = $("<table class = 'table table-striped table-light table-bordered table-hover table-sm ' id=DynamicTable></table>").appendTo("#ResultArea");
+      //Create table header row
+      var rowHeader = 
+      $("<tr></tr>").appendTo(table);
+      $("<td></td>").text("Name").appendTo(rowHeader);
+      $("<td></td").text("Album").appendTo(rowHeader);
+      $("<td></td>").text("Artist").appendTo(rowHeader)
+      //Get JSON data by calling action method in controller
+      $.each(data, function (i, value) {
+
+          //Create new row for each record
+          var row = 
+          $("<tr></tr>").appendTo(table);
+          $("<td></td>").text(value.Name).appendTo(row);
+          $("<td></td>").text(value.Album).appendTo(row);
+          $("<td></td>").text(value.Artist).appendTo(row);
+      });
+    }
+
+  </script>
+
+{% endblock %}

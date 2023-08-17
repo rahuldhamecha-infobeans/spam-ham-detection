@@ -1487,7 +1487,7 @@ h3.quote::before {
 .heading-align{
 
   text-align: center;
-  margin-bottom: 60px !important;
+  margin-bottom: 0px !important;
 }
 
 .card{
@@ -1577,3 +1577,27 @@ h3.quote::before {
   transform: scale(1.2);
 }
 
+
+.outer-shadow {
+  --outer-shadow: 3px 3px 3px #d0d0d0, -3px -3px 3px #f8f8f8;
+  box-shadow: var(--outer-shadow);
+}
+
+.inner-shadow {
+  --inner-shadow: inset 3px 3px 3px #d0d0d0, inset -3px -3px 3px #f8f8f8;
+  box-shadow: var(--inner-shadow);
+}
+
+
+.title-heading-justify{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 60px;
+}
+
+
+.title-heading-justify h2 {
+  font-size: 30px !important;
+}
