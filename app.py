@@ -69,24 +69,29 @@ def home_page():
 @app.route('/spam-detection', methods=['POST', 'GET'])
 def investor():
     navbar_brand = "Spam <span>Detection</span>"
-    result_message = '';
+    result_message = ''
+    result = ''
+
     if request.method == 'POST':
         result = request.form.get('message')
-        print(result)
         transformed_sms = transform_text(result)
         # 2. vectorize
         vector_input = tfidf.transform([transformed_sms])
         # 3. predict
-        result = model.predict(vector_input)[0]
+        prediction = model.predict(vector_input)[0]
         # 4. Display
-        if result == 1:
+        if prediction == 1:
             result_message = "Spam"
         else:
             result_message = "Not Spam"
 
-    result = result_message
+    template_args = {
+        'navbar_brand': navbar_brand,
+        'message': result,
+        'result': result_message,
+    }
 
-    return render_template('spam-ham-detection.html', **locals())
+    return render_template('spam-ham-detection.html', **template_args)
 
 @app.route("/popularity-based-recommendation", methods=["GET", "POST"])
 def popularity_based_recommendation():
