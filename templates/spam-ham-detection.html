@@ -22,7 +22,7 @@
                     <!-- end message -->
                     <h5 class="">Write Your Text Here                  </h5>
                     <div class="form-group-2 mb-4">
-                        <textarea id="msgarea" name="message" class="form-control" rows="10" placeholder="Type Anything...">{{input}}</textarea>
+                        <textarea id="msgarea" name="message" class="form-control" rows="10" placeholder="Type Anything...">{% if message %}{{message}}{% endif %} </textarea>
                     </div>
                     <button class="blue buttn" id="submit_query" name="submit" type="submit">Submit</button>
                     <button class="blue buttn" type="button" onClick="eraseText();" >Clear<i class="ti-reload"></i></button>
