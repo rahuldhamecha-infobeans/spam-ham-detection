@@ -8,7 +8,7 @@
             <img src="{{ url_for('static', filename='pictures/Logo.png') }}" alt="">
 		  </a>
           <a class="navbar-brand" href="">
-              {{ navbar_brand|safe }}
+               {% if title_brand %} {{title_brand| safe}}{% else %} {{ navbar_brand|safe }} {% endif %}
           </a>
 
 		  <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">

@@ -5,14 +5,14 @@ application_list = [
             'title': 'Spam Detection',
         },
         {
-            'route': 'investor',
+            'route': 'popularity_based_recommendation',
             'image_path': 'pictures/spam.jpg',
-            'title': 'Spam <span>Detection</span>',
+            'title': 'Song Recommendations<br><span>Popularity Based</span>',
         },
         {
-            'route': 'investor',
+            'route': 'mood_based_recommendation',
             'image_path': 'pictures/spam.jpg',
-            'title': 'Spam <span>Detection</span>',
+            'title': 'Song Recommendations<br><span>Mood Based</span>',
         },
         {
             'route': 'investor',
