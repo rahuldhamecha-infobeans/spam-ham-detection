@@ -90,15 +90,16 @@ def investor():
 
 @app.route("/popularity-based-recommendation", methods=["GET", "POST"])
 def popularity_based_recommendation():
+    title_brand = "Song <span>Recommendations</span>"
     if request.method == "POST":
          songname=request.form.get("song")
     else:   
          songname=""
     if songname=="":
-        return render_template('song-recommendation.html',message='')
+        return render_template('song-recommendation.html',message='',title_brand=title_brand,)
     new_song_df1 = find_song(songname)
     if new_song_df1 is None:
-        return render_template('song-recommendation.html',message='invalid song ') 
+        return render_template('song-recommendation.html',message='invalid song ',title_brand=title_brand,) 
     new_song_df1 = new_song_df1.copy()
     new_song_df = new_song_df1.drop(columns=['name'])
     csv_path = os.path.join(app.root_path, 'static/csv', 'song_data.csv')
@@ -138,23 +139,18 @@ def popularity_based_recommendation():
     # Get the names and predicted popularity scores of similar songs
     similar_song_names = songdata.iloc[similar_song_indices]['song_name']
     similar_song_popularities = predicted_popularity_scaled  # Use the same predicted popularity for all similar songs
-
-    # Print similar song names and predicted popularities
-    for song_name in similar_song_names:
-        print("Song:", song_name)
-        print("Predicted Popularity:", similar_song_popularities[0][0]*100)
-        print("=" * 30)
-    return render_template('song-recommendation.html', similar_songs=similar_song_names,song_predicted_rank=predicted_popularity,songname=songname)
+    return render_template('song-recommendation.html',title_brand=title_brand, similar_songs=similar_song_names,song_predicted_rank=predicted_popularity,songname=songname)
 
 @app.route("/mood-based-recommendation", methods=["GET", "POST"])
 def mood_based_recommendation():
+    title_brand = "Song <span>Recommendations</span>"
     if request.method == "POST":
         songname=request.form.get("song")
     else:   
-        return render_template('mood-based-recommendation.html',common_mood='')
+        return render_template('mood-based-recommendation.html',common_mood='',title_brand=title_brand,)
     new_song_df = find_mood_based_song(songname)
     if new_song_df is None:
-        return render_template('mood-based-recommendation.html',common_mood='',message='invalid song ') 
+        return render_template('mood-based-recommendation.html',common_mood='',message='invalid song ',title_brand=title_brand,) 
     mood_csv_path = os.path.join(app.root_path, 'static/csv', 'data_moods.csv')
     df = pd.read_csv(mood_csv_path)
     X = df.loc[:, 'popularity':'time_signature']
@@ -195,7 +191,7 @@ def mood_based_recommendation():
     similar_songs_df = pd.concat(similar_songs, ignore_index=True)
     print("Similar Songs with Predicted Mood:")
     print(similar_songs_df[['name', 'mood']])
-    return render_template('mood-based-recommendation.html',songname=songname,similar_songs=similar_songs_df,common_mood=most_common_mood)
+    return render_template('mood-based-recommendation.html',title_brand=title_brand,songname=songname,similar_songs=similar_songs_df,common_mood=most_common_mood)
 
 
 
