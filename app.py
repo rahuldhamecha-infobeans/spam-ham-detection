@@ -16,6 +16,7 @@ import os
 #from spotipy.oauth2 import SpotifyClientCredentials
 from spotify import *
 from sklearn.preprocessing import LabelBinarizer, MinMaxScaler
+import joblib
 
 ps = PorterStemmer()
 pp_model = load_model('popularity_predict.h5')
@@ -93,13 +94,13 @@ def popularity_based_recommendation():
          songname=request.form.get("song")
     else:   
          songname=""
+    if songname=="":
+        return render_template('song-recommendation.html',message='')
     new_song_df1 = find_song(songname)
-    print(new_song_df1)
     if new_song_df1 is None:
         return render_template('song-recommendation.html',message='invalid song ') 
     new_song_df1 = new_song_df1.copy()
     new_song_df = new_song_df1.drop(columns=['name'])
-    print(new_song_df1)
     csv_path = os.path.join(app.root_path, 'static/csv', 'song_data.csv')
     songdata= pd.read_csv(csv_path)
     songdata.drop_duplicates(keep='first',inplace=True)
@@ -110,13 +111,8 @@ def popularity_based_recommendation():
     scaler.fit(X_train)
     scaled_x_train= scaler.transform(X_train)
     scaled_x_test = scaler.transform(X_test)
-
-    #print(new_song_df)
-    # Load the saved MinMaxScaler
-
     # Scale the new song features
     scaled_new_song = scaler.transform(new_song_df)
-   # print(scaled_new_song.shape)
     # Check if the number of features matches the model's input shape
     if scaled_new_song.shape[1] == pp_model.input_shape[1]:
         # Make the prediction using the trained model
@@ -149,6 +145,57 @@ def popularity_based_recommendation():
         print("Predicted Popularity:", similar_song_popularities[0][0]*100)
         print("=" * 30)
     return render_template('song-recommendation.html', similar_songs=similar_song_names,song_predicted_rank=predicted_popularity,songname=songname)
+
+@app.route("/mood-based-recommendation", methods=["GET", "POST"])
+def mood_based_recommendation():
+    if request.method == "POST":
+        songname=request.form.get("song")
+    else:   
+        return render_template('mood-based-recommendation.html',common_mood='')
+    new_song_df = find_mood_based_song(songname)
+    if new_song_df is None:
+        return render_template('mood-based-recommendation.html',common_mood='',message='invalid song ') 
+    mood_csv_path = os.path.join(app.root_path, 'static/csv', 'data_moods.csv')
+    df = pd.read_csv(mood_csv_path)
+    X = df.loc[:, 'popularity':'time_signature']
+    X['length'] = X['length']/max(X['length'])
+    model_dir='trained_model_classifiers'
+
+    loaded_models = []
+    loaded_models.append(('Random Forest Classifier', joblib.load(os.path.join(model_dir,'Random Forest Classifier.joblib'))))
+    loaded_models.append(('Gradient Boosting Classifier', joblib.load(os.path.join(model_dir,'Gradient Boosting Classifier.joblib'))))
+    loaded_models.append(('XGB Classifier', joblib.load(os.path.join(model_dir,'XGB Classifier.joblib'))))
+    loaded_models.append(('Decision Tree Classifier', joblib.load(os.path.join(model_dir,'Decision Tree Classifier.joblib'))))
+    loaded_models.append(('LGBM Classifier', joblib.load(os.path.join(model_dir,'LGBM Classifier.joblib'))))
+    loaded_models.append(('Support Vector Classifier', joblib.load(os.path.join(model_dir,'Support Vector Classifier.joblib'))))
+    loaded_models.append(('KNN Classifier', joblib.load(os.path.join(model_dir,'KNN Classifier.joblib'))))
+    # Scale the new song's data
+    new_song_scaled = new_song_df.copy()
+    new_song_scaled['length'] = new_song_scaled['length'] / max(X['length'])  # Scale the length feature
+    new_song_scaled = new_song_scaled.drop(columns=['name'])
+    mood_count = {}  # Dictionary to count predicted moods
+    target_names = ['Happy', 'Sad', 'Energetic', 'Calm']
+    # Predict mood using trained models
+    for name, model in loaded_models:
+        mood_prediction = model.predict(new_song_scaled)
+        predicted_mood = target_names[mood_prediction[0]]  # Get the predicted mood label
+        if predicted_mood in mood_count:
+            mood_count[predicted_mood] += 1
+        else:
+            mood_count[predicted_mood] = 1
+
+        # Find the most common predicted mood
+        most_common_mood = max(mood_count, key=mood_count.get)
+
+    #print(mood_count)
+    #print('\033[1mPredicted Mood for ' + new_song_df['name'] + '\033[0m' + ': \033[1m' + most_common_mood + '\033[0m')
+    similar_songs = [] 
+    similar_songs_by_mood = df[df['mood'] == most_common_mood]
+    similar_songs.append(similar_songs_by_mood)
+    similar_songs_df = pd.concat(similar_songs, ignore_index=True)
+    print("Similar Songs with Predicted Mood:")
+    print(similar_songs_df[['name', 'mood']])
+    return render_template('mood-based-recommendation.html',songname=songname,similar_songs=similar_songs_df,common_mood=most_common_mood)
 
 
 

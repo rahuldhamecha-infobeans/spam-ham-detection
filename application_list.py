@@ -7,12 +7,12 @@ application_list = [
         {
             'route': 'popularity_based_recommendation',
             'image_path': 'pictures/spam.jpg',
-            'title': 'Song <span>Recommendations</span>',
+            'title': 'Song Recommendations<br><span>Popularity Based</span>',
         },
         {
-            'route': 'investor',
+            'route': 'mood_based_recommendation',
             'image_path': 'pictures/spam.jpg',
-            'title': 'Spam <span>Detection</span>',
+            'title': 'Song Recommendations<br><span>Mood Based</span>',
         },
         {
             'route': 'investor',
