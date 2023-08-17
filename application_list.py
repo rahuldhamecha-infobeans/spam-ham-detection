@@ -6,12 +6,12 @@ application_list = [
         },
         {
             'route': 'popularity_based_recommendation',
-            'image_path': 'pictures/spam.jpg',
+            'image_path': 'pictures/songrec.jpg',
             'title': 'Song Recommendations<br><span>Popularity Based</span>',
         },
         {
             'route': 'mood_based_recommendation',
-            'image_path': 'pictures/spam.jpg',
+            'image_path': 'pictures/songrec.jpg',
             'title': 'Song Recommendations<br><span>Mood Based</span>',
         },
         {
@@ -21,7 +21,7 @@ application_list = [
         },
         {
             'route': 'facial_emotion_based_recommendation',
-            'image_path': 'pictures/spam.jpg',
+            'image_path': 'pictures/songrec.jpg',
             'title': 'Song Recommendations <br><span>Facial Emotion Based</span>',
         },
         {
