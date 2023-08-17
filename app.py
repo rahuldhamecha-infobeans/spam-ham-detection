@@ -62,7 +62,7 @@ X = ""
 
 @app.context_processor
 def inject_global_navbar_brand():
-    navbar_brand = "<span>Infobeans</span> POCs"
+    navbar_brand = "<span>Infobeans</span> AI POCs"
     return dict(navbar_brand=navbar_brand)
 
 
