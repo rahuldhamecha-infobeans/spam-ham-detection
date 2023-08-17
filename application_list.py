@@ -20,9 +20,9 @@ application_list = [
             'title': 'Spam <span>Detection</span>',
         },
         {
-            'route': 'investor',
+            'route': 'facial_emotion_based_recommendation',
             'image_path': 'pictures/spam.jpg',
-            'title': 'Spam <span>Detection</span>',
+            'title': 'Song Recommendations <br><span>Facial Emotion Based</span>',
         },
         {
             'route': 'investor',

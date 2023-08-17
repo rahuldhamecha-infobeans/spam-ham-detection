@@ -1,5 +1,7 @@
 # import streamlit as st
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, Response, jsonify
+import gunicorn
+from camera import *
 import pandas as pd
 import numpy as np
 import pickle
@@ -24,6 +26,9 @@ pp_model = load_model('popularity_predict.h5')
 app = Flask(__name__)
 
 from spotify import  *
+headings = ("Name","Album","Artist")
+df1 = music_rec()
+df1 = df1.head(15)
 
 def transform_text(text):
     text = text.lower()
@@ -199,6 +204,28 @@ def mood_based_recommendation():
     return render_template('mood-based-recommendation.html',title_brand=title_brand,songname=songname,similar_songs=similar_songs_df,common_mood=most_common_mood)
 
 
+@app.route("/facial-emotion-based-recommendation", methods=["GET", "POST"])
+def facial_emotion_based_recommendation():
+    title_brand = "Song <span>Recommendations</span>"
+    #print(df1.to_json(orient='records'))
+    return render_template('emotion-based-song-recommendation.html',title_brand=title_brand, headings=headings, data=df1)
+
+def gen(camera):
+    while True:
+        global df1
+        frame, new_df1 = camera.get_frame()
+        if frame is not None:
+            df1 = new_df1  # Update the df1 with the new DataFrame
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen(VideoCamera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/t')
+def gen_table():
+    return df1.to_json(orient='records')
 
 if __name__ == '__main__':
     app.run(debug=True)
