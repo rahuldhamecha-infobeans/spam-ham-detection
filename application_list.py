@@ -25,8 +25,13 @@ application_list = [
             'title': 'Song Recommendations <br><span>Facial Emotion Based</span>',
         },
         {
-            'route': 'investor',
+            'route': 'image_classification',
             'image_path': 'pictures/spam.jpg',
-            'title': 'Spam <span>Detection</span>',
+            'title': 'Image <span>Classifiaction</span>',
+        },
+        {
+            'route': 'multi_image_classification',
+            'image_path': 'pictures/spam.jpg',
+            'title': 'Multiclass Image <br><span>Classifiaction</span>',
         },
 ]
