@@ -15,9 +15,9 @@ application_list = [
             'title': 'Song Recommendations<br><span>Mood Based</span>',
         },
         {
-            'route': 'investor',
-            'image_path': 'pictures/spam.jpg',
-            'title': 'Spam <span>Detection</span>',
+            'route': 'object_detection',
+            'image_path': 'pictures/object_detection.png',
+            'title': 'Live Object <span>Detection</span>',
         },
         {
             'route': 'facial_emotion_based_recommendation',

@@ -1,0 +1,35 @@
+{% extends 'layouts/base.html' %}
+
+{% block page_title %}
+Live Object Detection
+{% endblock %}
+
+{% block body_block %}
+<section class="contact-form-wrap section">
+    <div class="container-fluid">
+        <div class="row p-5" id="body">
+            <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
+                <h2 class="mb-4 heading-align">InfoBeans : Live Object Detection</h2>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
+                <img class="outer-shadow" id="bg" class="center img-fluid" src="{{ url_for('video_feed_for_object') }}" />
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+<script type=text/javascript>
+    function eraseText() {
+        document.getElementById("msgarea").value = "";
+        document.getElementById("msgarea2").value = "";
+    }
+    setInterval(function() {
+        $.getJSON('/t', function(data) {
+            console.log(data,"DATA");
+          });
+        return false;
+    }, 300);
+</script>
+{% endblock %}
