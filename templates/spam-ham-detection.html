@@ -6,10 +6,6 @@
 
 {% block body_block %}
 <section class="contact-form-wrap section">
-    <div class="pychart-area">
-        <h1>Test</h1>
-        {{ plt }}
-    </div>
     <div class="container-fluid" >
         <div class="row p-5">
             <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
@@ -17,8 +13,8 @@
                 </h2>
                 <h2> Messages/Emails!</h2>
             </div>
-            <div class="col-lg-6">
-                <div class="col-lg-12 col-md-12 col-sm-12">
+
+            <div class="col-lg-5 col-md-12 col-sm-12">
                <!--  {% include 'inc/error_mess.html' %} -->
                  <form id="contact-form" class="contact__form" method="post" action="{{ url_for('investor') }}">
                  <!-- form message -->
@@ -28,35 +24,23 @@
                     <div class="form-group-2 mb-4">
                         <textarea id="msgarea" name="message" class="form-control" rows="10" placeholder="Type Anything...">{% if message %}{{message}}{% endif %} </textarea>
                     </div>
+                    <button class="blue buttn" id="submit_query" name="submit" type="submit">Submit</button>
+                    <button class="blue buttn" type="button" onClick="eraseText();" >Clear<i class="ti-reload"></i></button>
+                    <div id="loading-icon" style="display: none;">
+                        <!-- Replace with your loading icon HTML or image -->
+                        Loading...
+                    </div>
                 </form>
             </div>
-            <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="col-lg-7 col-md-12 col-sm-12">
                 <!-- form message -->
                    <!-- end message -->
                    <h5 class="">Answer</h5>
                    <div class="form-group-2 mb-4">
                        <textarea disabled id="msgarea2" name="message_output" class="form-control" rows="10" placeholder="">{% if result %}{{result}}{% endif %}</textarea>
                    </div>
-                    <div class="loading-area">
-                        <button class="blue buttn" id="submit_query" name="submit" type="button" onclick="submit_form()">Submit</button>
-                        <button class="blue buttn" type="button" onClick="eraseText();" >Clear<i class="ti-reload"></i></button>
-                        <div id="loading-icon">
-                            <span class="loader"></span>
-                        </div>
-                    </div>
+
            </div>
-            </div>
-             <div class="col-lg-6 col-xl-6 col-md-12 col-sm-12 p-4">
-                 <div class="row">
-                     <div class="col-lg-12">
-                         <h3>All Suggestions</h3>
-                     </div>
-                 </div>
-
-                 <div class="row suggestion_list">
-
-                 </div>
-             </div>
         </div>
     </div>
 </section>
@@ -73,94 +57,6 @@
     document.getElementById("msgarea").value = "";
     document.getElementById("msgarea2").value = "";
     }
-
-    function submit_form(){
-        let message = $('#msgarea').text();
-        let output = $('#msgarea2');
-
-        $.ajax({
-            url: '/api/spam-ham-email-detection',
-            type: 'post',
-            beforeSend:function (request){
-                $('#loading-icon').toggleClass('active');
-            },
-            success: function (response){
-                $(output).text(response.result);
-                $('#loading-icon').toggleClass('active');
-                if (response.suggestion_list.length > 0){
-                    let html = ''
-                    $.each(response.suggestion_list,function (key,item){
-                        html += '<div class="col-lg-12 mt-4">' +
-                            '<div class="card p-4 rounded">' +
-                            item +
-                            '</div>' +
-                            '</div>';
-                    });
-                    $('.suggestion_list').html(html);
-                }
-            }
-        })
-    }
-
 </script>
 
-{% endblock %}
-
-{% block head_styles %}
-    <style>
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: #FF3D00;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-
-        .loading-area {
-            display: flex;
-            justify-content: flex-start;
-            gap: 20px;
-        }
-
-        .loading-area #loading-icon{
-            display: none;
-        }
-
-        .loading-area #loading-icon.active{
-            display: flex;
-        }
-
-        @keyframes rotation {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .row.suggestion_list .card {
-            border-radius: 10px !important;
-            -webkit-box-shadow: 2px 7px 9px -3px rgba(0,0,0,0.39);
-            -moz-box-shadow: 2px 7px 9px -3px rgba(0,0,0,0.39);
-            box-shadow: 2px 7px 9px -3px rgba(0,0,0,0.39);
-        }
-
-        .pychart-area {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            max-width: 500px;
-            max-height: 300px;
-        }
-
-    </style>
 {% endblock %}

@@ -11,8 +11,8 @@ import pickle
 import string
 from nltk.corpus import stopwords
 import nltk
-import matplotlib.pyplot as plt
-import numpy as np
+import pygal
+import numpy
 
 nltk.download('punkt')
 from nltk.stem.porter import PorterStemmer
@@ -351,16 +351,29 @@ class SpamHamDetection(Resource):
         }
 
     def post(self):
+        chart_data = [{"name": "Spam", "percent": "85", 'color': '#ff0000'},
+                    {"name": "Not Spam", "percent": "15", 'color': 'green'}]
+
         return {
             'percentage': 'POST',
             'suggestion_list': [
                 'Test 1', 'Test 2', 'Test 3', 'Test 4'
             ],
             'result': 'Not Spam',
+            'chart_data' : chart_data
         }
 
 
 api.add_resource(SpamHamDetection, '/api/spam-ham-email-detection')
+
+
+@app.route('/spam-email', methods=['POST', 'GET'])
+def spam_email():
+    navbar_brand = "Email <span>Detection</span>"
+    template_args = {
+        'navbar_brand': navbar_brand,
+    }
+    return render_template('spam-email-detection.html', **template_args)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -11,6 +11,18 @@ application_list = [
         'project_model_code_link': '#',
         'created_by': 'Prgati Nande'
     },
+    {
+            'route': 'spam_email',
+            'image_path': 'pictures/spam.jpg',
+            'title': 'Spam Detection',
+            'project_name': ' Automatic Email Filtering',
+            'project_description': 'Automatic spam filtering is a technology that employs algorithms to analyze incoming emails, messages, or content and identify and categorize unwanted or malicious spam items. By examining various attributes like sender, content, and patterns, it helps users manage their communications more effectively and protect against unsolicited or harmful messages.',
+            'project_demo_link': 'http://aipocdemo.creatingwow.in/',
+            'project_demo_video': 'https://drive.google.com/file/d/1aGaoqv786_944dC0h6oZDDfTaTojbiMI/view?t=10s',
+            'project_demo_ppt': 'https://docs.google.com/presentation/d/15l41H5aua3hu08ZuFjAg6jgLW0iNEr7Z/edit#slide=id.g25e105483f5_0_832',
+            'project_model_code_link': '#',
+            'created_by': 'Prgati Nande'
+    },
     # {
     #     'route': 'popularity_based_recommendation',
     #     'image_path': 'pictures/songrec.jpg',
