@@ -104,7 +104,7 @@ application_list = [
     },
 
     {
-    'route': 'spam_email',
+    'route': 'email_validator',
     'image_path': 'pictures/spam.jpg',
     'title': 'Email<br><span>Validator</span>',
     # New Data
