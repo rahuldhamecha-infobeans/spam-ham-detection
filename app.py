@@ -1,6 +1,7 @@
 # import streamlit as st
 import os
-from flask import Flask, render_template, request, flash, Response, jsonify
+from flask import Flask, render_template, request, flash, Response, jsonify, request
+from flask_restful import Resource, Api
 import numpy as np
 import cv2
 import gunicorn
@@ -10,6 +11,9 @@ import pickle
 import string
 from nltk.corpus import stopwords
 import nltk
+import pygal
+import numpy
+
 nltk.download('punkt')
 from nltk.stem.porter import PorterStemmer
 from application_list import application_list
@@ -29,10 +33,12 @@ app = Flask(__name__)
 
 classification_model = load_model('image_classification.h5')
 multiclass_classification_model = load_model('multi_image_classification.h5')
-from spotify import  *
-headings = ("Name","Album","Artist")
+from spotify import *
+
+headings = ("Name", "Album", "Artist")
 df1 = music_rec()
 df1 = df1.head(15)
+
 
 def transform_text(text):
     text = text.lower()
@@ -102,15 +108,16 @@ def investor():
 
     return render_template('spam-ham-detection.html', **template_args)
 
+
 @app.route("/popularity-based-recommendation", methods=["GET", "POST"])
 def popularity_based_recommendation():
     title_brand = "Song <span>Recommendations</span>"
     if request.method == "POST":
-         songname=request.form.get("song")
+        songname = request.form.get("song")
     else:
-         songname=""
-    if songname=="":
-        return render_template('song-recommendation.html',message='',title_brand=title_brand,)
+        songname = ""
+    if songname == "":
+        return render_template('song-recommendation.html', message='', title_brand=title_brand, )
     new_song_df1 = find_song(songname)
     if new_song_df1 is None:
         return render_template('song-recommendation.html', message='invalid song ', title_brand=title_brand, )
@@ -152,7 +159,8 @@ def popularity_based_recommendation():
     # Get the names and predicted popularity scores of similar songs
     similar_song_names = songdata.iloc[similar_song_indices]['song_name']
     similar_song_popularities = predicted_popularity_scaled  # Use the same predicted popularity for all similar songs
-    return render_template('song-recommendation.html',title_brand=title_brand, similar_songs=similar_song_names,song_predicted_rank=predicted_popularity,songname=songname)
+    return render_template('song-recommendation.html', title_brand=title_brand, similar_songs=similar_song_names,
+                           song_predicted_rank=predicted_popularity, songname=songname)
 
 
 @app.route("/mood-based-recommendation", methods=["GET", "POST"])
@@ -164,7 +172,7 @@ def mood_based_recommendation():
         return render_template('mood-based-recommendation.html', common_mood='', title_brand=title_brand, )
     new_song_df = find_mood_based_song(songname)
     if new_song_df is None:
-        return render_template('song-recommendation.html',message='invalid song ',title_brand=title_brand,)
+        return render_template('song-recommendation.html', message='invalid song ', title_brand=title_brand, )
     mood_csv_path = os.path.join(app.root_path, 'static/csv', 'data_moods.csv')
     df = pd.read_csv(mood_csv_path)
     X = df.loc[:, 'popularity':'time_signature']
@@ -309,22 +317,63 @@ def multi_image_classification():
 
     return render_template('multi-image-classification.html')
 
+
 @app.route('/object-detection')
 def object_detection():
     navbar_brand = "<span>Live </span> Object Detection"
     return render_template('object-detection.html', navbar_brand=navbar_brand)
+
 
 @app.route('/video-feed-for-object')
 def video_feed_for_object():
     return Response(generate_webcam(VideoCameraForObject()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
 def generate_webcam(camera):
     while True:
         frame = camera.get_frame()
         if frame is not None:
             yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+api = Api(app)
+
+
+class SpamHamDetection(Resource):
+    def get(self):
+        return {
+            'percentage': 'GET',
+            'suggections': [
+                'Test 1', 'Test 2', 'Test 3', 'Test 4'
+            ]
+        }
+
+    def post(self):
+        chart_data = [{"name": "Spam", "percent": "85", 'color': '#ff0000'},
+                    {"name": "Not Spam", "percent": "15", 'color': 'green'}]
+
+        return {
+            'percentage': 'POST',
+            'suggestion_list': [
+                'Test 1', 'Test 2', 'Test 3', 'Test 4'
+            ],
+            'result': 'Not Spam',
+            'chart_data' : chart_data
+        }
+
+
+api.add_resource(SpamHamDetection, '/api/spam-ham-email-detection')
+
+
+@app.route('/spam-email', methods=['POST', 'GET'])
+def spam_email():
+    navbar_brand = "Email <span>Detection</span>"
+    template_args = {
+        'navbar_brand': navbar_brand,
+    }
+    return render_template('spam-email-detection.html', **template_args)
 
 if __name__ == '__main__':
     app.run(debug=True)
