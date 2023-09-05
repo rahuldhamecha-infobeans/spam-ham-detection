@@ -13,6 +13,10 @@ from nltk.corpus import stopwords
 import nltk
 import pygal
 import numpy
+import spacy
+import requests
+# Load the spaCy English model
+nlp = spacy.load("en_core_web_sm")
 
 nltk.download('punkt')
 from nltk.stem.porter import PorterStemmer
@@ -25,7 +29,6 @@ from spotify import *
 from sklearn.preprocessing import LabelBinarizer, MinMaxScaler
 import joblib
 import os
-
 ps = PorterStemmer()
 pp_model = load_model('popularity_predict.h5')
 
@@ -34,6 +37,9 @@ app = Flask(__name__)
 classification_model = load_model('image_classification.h5')
 multiclass_classification_model = load_model('multi_image_classification.h5')
 from spotify import *
+
+API_URL = "https://api-inference.huggingface.co/models/atharvamundada99/bert-large-question-answering-finetuned-legal"
+headers = {"Authorization": "Bearer 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"}
 
 headings = ("Name", "Album", "Artist")
 df1 = music_rec()
@@ -343,37 +349,95 @@ api = Api(app)
 
 class SpamHamDetection(Resource):
     def get(self):
-        return {
+        response_data = {
             'percentage': 'GET',
-            'suggections': [
+            'suggestions': [
                 'Test 1', 'Test 2', 'Test 3', 'Test 4'
             ]
         }
+        return jsonify(response_data)
 
     def post(self):
-        chart_data = [{"name": "Spam", "percent": "85", 'color': '#ff0000'},
-                    {"name": "Not Spam", "percent": "15", 'color': 'green'}]
+        try:
+        # Get the JSON data from the POST request
+            data = request.get_json()
 
-        return {
-            'percentage': 'POST',
-            'suggestion_list': [
-                'Test 1', 'Test 2', 'Test 3', 'Test 4'
-            ],
-            'result': 'Not Spam',
-            'chart_data' : chart_data
-        }
+            # Check if the 'email_content' field exists in the JSON data
+            if 'emailto_content' in data:
+                email_content = data['emailto_content']
+                email_reply = data['email_reply']
+                detected_questions = preprocess_email_content(email_content)
+                # Return the detected questions as JSON response
+                total_qsn=len(detected_questions)
+                unanswered_qsn=[]
+                answered_qsn=[]
+                is_ans=0
+                if detected_questions:
+                    for question in detected_questions:
+                        output = query({
+                            "inputs": {
+                                "question": question,
+                                "context": email_reply
+                            },
+                        })
+                        if output:
+                            if output['score'] > 0.2:
+                                is_ans = is_ans+1
+                                answered_qsn.append(str(question)) 
+                            else:    
+                                unanswered_qsn.append(str(question)) 
+                                
+                correct_reply_accuracy=(is_ans/total_qsn)*100
+                return jsonify({"detected_questions": detected_questions,"unanswered_qsn":unanswered_qsn, "answered_qsn":answered_qsn,"accuracy":correct_reply_accuracy})
+
+            else:
+                return jsonify({"error": "Missing 'email_content' field in the request data"}), 400
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
 
 api.add_resource(SpamHamDetection, '/api/spam-ham-email-detection')
 
 
-@app.route('/spam-email', methods=['POST', 'GET'])
-def spam_email():
-    navbar_brand = "Email <span>Detection</span>"
+def preprocess_email_content(email_content):
+    # Define common greetings and closing phrases to remove
+    common_phrases = ["hi", "hello", "hey", "best regards", "regards", "thank you", "thanks", "yours sincerely", "dear"]
+
+    # Convert email content to lowercase for case-insensitive matching
+    email_lower = email_content.lower()
+
+    # Remove common phrases
+    for phrase in common_phrases:
+        email_lower = email_lower.replace(phrase, "")
+
+    # Process the email content using spaCy
+    doc = nlp(email_lower)
+
+    # Initialize a list to store detected questions
+    questions = []
+
+    # Identify sentences with question patterns and convert them to strings
+    for sentence in doc.sents:
+        if "?" in sentence.text or any(token.lower_ in ("who", "what", "when", "where", "why", "how", "can", "is", "are", "do", "did", "could") for token in sentence):
+            questions.append(str(sentence.text))  # Convert to string
+
+    return questions
+
+def query(payload):
+	response = requests.post(API_URL, headers=headers, json=payload)
+	return response.json()
+
+@app.route('/email-validator', methods=['POST', 'GET'])
+def email_validator():
+    navbar_brand = "Email <span> Validator</span>"
     template_args = {
         'navbar_brand': navbar_brand,
     }
-    return render_template('spam-email-detection.html', **template_args)
+    return render_template('email-qna-validator.html', **template_args)
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
