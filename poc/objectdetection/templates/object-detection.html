@@ -24,12 +24,6 @@ Live Object Detection
     function eraseText() {
         document.getElementById("msgarea").value = "";
         document.getElementById("msgarea2").value = "";
-    }
-    setInterval(function() {
-        $.getJSON('/object-detection/t', function(data) {
-            console.log(data,"DATA");
-          });
-        return false;
-    }, 300);
+    }    
 </script>
 {% endblock %}

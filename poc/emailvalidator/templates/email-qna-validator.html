@@ -1,0 +1,292 @@
+{% extends 'layouts/base.html' %} {% block page_title %} Spam Ham Detection {%
+endblock %} {% block body_block %}
+<section class="contact-form-wrap section">
+  <!--     <div class="pie_chart_area">
+        <canvas id="pieChart"></canvas>
+    </div> -->
+  <div class="container-fluid">
+    <div class="row p-5">
+      <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
+        <h2 class="mb-4 heading-align">InfoBeans : Email QnA Validator</h2>
+        <h2>Emails!</h2>
+      </div>
+      <div class="col-lg-6">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <!--  {% include 'inc/error_mess.html' %} -->
+          <form
+            id="contact-form"
+            class="contact__form"
+            method="post"
+            action="{{ url_for('spamham.investor') }}"
+          >
+            <!-- form message -->
+
+            <!-- end message -->
+            <h5 class="">Email</h5>
+            <div class="form-group-2 mb-4">
+              <textarea
+                id="msgarea"
+                name="message"
+                class="form-control"
+                rows="10"
+                placeholder="Type Anything..."
+              >
+{% if message %}{{message}}{% endif %} </textarea
+              >
+            </div>
+          </form>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <!-- form message -->
+          <!-- end message -->
+          <h5 class="">Reply</h5>
+          <div class="form-group-2 mb-4">
+            <textarea
+              id="msgarea2"
+              name="message_output"
+              class="form-control"
+              rows="10"
+              placeholder=""
+            >
+{% if result %}{{result}}{% endif %}</textarea
+            >
+          </div>
+          <div class="loading-area">
+            <button
+              class="blue buttn"
+              id="submit_query"
+              name="submit"
+              type="button"
+              onclick="submit_form()"
+            >
+              Submit
+            </button>
+            <button class="blue buttn" type="button" onClick="eraseText();">
+              Clear<i class="ti-reload"></i>
+            </button>
+            <div id="loading-icon">
+              <span class="loader"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="col-lg-6 col-xl-6 col-md-12 col-sm-12 p-4 d-none"
+        id="block-feed"
+      >
+        <div class="row">
+          <div class="col-lg-12 accuracy-flex">
+            <h3>Asked Questions</h3>
+            <h3 id="ans-accuracy"></h3>
+          </div>
+        </div>
+
+        <div class="row suggestion_list"></div>
+
+        <div class="row" id="unans-qsn">
+          <div class="col-lg-12 accuracy-flex">
+            <h3>Unanswered Questions</h3>
+          </div>
+        </div>
+        <div class="row unans_list"></div>
+
+        <div class="row" id="ans-qsn">
+          <div class="col-lg-12 accuracy-flex">
+            <h3>Answered Questions</h3>
+          </div>
+        </div>
+        <div class="row ans_list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block body_scripts %}
+<!--
+#########################################################
+##########          Essential Scripts          ##########
+#########################################################
+-->
+<script>
+  function eraseText() {
+    document.getElementById("msgarea").value = "";
+    document.getElementById("msgarea2").value = "";
+  }
+
+  function submit_form() {
+    // let input_email_text = $('#msgarea').text();
+    // let input_reply_text = $('#msgarea2');
+    // Create an object to hold the data you want to send to the API
+    let input_email_text = $("#msgarea").val();
+    let input_reply_text = $("#msgarea2").val();
+    let requestData = {
+      emailto_content: input_email_text, // Assuming input1 contains the email content
+      email_reply: input_reply_text, // Assuming input2 contains additional data
+    };
+    $.ajax({
+      url: "/email-validator/api/spam-ham-email-detection",
+      type: "POST",
+      data: JSON.stringify(requestData), // Send the data as JSON
+      contentType: "application/json", // Set the content type to JSON
+      beforeSend: function (request) {
+        $("#loading-icon").toggleClass("active");
+      },
+      success: function (response) {
+        $("#block-feed").removeClass("d-none");
+        $("#loading-icon").toggleClass("active");
+        if (response.detected_questions.length > 0) {
+          let html = "";
+          $.each(response.detected_questions, function (key, item) {
+            html +=
+              '<div class="col-lg-12 mt-4">' +
+              '<div class="card p-4 rounded">' +
+              item +
+              "</div>" +
+              "</div>";
+          });
+          $(".suggestion_list").html(html);
+          $("#ans-accuracy")
+            .html("Overall Accuracy: " + response.accuracy + "%")
+            .css("color", "green");
+        }
+        if (response.unanswered_qsn.length > 0) {
+          let html1 = "";
+          console.log(response.unanswered_qsn);
+          $.each(response.unanswered_qsn, function (key1, item1) {
+            html1 +=
+              '<div class="col-lg-12 mt-4">' +
+              '<div class="card p-4 rounded">' +
+              item1 +
+              "</div>" +
+              "</div>";
+          });
+          $(".unans_list").html(html1);
+        } else {
+          // $('#unans-qsn').html().css('display:none')
+          $("#unans-qsn").addClass("d-none");
+        }
+        if (response.answered_qsn.length > 0) {
+          let html2 = "";
+          console.log(response.answered_qsn);
+          $.each(response.answered_qsn, function (key2, item2) {
+            html2 +=
+              '<div class="col-lg-12 mt-4">' +
+              '<div class="card p-4 rounded">' +
+              item2 +
+              "</div>" +
+              "</div>";
+          });
+          $(".ans_list").html(html2);
+        } else {
+          // $('#unans-qsn').html().css('display:none')
+          $("#ans-qsn").addClass("d-none");
+        }
+      },
+    });
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+<script>
+  function OnSuccess_(response) {
+    var pieChartCanvas = $("#pieChart").get(0).getContext("2d");
+    var pieChart = new Chart(pieChartCanvas);
+    var PieData = [];
+
+    // create PieData dynamically
+    response.forEach(function (e) {
+      var random_color =
+        "#" + Math.floor(Math.random() * 16777215).toString(16);
+      PieData.push({
+        value: e.percent,
+        color: e.color,
+        highlight: e.color,
+        label: e.name,
+      });
+    });
+
+    var pieOptions = {
+      //Boolean - Whether we should show a stroke on each segment
+      segmentShowStroke: true,
+      //String - The colour of each segment stroke
+      segmentStrokeColor: "#fff",
+      //Number - The width of each segment stroke
+      segmentStrokeWidth: 2,
+      //Number - The percentage of the chart that we cut out of the middle
+      percentageInnerCutout: 0, // This is 0 for Pie charts
+      //Number - Amount of animation steps
+      animationSteps: 100,
+      //String - Animation easing effect
+      animationEasing: "easeOutBounce",
+      //Boolean - Whether we animate the rotation of the Doughnut
+      animateRotate: true,
+      //Boolean - Whether we animate scaling the Doughnut from the centre
+      animateScale: false,
+      //Boolean - whether to make the chart responsive to window resizing
+      responsive: true,
+      // Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+      maintainAspectRatio: true,
+      //String - A legend template
+      legendTemplate: "test",
+    };
+
+    //Create pie or douhnut chart
+    // You can switch between pie and douhnut using the method below.
+    pieChart.Doughnut(PieData, pieOptions);
+  }
+</script>
+{% endblock %} {% block head_styles %}
+<style>
+  .loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #fff;
+    border-bottom-color: #ff3d00;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+
+  .loading-area {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+
+  .loading-area #loading-icon {
+    display: none;
+  }
+
+  .loading-area #loading-icon.active {
+    display: flex;
+  }
+
+  @keyframes rotation {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .row.suggestion_list .card {
+    border-radius: 10px !important;
+    -webkit-box-shadow: 2px 7px 9px -3px rgba(0, 0, 0, 0.39);
+    -moz-box-shadow: 2px 7px 9px -3px rgba(0, 0, 0, 0.39);
+    box-shadow: 2px 7px 9px -3px rgba(0, 0, 0, 0.39);
+  }
+
+  .pie_chart_area {
+    position: absolute;
+    top: 85px;
+    right: -7px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 500px;
+    max-height: 300px;
+  }
+</style>
+{% endblock %}
