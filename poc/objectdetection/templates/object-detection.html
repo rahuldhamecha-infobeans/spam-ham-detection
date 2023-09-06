@@ -12,7 +12,7 @@ Live Object Detection
                 <h2 class="mb-4 heading-align">InfoBeans : Live Object Detection</h2>
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
-                <img class="outer-shadow" id="bg" class="center img-fluid" src="{{ url_for('video_feed_for_object') }}" />
+                <img class="outer-shadow" id="bg" class="center img-fluid" src="{{ url_for('objectdetection.video_feed_for_object') }}" />
             </div>
         </div>
     </div>
@@ -26,7 +26,7 @@ Live Object Detection
         document.getElementById("msgarea2").value = "";
     }
     setInterval(function() {
-        $.getJSON('/t', function(data) {
+        $.getJSON('/object-detection/t', function(data) {
             console.log(data,"DATA");
           });
         return false;
