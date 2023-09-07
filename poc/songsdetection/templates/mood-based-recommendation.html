@@ -1,0 +1,105 @@
+{% extends 'layouts/base.html' %} {% block page_title %} Mood Based Songs
+Recommendations {% endblock %} {% block body_block %}
+<section class="contact-form-wrap section">
+  <div class="container-fluid">
+    <div class="row p-5">
+      <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
+        <h2 class="mb-4 heading-align">InfoBeans : Mood Based Song</h2>
+        <h2>Recommendations</h2>
+      </div>
+
+      <div class="col-lg-5 col-md-12 col-sm-12">
+        <!--  {% include 'inc/error_mess.html' %} -->
+        <form
+          id="contact-form"
+          class="contact__form"
+          method="post"
+          action="/songs/mood-based-recommendation"
+        >
+          <!-- form message -->
+
+          <!-- end message -->
+          <h5 class="">Write Your Text Here</h5>
+          <div class="form-group-2 mb-4">
+            <textarea
+              id="msgarea"
+              name="song"
+              class="form-control"
+              rows="10"
+              placeholder="Type Anything..."
+            >
+{% if songname %}{{ songname }} {% endif %}</textarea
+            >
+          </div>
+          <button
+            class="blue buttn"
+            id="submit_query"
+            name="submit"
+            type="submit"
+          >
+            Submit
+          </button>
+          <button class="blue buttn" type="button" onClick="eraseText();">
+            Clear<i class="ti-reload"></i>
+          </button>
+          <div id="loading-icon" style="display: none">
+            <!-- Replace with your loading icon HTML or image -->
+            Loading...
+          </div>
+        </form>
+      </div>
+      <div class="col-lg-7 col-md-12 col-sm-12">
+        <!-- form message -->
+        <!-- end message -->
+        <h5 class="">Answer</h5>
+        <div class="form-group-2 mb-4">
+          <textarea
+            id="msgarea2"
+            name="message_output"
+            class="form-control"
+            rows="10"
+            placeholder=""
+            disabled
+          >
+{{common_mood}}</textarea
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block body_scripts %}
+<!--
+#########################################################
+##########          Essential Scripts          ##########
+#########################################################
+-->
+<script>
+  function eraseText() {
+    document.getElementById("msgarea").value = "";
+    document.getElementById("msgarea2").value = "";
+  }
+</script>
+<script>
+  // Get the textarea element
+  var textarea = document.getElementById('msgarea2');
+
+  // Define the content you want to populate the textarea with
+  var content = "";
+
+  {% if songname %}
+  content += "Mood of  your song {{songname}}: {{common_mood}}\n";
+  {% endif %}
+
+  {% if similar_songs|length > 0 %}
+  content += "Similar songs:\n";
+  {% for index, song in similar_songs.iterrows() %}
+  content += "{{ song['name'] }}\n";
+  {% endfor %}
+  {% endif %}
+  content+="{{ message }}"
+  // Set the content of the textarea
+  textarea.value = content;
+</script>
+
+{% endblock %}

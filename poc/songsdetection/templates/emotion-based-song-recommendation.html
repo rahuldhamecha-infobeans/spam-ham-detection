@@ -14,7 +14,7 @@ Mood Based Songs Recommendations
             </div>
             <div class="col-lg-5 col-md-12 col-sm-12">
                 <h5 class="">Emotion Detector</h5>
-                <img class="outer-shadow" id="bg" class="center img-fluid" src="{{ url_for('video_feed') }}" />
+                <img class="outer-shadow" id="bg" class="center img-fluid" src="{{ url_for('songsdetection.video_feed') }}" />
             </div>
             <div class="col-lg-7 col-md-12 col-sm-12">
                 <h5 class="">Recommend Songs</h5>
@@ -45,7 +45,7 @@ Mood Based Songs Recommendations
 
 // Constantly Update Table
     setInterval(function() {
-        $.getJSON('/t', function(data) {
+        $.getJSON('/songs/t', function(data) {
             CreateHtmlTable(data);
             console.log(data,"DATA");
           });
