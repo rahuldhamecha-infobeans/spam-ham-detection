@@ -1,0 +1,67 @@
+{% extends 'layouts/admin/auth/base.html' %}
+
+{% block page_title %} Register {% endblock %}
+
+{% block body_block %}
+    <div class="container-xxl">
+      <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+        {% for field, errors in form.errors.items() %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                {{ form[field].label }}: {{ ', '.join(errors) }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+          <!-- Register Card -->
+          <div class="card">
+            <div class="card-body">
+              <!-- Logo -->
+              <div class="app-brand justify-content-center">
+                <a href="{{ url_for('front.index') }}" class="app-brand-link gap-2">
+                  <span class="app-brand-logo demo">
+                    <img src="{{ url_for('static',filename='public/images/company_logo.jpg') }}" alt="Company Logo">
+                  </span>
+                </a>
+              </div>
+
+              <form id="formAuthentication" class="mb-3" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                  <label for="username" class="form-label">Username</label>
+                  {{ form.username(class="form-control",placeholder="Enter your username",id="username",autofocus=True) }}
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                    {{ form.email(class="form-control",id="email",placeholder="Enter your email") }}
+                </div>
+                <div class="mb-3 form-password-toggle">
+                  <label class="form-label" for="password">Password</label>
+                  <div class="input-group input-group-merge">
+                    {{ form.password(id="password",class="form-control",placeholder="xxxxxxxxxxxxxxxxx") }}
+                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                  </div>
+                </div>
+
+                  <div class="mb-3 form-password-toggle">
+                  <label class="form-label" for="password">Confirm Password</label>
+                  <div class="input-group input-group-merge">
+                    {{ form.pass_confirm(id="password_confirm",class="form-control",placeholder="xxxxxxxxxxxxxxxxx") }}
+                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                  </div>
+                </div>
+                {{ form.submit(class="btn btn-primary d-grid w-100") }}
+              </form>
+
+              <p class="text-center">
+                <span>Already have an account?</span>
+                <a href="{{ url_for('auth.admin_login') }}">
+                  <span>Sign in instead</span>
+                </a>
+              </p>
+            </div>
+          </div>
+          <!-- Register Card -->
+        </div>
+      </div>
+    </div>
+{% endblock %}

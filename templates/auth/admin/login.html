@@ -1,0 +1,106 @@
+{% extends 'layouts/admin/auth/base.html' %}
+
+{% block page_title %} Login {% endblock %}
+
+{% block body_block %}
+    <div class="container-xxl">
+      <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+            {% for field, errors in form.errors.items() %}
+                <div class="alert alert-error">
+                    {{ form[field].label }}: {{ ', '.join(errors) }}
+                </div>
+            {% endfor %}
+          <!-- Register -->
+          <div class="card">
+            <div class="card-body">
+              <!-- Logo -->
+              <div class="app-brand justify-content-center">
+                <a href="{{ url_for('front.index') }}" class="app-brand-link gap-2">
+                  <span class="app-brand-logo demo">
+                    <img src="{{ url_for('static',filename='public/images/company_logo.jpg') }}" alt="Company Logo">
+                  </span>
+                </a>
+              </div>
+
+              <form id="formAuthentication" class="mb-3" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email or Username</label>
+                    {{ form.email(class="form-control",id="email",placeholder="Enter your email or username") }}
+                </div>
+                <div class="mb-3 form-password-toggle">
+                  <div class="d-flex justify-content-between">
+                    <label class="form-label" for="password">Password</label>
+                  </div>
+                  <div class="input-group input-group-merge">
+                    {{ form.password(id="password",class="form-control",placeholder="xxxxxxxxxxx") }}
+                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                  </div>
+                </div>
+                <div class="mb-3 d-flex justify-content-between">
+                    {{ form.submit(class="btn btn-primary d-grid") }}
+                    <div class="google-btn">
+                    <a href="{{ url_for('google_login') }}">
+                        <div class="google-icon-wrapper">
+                            <img class="google-icon" src="{{ url_for('static',filename="public/images/google_logo.svg") }}"/>
+                        </div>
+                        <p class="btn-text"><b>Sign in with google</b></p>
+                    </a>
+                </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- /Register -->
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block head_styles %}
+    <style>
+    .google-btn {
+      width: 184px;
+      height: 42px;
+      background-color: #4285f4;
+      border-radius: 2px;
+      box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.25);
+    }
+    .google-btn .google-icon-wrapper {
+      position: absolute;
+      margin-top: 1px;
+      margin-left: 1px;
+      width: 40px;
+      height: 40px;
+      border-radius: 2px;
+      background-color: #fff;
+    }
+    .google-btn .google-icon {
+      position: absolute;
+      margin-top: 11px;
+      margin-left: 11px;
+      width: 18px;
+      height: 18px;
+    }
+    .google-btn .btn-text {
+      float: right;
+      margin: 11px 11px 0 0;
+      color: #fff;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+      font-family: "Roboto";
+    }
+    .google-btn:hover {
+      box-shadow: 0 0 6px #4285f4;
+    }
+    .google-btn:active {
+      background: #1669F2;
+    }
+    .authentication-wrapper.authentication-basic .authentication-inner:before,
+    .authentication-wrapper.authentication-basic .authentication-inner:after{
+        width: 0 !important;
+        height: 0 !important;
+    }
+    </style>
+{% endblock %}

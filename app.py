@@ -1,14 +1,11 @@
-from flask import Flask, render_template
+from ib_tool import app
+from flask import render_template
 from application_list import application_list
 from poc.songsdetection.views import songs_blueprint
 from poc.spamham.views import spamham_blueprint
 from poc.objectdetection.views import object_detection_blueprint
 from poc.imageclassification.views import image_classification_blueprint
 from poc.emailvalidator.views import email_validator_blueprint
-
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "mysecret"
-
 
 @app.route('/')
 def home_page():

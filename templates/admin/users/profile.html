@@ -1,0 +1,80 @@
+{% extends 'layouts/admin/dashboard/base.html' %}
+
+{% block page_title %}
+    Profile
+{% endblock %}
+
+{% block page_body_title %} Profile {% endblock %}
+
+{% block body_block %}
+  <!-- Basic Layout -->
+  <div class="row">
+    <div class="col-xl">
+      <div class="card mb-12">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Update Profile</h5>
+        </div>
+        <div class="card-body">
+        {% for field, errors in form.errors.items() %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                {{ form[field].label }}: {{ ', '.join(errors) }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+          <form method="post">
+              {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="col-xl-4">
+                    <div class="mb-3">
+                      <label class="form-label" for="basic-default-fullname">{{ form.full_name.label }}</label>
+                     {{ form.full_name(class="form-control",id="basic-default-fullname",placeholder="Enter your full name") }}
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="mb-3">
+                      <label class="form-label" for="basic-default-fullname">{{ form.username.label }}</label>
+                     {{ form.username(class="form-control",id="basic-default-fullname",placeholder="Enter your user name") }}
+                    </div>
+                </div>
+
+                <div class="col-xl-4">
+                    <div class="mb-3 form-password-toggle">
+                      <label class="form-label" for="password">{{ form.password.toggle }}</label>
+                      <div class="input-group input-group-merge">
+                        {{ form.password(id="password",class="form-control",placeholder="xxxxxxxxxxxxxxxxx") }}
+                        <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                      </div>
+                    </div>
+                </div>
+            </div>
+              <div class="row">
+                  <div class="col-xl-4">
+                    <div class="mb-3">
+                      <label class="form-label" for="basic-default-fullname">{{ form.email.label }}</label>
+                     {{ form.email(class="form-control",id="basic-default-fullname",placeholder="Enter your email name") }}
+                    </div>
+                 </div>
+                 <div class="col-xl-4">
+                    <div class="mb-3">
+                      <label class="form-label" for="basic-default-fullname">{{ form.roles.label }}</label>
+                        <input type="hidden" name="roles" value="{{ user.role_id }}" />
+                        <input type="text" class="form-control" value="{{ user.role_name() }}" readonly>
+                    </div>
+                </div>
+              </div>
+            {{ form.submit(class="btn btn-primary") }}
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block head_styles %}
+    <style>
+        .pointer-event-none{
+            pointer-events: none;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,77 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+  <div class="app-brand demo" style="display: flex;justify-content: center;align-items: center;">
+    <a href="{{ url_for('dashboard.index') }}" class="app-brand-link">
+      <span class="app-brand-logo demo">
+        <img style="max-width: 150px;" src="{{ url_for('static',filename="public/images/company_logo.jpg") }}" alt="">
+      </span>
+    </a>
+
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+      <i class="bx bx-chevron-left bx-sm align-middle"></i>
+    </a>
+  </div>
+
+  <div class="menu-inner-shadow"></div>
+
+  <ul class="menu-inner py-1">
+    <!-- Dashboard -->
+    {% if user_has_permission('Dashboard') %}
+    <li class="menu-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+      <a href="{{ url_for('dashboard.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-home-circle"></i>
+        <div data-i18n="Analytics">Dashboard</div>
+      </a>
+    </li>
+    {% endif %}
+
+
+    <!-- Layouts -->
+  {% if user_has_permission('Users') or user_has_permission('Roles') or user_has_permission('Permissions') %}
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Users</span>
+    </li>
+  {% endif %}
+    {% if user_has_permission('Users') %}
+    <li class="menu-item {% if request.endpoint in ['users.index','users.create','users.update','users.delete']  %}active{% endif %}">
+      <a href="{{ url_for('users.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-user-circle"></i>
+        <div data-i18n="Basic">Users</div>
+      </a>
+    </li>
+    {% endif %}
+
+    {% if user_has_permission('Roles') %}
+      <li class="menu-item {% if request.endpoint in ['roles.index','roles.create','roles.update','roles.delete','roles.permissions'] %}active{% endif %}">
+      <a href="{{ url_for('roles.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-lock-alt"></i>
+        <div data-i18n="Basic">Roles</div>
+      </a>
+    </li>
+  {% endif %}
+
+  {% if user_has_permission('Permissions') %}
+    <li class="menu-item {% if request.endpoint in ['permissions.index','permissions.create','permissions.update','permissions.delete'] %}active{% endif %}">
+      <a href="{{ url_for('permissions.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-lock-alt"></i>
+        <div data-i18n="Basic">Permissions</div>
+      </a>
+    </li>
+  {% endif %}
+   <!-- Layouts -->
+  {% if user_has_permission('Interview Analyzer') %}
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">AI Tools</span>
+    </li>
+  {% endif %}
+  {% if user_has_permission('Interview Analyzer') %}
+    <li class="menu-item {% if request.endpoint in ['interview_analyzer.index','interview_analyzer.create','interview_analyzer.update','interview_analyzer.delete'] %}active{% endif %}">
+      <a href="{{ url_for('interview_analyzer.index') }}" class="menu-link">
+        <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18 7c0-1.103-.897-2-2-2H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-3.333L22 17V7l-4 3.333V7zm-1.998 10H4V7h12l.001 4.999L16 12l.001.001l.001 4.999z"/></svg>
+        </span>
+        <div data-i18n="Basic">Interview Analyzer</div>
+      </a>
+    </li>
+  {% endif %}
+  </ul>
+</aside>

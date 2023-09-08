@@ -52,7 +52,6 @@ six==1.16.0
 SQLAlchemy==2.0.20
 tensorrt==8.6.1
 tensorrt-bindings==8.6.1
-tensorrt-libs==8.6.1
 threadpoolctl==3.2.0
 tqdm==4.66.1
 typing_extensions==4.7.1

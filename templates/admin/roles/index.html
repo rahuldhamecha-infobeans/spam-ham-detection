@@ -1,0 +1,58 @@
+{% extends 'layouts/admin/dashboard/base.html' %}
+
+{% block page_title %} Roles {% endblock %}
+
+{% block page_body_title %} Roles {% endblock %}
+
+{% block body_block %}
+  <!-- Basic Layout -->
+  <div class="row">
+    <div class="col-xl">
+      <div class="card mb-12">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Roles Listing</h5>
+          <small class="text-muted float-end">
+              {% if user_has_permission('Roles Create') %}
+              <a href="{{ url_for('roles.create') }}" class="btn btn-outline-primary">Create Role</a>
+              {% endif %}
+          </small>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive text-nowrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Role Name</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                    {% for role in roles %}
+                    	<tr>
+                        <td>{{ role.id }}</td>
+                        <td>{{ role.name }}</td>
+                        <td>
+                         {% if user_has_permission('Roles Update') %}
+                            <a href="{{ url_for('roles.update',id=role.id) }}" class="btn btn-outline-primary"><i class="bx bx-edit-alt me-1"></i></a>
+                         {% endif %}
+
+                         {% if user_has_permission('Roles Delete') %}
+                             <a href="{{ url_for('roles.delete',id=role.id) }}" class="btn btn-outline-danger"><i class="bx bx-trash me-1"></i></a>
+                         {% endif %}
+
+                         {% if user_has_role('SuperAdmin') and user_has_permission('Can Permission Assigned') %}
+                            <a href="{{ url_for('roles.permissions',id=role.id) }}" class="btn btn-outline-warning"><i class="bx bx-lock-alt me-1"></i></a>
+                         {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

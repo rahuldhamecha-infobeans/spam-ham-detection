@@ -1,0 +1,58 @@
+{% extends 'layouts/admin/dashboard/base.html' %}
+
+{% block page_title %} Permissions {% endblock %}
+
+{% block page_body_title %} Permissions {% endblock %}
+
+{% block body_block %}
+  <!-- Basic Layout -->
+  <div class="row">
+    <div class="col-xl">
+      <div class="card mb-12">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Permissions Listing</h5>
+          <small class="text-muted float-end">
+              <a href="{{ url_for('permissions.create') }}" class="btn btn-outline-primary">Create Permission</a>
+          </small>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive text-nowrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Id</th>
+                        <th>Permission Name</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                    {% if permissions %}
+                        {% for permission in permissions %}
+                            <tr>
+                            <td>{{ permission.id }}</td>
+                            <td>{{ permission.name }}</td>
+                            <td>
+                               {% if user_has_permission('Permissions Create') %}
+                                   <a href="{{ url_for('permissions.update',id=permission.id) }}" class="btn btn-outline-primary"><i class="bx bx-edit-alt me-1"></i></a>
+                                {% endif %}
+                                {% if user_has_permission('Permissions Delete') %}
+                                    <a href="{{ url_for('permissions.delete',id=permission.id) }}" class="btn btn-outline-danger"><i class="bx bx-trash me-1"></i></a>
+                                {% endif %}
+                            </td>
+                          </tr>
+                        {% endfor %}
+                    {% else: %}
+                        <tr>
+                            <td class="text-warning text-center" colspan="3">
+                                No Permissions Found
+                            </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
