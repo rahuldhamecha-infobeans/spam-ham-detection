@@ -6,10 +6,13 @@ from poc.spamham.views import spamham_blueprint
 from poc.objectdetection.views import object_detection_blueprint
 from poc.imageclassification.views import image_classification_blueprint
 from poc.emailvalidator.views import email_validator_blueprint
+from flask_login import login_required
 
 @app.route('/')
+@login_required
 def home_page():
     return render_template('home.html', application_list=application_list)
+
 
 
 app.register_blueprint(spamham_blueprint,

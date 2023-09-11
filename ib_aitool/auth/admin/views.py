@@ -2,7 +2,7 @@ from flask import Blueprint, render_template,redirect,request,url_for,flash,abor
 from ib_aitool import app
 from ib_aitool.auth.admin.forms import LoginForm,RegistrationForm
 from ib_aitool.database.models.User import User
-from flask_login import login_user,logout_user,login_required,current_user
+from flask_login import login_user,logout_user,login_required
 from flask_dance.contrib.google import google
 from ib_aitool.database import db
 from ib_aitool.database.models.Role import Role
@@ -30,6 +30,29 @@ def admin_login():
             flash('Email Or Password Not Matched.')
 
     return render_template('auth/admin/login.html',form=form)
+
+
+@auth_admin_blueprint.route('/agent-login',methods=['GET','POST'])
+def agent_login():
+    form = LoginForm()
+    # if current_user.is_authenticated:
+    #     logout_user()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if user is not None and user.verify_password(form.password.data):
+            login_user(user)
+            flash('Logged in Successfully!')
+            next = request.args.get('next')
+
+            if next == None or not next[0] == '/':
+                next = url_for('dashboard.index')
+
+            return redirect(next)
+        else:
+            flash('Email Or Password Not Matched.')
+
+    return render_template('auth/admin/agent_login.html',form=form)
 
 @auth_admin_blueprint.route('/register',methods=['GET','POST'])
 @login_required
@@ -80,7 +103,7 @@ def google_login_verify():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
-    return redirect(url_for('dashboard.index'))
+    return redirect(url_for('home_page'))
 
 
 app.register_blueprint(auth_admin_blueprint,url_prefix="/admin/auth")

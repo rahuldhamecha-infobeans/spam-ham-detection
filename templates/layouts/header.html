@@ -11,9 +11,9 @@
                {% if title_brand %} {{title_brand| safe}}{% else %} {{ navbar_brand|safe }} {% endif %}
           </a>
 
-          {% if not current_user.is_authenticated %}
-              <a class="navbar-brand" href="{{  url_for('auth.admin_login') }}">
-                <span>Login</span>
+          {% if current_user.is_authenticated %}
+              <a class="navbar-brand" href="{{  url_for('auth.admin_logout') }}">
+                <span>Logout</span>
               </a>
           {% endif %}
 
