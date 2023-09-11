@@ -9,9 +9,51 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-body">
-                    <h1>Test</h1>
+                    <form id="upload-form" class="dropzone" enctype="multipart/form-data">
+                        <div>
+                            <!-- this is were the previews should be shown. -->
+                        <div class="previews"></div>
+                        <div class="dz-default dz-message"><button class="dz-button" type="button">Drop files here to upload</button></div>
+                        <input type="text" name="candidate_name" class="form-control" placeholder="Enter Candidate Name" />
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static',filename='admin/assets/js/dropzone.min.js') }}"></script>
+    <script>
+            $('#upload-form').dropzone({
+                addRemoveLinks: true,
+                acceptedFiles: 'video/*',
+                complete: function(file) {
+                    return false
+                },
+                'url': '{{ url_for('interview_analyzer.interview_video_upload') }}',
+            })
+    </script>
+{% endblock %}
+
+{% block head_styles %}
+    <link rel="stylesheet" href="{{ url_for('static',filename='admin/assets/css/dropzone.css') }}" type="text/css" />
+    <style>
+    .dropzone {
+        min-height: 250px;
+        border: 3px dashed #00dcff;
+        border-radius: 5px;
+        padding: 20px 20px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dropzone .dz-message .dz-button {
+        color: #00dcff;
+        font-size: 20px;
+    }
+    </style>
 {% endblock %}
