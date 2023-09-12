@@ -1,0 +1,36 @@
+<table class="table table-responsive table-bordered" id="candidate_list">
+    <thead>
+        <th>Name</th>
+        <th>Added By</th>
+        <th>Report Generated</th>
+        <th>Action</th>
+    </thead>
+    <tbody>
+        {% if candidates %}
+            {% for candidate in candidates %}
+                <tr>
+                    <td>{{ candidate.name or 'N/A' }}</td>
+                    <td>{{ candidate.user_data().full_name or 'N/A' }}</td>
+                    <td>
+                        {% if candidate.is_report_generated %}
+                            <span class="badge bg-success">Generated</span>
+                        {% else %}
+                            <span class="badge bg-danger">Not Generated</span>
+                        {% endif %}
+                    </td>
+                <td>
+                    <a href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}" class="btn btn-info">Generate Report</a>
+                    {% if candidate.is_report_generated %}
+                        <a href="{{ candidate.report_url }}" class="btn btn-success">PDF Report</a>
+                    {% endif %}
+                    <a href="#" class="btn btn-danger">Delete</a>
+                </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">No Candidates Found.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>

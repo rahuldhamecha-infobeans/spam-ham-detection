@@ -22,7 +22,22 @@
                     </form>
                 </div>
             </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h4>Candidate List</h4>
+                    <div class="m-4">
+                        <div class="table_div">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div class="test" id="test_rock">
+
     </div>
 {% endblock %}
 
@@ -48,26 +63,46 @@
                       accept: function(file, done) {
                         let candidate_name = $('#candidate_name').val();
                         if (candidate_name == '' || candidate_name == undefined || candidate_name == null) {
-                          done("Please Enter Candidate Name.");
-                          myDropzone.removeFile(file)
-                            toastr['error']('Please Enter Candidate Name.')
                             alert('Please Enter Candidate Name.')
-                        }
-                        else {
+                            done();
+                        } else {
                             done();
                         }
                       },
-                      success:function(file){
+                      success:function(file,response){
                          myDropzone.removeFile(file)
                           $('#candidate_name').val('');
+                         reload_candidate_list();
                       },
                       addRemoveLinks: true,
                       acceptedFiles: 'video/*',
                   }
               );
 
+              function reload_candidate_list(){
+                  $.ajax({
+                      url: '{{ url_for('interview_analyzer.fetch_candidate_list') }}',
+                      type: 'GET',
+                      dataType:'html',
+                      success:function (response){
+                            $('.table_div').html(response);
+                      }
+                  })
+              }
+
+              reload_candidate_list()
+
+            setInterval(function (){
+                reload_candidate_list()
+            },4000)
+
               function upload_video(){
-                myDropzone.processQueue()
+                  let candidate_name = $('#candidate_name').val();
+                    if (candidate_name != '' && candidate_name != undefined && candidate_name != null) {
+                        myDropzone.processQueue()
+                    }else{
+                        alert('Please Enter Candidate Name.')
+                    }
               }
             </script>
 {% endblock %}

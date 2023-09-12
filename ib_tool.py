@@ -1,4 +1,6 @@
 from flask import Flask, render_template,send_from_directory
+from flask_mail import Mail,Message
+from app_config import mail_config
 import os
 
 BASE_DIR = os.path.dirname(__file__)
@@ -12,6 +14,22 @@ def create_ecommerce_app():
 app = create_ecommerce_app()
 app.config['SECRET_KEY'] = 'infobeans_app_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+email_config = mail_config()
+
+# configuration of mail
+app.config['MAIL_SERVER'] = email_config['MAIL_SERVER']
+app.config['MAIL_PORT'] = email_config['MAIL_PORT']
+app.config['MAIL_USERNAME'] = email_config['MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = email_config['MAIL_PASSWORD']
+app.config['MAIL_USE_TLS'] = email_config['MAIL_USE_TLS']
+app.config['MAIL_USE_SSL'] = email_config['MAIL_USE_SSL']
+
+def create_mail():
+    mail = Mail(app)
+    return mail
+
+mail = create_mail()
 
 @app.route('/uploads/<dir>/<name>')
 def get_file_url(dir,name):

@@ -5,3 +5,13 @@ def google_config():
         'GOOGLE_ENV_LOCAL': True,
         'GOOGLE_SCOPE': ['profile', 'email'],
     }
+
+def mail_config():
+    return {
+        'MAIL_SERVER' : 'smtp.gmail.com',
+        'MAIL_PORT' : 587,
+        'MAIL_USERNAME' : 'rahul.dhamecha@infobeans.com',
+        'MAIL_PASSWORD' : 'cvmrwahrucmdolws',
+        'MAIL_USE_TLS' : True,
+        'MAIL_USE_SSL' : False,
+    }
