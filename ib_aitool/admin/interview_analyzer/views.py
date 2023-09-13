@@ -1,6 +1,6 @@
 from ib_aitool import app
 from ib_tool import BASE_DIR,mail
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required,current_user
 from ib_aitool.admin.decorators import has_permission
 from ib_aitool.database.models.CandidateModel import Candidate
@@ -13,7 +13,8 @@ import os
 import jinja2
 products_blueprint = Blueprint('interview_analyzer', __name__)
 import subprocess
-
+from ib_aitool.database.models.VideoProcessModel import VideoReport
+from ib_aitool.database.models.VideoProcessModel import VideoProcess
 
 @products_blueprint.route('/')
 @login_required
@@ -174,4 +175,69 @@ def view_report(id):
     candidate = Candidate.query.get(id)
     return render_template('admin/interview_analyzer/view_report.html', candidate=candidate)
 
+
+#start
+
+def get_video_data(video_id):
+    try:
+        query = db.session.query(VideoReport, VideoProcess) \
+            .join(VideoProcess, VideoReport.video_process_id == VideoProcess.id) \
+            .filter(VideoProcess.vid == video_id)
+        data = query.all()
+        # Print the SQL query
+        print(query.statement)
+        return data
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+# Function to generate a PDF
+def generate_pdf(data):
+    try:
+        print(data)
+        templateLoader = jinja2.FileSystemLoader(searchpath="./")
+        templateEnv = jinja2.Environment(loader=templateLoader)
+        TEMPLATE_FILE = "templates/admin/interview_analyzer/report.html"
+        template = templateEnv.get_template(TEMPLATE_FILE)
+
+        outputText = template.render(report_data=data, base_dir=BASE_DIR)
+
+        dir_path = get_dir_path('reports')
+        current_time = int(datetime.now().strftime('%Y%m%d%H%M%S'))
+        video_report, video_process = data[0]
+        # Convert added_by to a string and replace spaces with underscores
+        added_by_str = str(video_report.added_by)
+        added_by_str = added_by_str.replace(' ', '_').lower()
+
+        # Create the file name
+        file_name = f"{added_by_str}_{current_time}_reports.pdf"
+        report_path = f"{dir_path}/{file_name}"
+        report_url = f"/uploads/reports/{file_name}"
+        pdfkit.from_string(outputText, report_path, options={"enable-local-file-access": ""})
+        print("*******************************")
+        print(report_url)
+        print("*******************************")
+        return report_url
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+@products_blueprint.route('/generate-pdf', methods=['GET'])
+def generate_pdf_endpoint():
+    #user_id = request.args.get('user_id')
+    video_id = request.args.get('video_id')
+    data = get_video_data(video_id)
+    if data:
+        pdf_url = generate_pdf(data)
+        if pdf_url:
+            return jsonify({'message': 'PDF generated successfully', 'pdf_url': pdf_url})
+        else:
+            return jsonify({'error': 'Failed to generate PDF'}), 500
+    else:
+        return jsonify({'error': 'No data found for the given user_id and video_id123'}), 404
+
+
+#end
 app.register_blueprint(products_blueprint, url_prefix='/admin/interview-analyzer')
