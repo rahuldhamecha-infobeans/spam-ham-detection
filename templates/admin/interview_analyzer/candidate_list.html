@@ -19,11 +19,12 @@
                         {% endif %}
                     </td>
                 <td>
-                    <a href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}" class="btn btn-info">Generate Report</a>
                     {% if candidate.is_report_generated %}
-                        <a href="{{ candidate.report_url }}" class="btn btn-success">PDF Report</a>
+                        <a href="{{ url_for('interview_analyzer.view_report',id=candidate.id) }}" class="btn btn-info btn-sm">View Report</a>
+                        <a href="{{ candidate.report_url }}" class="btn btn-success btn-sm">Report PDF</a>
+                    {% else %}
+                        <a href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}" class="btn btn-info btn-sm">Generate Report</a>
                     {% endif %}
-                    <a href="#" class="btn btn-danger">Delete</a>
                 </td>
                 </tr>
             {% endfor %}

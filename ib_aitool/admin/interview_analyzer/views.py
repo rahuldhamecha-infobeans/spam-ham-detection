@@ -167,4 +167,11 @@ def remove_files(template_data):
         for question in questions:
             os.remove(BASE_DIR+question['question_url'])
 
+@products_blueprint.route('/view-reports/<id>')
+@login_required
+@has_permission('Interview Analyzer')
+def view_report(id):
+    candidate = Candidate.query.get(id)
+    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate)
+
 app.register_blueprint(products_blueprint, url_prefix='/admin/interview-analyzer')

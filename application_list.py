@@ -117,6 +117,20 @@ application_list = [
         'created_by': 'Prgati Nande & Sharad Kumar Gupta'
     },
 
+    {
+        'route': 'interview_analyzer.index',
+        'image_path': 'pictures/spam.jpg',
+        'title': 'Interview <br><span>Analyzer</span>',
+        # New Data
+        'project_name': 'Interview Video Analyzer',
+        'project_description': '',
+        'project_demo_link': 'http://aipocdemo.creatingwow.in/',
+        'project_demo_video': '#',
+        'project_demo_ppt': '#',
+        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection',
+        'created_by': 'Prgati Nande & Sharad Kumar Gupta'
+    },
+
     # {
     #     'route': 'multi_image_classification',
     #     'image_path': 'pictures/spam.jpg',
