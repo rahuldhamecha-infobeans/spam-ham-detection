@@ -122,7 +122,7 @@ application_list = [
         'image_path': 'pictures/spam.jpg',
         'title': 'Interview <br><span>Analyzer</span>',
         # New Data
-        'project_name': 'Interview Video Analyzer',
+        'project_name': 'Smart Interview Assessment',
         'project_description': '',
         'project_demo_link': 'http://aipocdemo.creatingwow.in/',
         'project_demo_video': '#',

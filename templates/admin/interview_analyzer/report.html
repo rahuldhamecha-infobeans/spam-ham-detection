@@ -11,7 +11,10 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Icons. Uncomment required icon fonts -->
     <link
@@ -68,16 +71,14 @@
       class="container d-flex justify-content-between align-items-center justify-content-between"
     >
       <img src="{{ base_dir }}/static/public/images/company_logo.jpg" alt="" />
-        <h1><strong>Interviewer Name: Pragati</strong></h1>
+      <h1><strong>Interviewer Name: Pragati</strong></h1>
     </div>
     <hr />
     {% if report_data %}
-
     <div class="row">
       <div class="col-md-12">
         <div class="section">
           <h2 class="text-center text-dark mt-3 mb-5"><u>Overall Rating</u></h2>
-
         </div>
       </div>
     </div>
@@ -223,7 +224,6 @@
       </div>
     </div>
 
-
     <hr />
     <div class="">
       <div class="col-md-12">
@@ -233,77 +233,28 @@
           </h2>
         </div>
       </div>
-       {% for video_report, video_process in report_data %}
+      {% for video_report, video_process in report_data %}
       <div class="question-wrapper mt-3">
         <h3 class="font-weight-bold text-dark">
-          {{video_process.interview_transcript}}
+          {{ loop.index }}. {{video_process.interview_transcript}}
         </h3>
         <div class="question-graphs d-flex align-items-center text-center">
-          <div class="w-33 p-3">
+          <div class="w-50 p-3">
             <img
               class="w-100"
-              src="{{ base_dir }}/static/public/images/piechart.png"
+              src="{{ base_dir }}/uploads/reports/graphs/_text_analysis_chart_{{video_report.video_process_id}}.png"
             />
-            <h6 class="font-weight-bold text-dark">Text Analysis</h6>
+            <h6 class="font-weight-bold text-dark">Text Sentiment Analysis</h6>
           </div>
-          <div class="w-33 p-3">
+          <div class="w-50 p-3">
             <img
               class="w-100"
-              src="{{ base_dir }}/static/public/images/piechart.png"
+              src="{{ base_dir }}/uploads/reports/graphs/_frame_analysis_chart_{{video_report.video_process_id}}.png"
             />
-            <h6 class="font-weight-bold text-dark">Emotion Analysis</h6>
-          </div>
-
-          <div class="w-33 p-3">
-            <img
-              class="w-100"
-              src="{{ base_dir }}/static/public/images/piechart.png"
-            />
-            <h6 class="font-weight-bold text-dark">Text Analysis</h6>
+            <h6 class="font-weight-bold text-dark">Video Analysis</h6>
           </div>
         </div>
       </div>
-
-<!--      <div class="hr-theme-ib">-->
-<!--        <div class="hr-line"></div>-->
-<!--        <div class="hr-icon">-->
-<!--          <img-->
-<!--            class="w-100"-->
-<!--            src="{{ base_dir }}/static/public/images/fav.png"-->
-<!--          />-->
-<!--        </div>-->
-<!--        <div class="hr-line"></div>-->
-<!--      </div>-->
-<!--      <div class="question-wrapper mt-3">-->
-<!--        <h3 class="font-weight-bold text-dark">-->
-<!--          2. Please explain confusion matrix.-->
-<!--        </h3>-->
-<!--        <div class="question-graphs d-flex align-items-center text-center">-->
-<!--          <div class="w-33 p-3">-->
-<!--            <img-->
-<!--              class="w-100"-->
-<!--              src="{{ base_dir }}/static/public/images/piechart.png"-->
-<!--            />-->
-<!--            <h6 class="font-weight-bold text-dark">Text Analysis</h6>-->
-<!--          </div>-->
-<!--          <div class="w-33 p-3">-->
-<!--            <img-->
-<!--              class="w-100"-->
-<!--              src="{{ base_dir }}/static/public/images/piechart.png"-->
-<!--            />-->
-<!--            <h6 class="font-weight-bold text-dark">Emotion Analysis</h6>-->
-<!--          </div>-->
-
-<!--          <div class="w-33 p-3">-->
-<!--            <img-->
-<!--              class="w-100"-->
-<!--              src="{{ base_dir }}/static/public/images/piechart.png"-->
-<!--            />-->
-<!--            <h6 class="font-weight-bold text-dark">Text Analysis</h6>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-
       <div class="hr-theme-ib">
         <div class="hr-line"></div>
         <div class="hr-icon">
@@ -315,26 +266,6 @@
         <div class="hr-line"></div>
       </div>
       {% endfor %}
-      <!-- <table class="table table-responsive table-bordered">
-        <thead>
-          <th>Question</th>
-          <th>Rating</th>
-        </thead>
-        <tbody>
-          {% for question in questions %}
-          <tr>
-            <td>{{ question['question_title'] }}</td>
-            <td>
-              <img
-                src="{{ base_dir }}/{{ question['question_url'] }}"
-                alt=""
-                style="width: 200px"
-              />
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table> -->
     </div>
     {% endif %}
   </body>
