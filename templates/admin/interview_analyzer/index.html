@@ -20,7 +20,7 @@ Assessment {% endblock %} {% block body_block %}
                 id="candidate_name"
                 name="candidate_name"
                 class="form-control"
-                placeholder="Enter Candidate Name"
+                placeholder="Enter Interviewer Name"
               />
               <button
                 class="btn btn-primary"
@@ -37,7 +37,7 @@ Assessment {% endblock %} {% block body_block %}
 
     <div class="card mt-4">
       <div class="card-body">
-        <h4>Candidate List</h4>
+        <h4>Interviewer List</h4>
         <div class="m-4">
           <div class="table_div"></div>
         </div>
@@ -69,7 +69,7 @@ Assessment {% endblock %} {% block body_block %}
                         accept: function(file, done) {
                           let candidate_name = $('#candidate_name').val();
                           if (candidate_name == '' || candidate_name == undefined || candidate_name == null) {
-                              alert('Please Enter Candidate Name.')
+                              alert('Please Enter Interviewer Name.')
                               done();
                           } else {
                               done();
@@ -107,7 +107,7 @@ Assessment {% endblock %} {% block body_block %}
                       if (candidate_name != '' && candidate_name != undefined && candidate_name != null) {
                           myDropzone.processQueue()
                       }else{
-                          alert('Please Enter Candidate Name.')
+                          alert('Please Enter Interviewer Name.')
                       }
                 }
 </script>

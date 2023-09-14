@@ -19,12 +19,17 @@
       </td>
       <td>
         {% if candidate.is_report_generated %}
+<!--        <a-->
+<!--          href="{{ url_for('interview_analyzer.view_report',id=candidate.id) }}"-->
+<!--          class="btn btn-info btn-sm"-->
+<!--          >View Report</a-->
+<!--        >-->
         <a
-          href="{{ url_for('interview_analyzer.view_report',id=candidate.id) }}"
+          target="_blank" href="{{ candidate.interview_video  }}"
           class="btn btn-info btn-sm"
-          >View Report</a
+          >View Video</a
         >
-        <a href="{{ candidate.report_url }}" class="btn btn-success btn-sm"
+        <a target="_blank" href="{{ candidate.report_url }}" class="btn btn-success btn-sm"
           >Report PDF</a
         >
         {% else %}
