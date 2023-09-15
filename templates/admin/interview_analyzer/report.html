@@ -15,6 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!-- Icons. Uncomment required icon fonts -->
     <link
@@ -71,7 +72,7 @@
       class="container d-flex justify-content-between align-items-center justify-content-between"
     >
       <img src="{{ base_dir }}/static/public/images/company_logo.jpg" alt="" />
-      <h1><strong>Interviewer Name: Pragati</strong></h1>
+      <h1><strong>Interviewer Name: {{candidate.name}}</strong></h1>
     </div>
     <hr />
     {% if report_data %}
@@ -154,7 +155,7 @@
         </div>
       </div>
       <div class="col-6 col-md-6">
-        <h2 class="text-dark">Candidate's Rating</h2>
+        <h2 class="text-dark">Candidate's Rating(Demo)</h2>
         <div class="data">
           <div class="d-flex align-items-center justify-content-between mb-3">
             <h6 class="pr-2 mb-0 font-weight-bold text-dark">Happiness:</h6>
@@ -235,7 +236,7 @@
       </div>
       {% for video_report, video_process in report_data %}
       <div class="question-wrapper mt-3">
-        <h3 class="font-weight-bold text-dark">
+        <h3 class="font-weight-bold text-dark"><i class="fa fa-question-circle" aria-hidden="true" style="color:#AA142D"></i>
           {{ loop.index }}. {{video_process.interview_transcript}}
         </h3>
         <div class="question-graphs d-flex align-items-center text-center">
@@ -255,6 +256,9 @@
           </div>
         </div>
       </div>
+      <div class="question-wrapper mt-3">
+        <h3 class="font-weight-bold text-dark"><i class="fa fa-check-circle" aria-hidden="true" style="color:#AA142D"></i> Answer: This is demo answer.</h3>
+      </div>
       <div class="hr-theme-ib">
         <div class="hr-line"></div>
         <div class="hr-icon">
@@ -263,6 +267,7 @@
             src="{{ base_dir }}/static/public/images/fav.png"
           />
         </div>
+
         <div class="hr-line"></div>
       </div>
       {% endfor %}

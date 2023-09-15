@@ -214,10 +214,6 @@ def view_report(id):
 @has_permission('Interview Analyzer')
 def view_video(id):
     candidate_data = Candidate.query.filter_by(id=id).first()
-    print("*****************************")
-    print(candidate_data.interview_video)
-    print("*********************")
-
     return render_template(candidate_data.interview_video)
 
 
