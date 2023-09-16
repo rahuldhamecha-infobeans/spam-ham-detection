@@ -25,6 +25,8 @@
                     {% else %}
                         <a href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}" class="btn btn-theme-white btn-sm">Generate Report</a>
                     {% endif %}
+                    <a href="#" data-candidate="{{ candidate.id }}" class="btn btn-theme-white btn-sm analyze-this">Analyze Video</a>
+                    <a href="#" class="btn btn-theme-white btn-sm">Video Status</a>
                 </td>
                 </tr>
             {% endfor %}
@@ -35,3 +37,35 @@
         {% endif %}
     </tbody>
 </table>
+
+
+
+<script>
+$(document).ready(function() {
+// Attach a click event handler to links with the 'analyze-this' class
+    $('.analyze-this').click(function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+
+        // Get the candidate ID from the 'data-candidate' attribute
+        var candidateId = $(this).data('candidate');
+        alert(candidateId);
+        // Perform your AJAX request here
+        $.ajax({
+        url: '{{ url_for('interview_analyzer.run_tasks') }}', // Replace with your actual AJAX endpoint URL
+        type: 'POST', // or 'GET', depending on your requirements
+        contentType: 'application/json', // Set the content type to JSON
+        data: JSON.stringify({ candidate_id: candidateId }), // Convert data to JSON format
+        success: function(response) {
+            // Handle the AJAX response here
+            console.log('AJAX success', response);
+            // You can update the UI or do other operations with the response data
+        },
+        error: function(xhr, status, error) {
+            // Handle AJAX errors here
+            console.error('AJAX error', status, error);
+        }
+        });
+
+    });
+});
+</script>

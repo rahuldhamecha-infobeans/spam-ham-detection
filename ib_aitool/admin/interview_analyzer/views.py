@@ -1,9 +1,11 @@
 from ib_aitool import app
 from ib_tool import BASE_DIR,mail
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash,jsonify
 from flask_login import login_required,current_user
 from ib_aitool.admin.decorators import has_permission
 from ib_aitool.database.models.CandidateModel import Candidate
+from ib_aitool.database.models.VideoProcessModel import VideoProcess
+
 from ib_aitool.database import db
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -11,9 +13,16 @@ from flask_mail import Message
 import pdfkit
 import os
 import jinja2
+from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt,save_frames_for_timestamps,analyze_timestamp_folder
+from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report,generate_and_save_overall_video_report
+
+current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
 products_blueprint = Blueprint('interview_analyzer', __name__)
 import subprocess
-
+import time
+import queue
+import threading
 
 @products_blueprint.route('/')
 @login_required
@@ -173,5 +182,175 @@ def remove_files(template_data):
 def view_report(id):
     candidate = Candidate.query.get(id)
     return render_template('admin/interview_analyzer/view_report.html', candidate=candidate)
+
+
+
+def analyze_video(queue,candidate_id):
+    print(f'candnnnnnn= {candidate_id}')
+    with app.app_context():
+        data = Candidate.get_video_data(candidate_id)
+        if data is not None:
+            videoPath=data.interview_video
+            transcriptJson = generate_transcipt(videoPath)
+            # Loop through the data and save it to the database
+            for entry in transcriptJson:
+                video_entry = VideoProcess(
+                    vid=candidate_id,
+                    start_duration=entry['start'],
+                    end_duration=entry['end'],
+                    interview_transcript=entry['transcript'],
+                    added_by=data.added_by,
+                    created_at=datetime.utcnow(),
+                    speaker=entry['speaker'],
+                )
+                db.session.add(video_entry)
+                db.session.commit()
+            result= True
+        else:
+            result= False
+        queue.put(result)
+        time.sleep(1)  # Simulate some processing time
+        print('Part 1 completed')  # Debugging statement
+
+
+def get_video_frames(queue,candidate_id):
+    print("part2dsadsdsadsa")
+    with app.app_context():
+        print("part2  confirmation")
+        data = Candidate.get_video_data(candidate_id)
+        interviewer_data = VideoProcess.get_transcripts('Interviewer',candidate_id)
+        if data is not None and interviewer_data is not None:
+            videoPath=data.interview_video
+            # Use os.path.basename to get the file name
+            video_name = os.path.basename(videoPath)
+            # Remove the file extension if needed
+            video_name_without_extension, extension = os.path.splitext(video_name)
+            print("Video Name without Extension:", video_name_without_extension)
+
+            saving_frames=save_frames_for_timestamps(f'{videoPath}', interviewer_data, f'uploads/{video_name_without_extension}/videoframes/', 'frame')
+            if saving_frames:
+                result= True
+            else:
+                result= False
+        else:
+            result= False
+
+        queue.put(result)
+        time.sleep(1)  # Simulate some processing time
+        print('Part 2 completed')  # Debugging statement
+
+
+def get_timestamp_emotion(queue,candidate_id):
+    with app.app_context():
+        data = Candidate.get_video_data(candidate_id)
+        if data is not None :
+            videoPath=data.interview_video
+            # Use os.path.basename to get the file name
+            video_name = os.path.basename(videoPath)
+            # Remove the file extension if needed
+            video_name_without_extension, extension = os.path.splitext(video_name)
+            print("Video Name without Extension:", video_name_without_extension)
+            overall_timestamp=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/videoframes/')
+            save_timestamp_video_report=save_videots_report(overall_timestamp)
+            if overall_timestamp:
+                result= True
+            else:
+                result= False
+        else:
+            result= False
+
+        queue.put(result)
+        time.sleep(1)  # Simulate some processing time
+        print('Part 3 completed')  # Debugging statement
+
+
+def save_overall_report_to_candidate_table(queue,candidate_id):
+    with app.app_context():
+        if candidate_id:
+            overall_interviewer_report=generate_and_save_overall_video_report(candidate_id,'Interviewer')
+            if overall_interviewer_report:
+                result= True
+            else:
+                result= False
+        else:
+            result= False
+
+        queue.put(result)
+        time.sleep(1)  # Simulate some processing time
+        print('Part 4 completed')  # Debugging statement
+
+def part_one(queue,candidate_id):
+    # Part 1: Perform addition and put the result in the queue
+    a = 5
+    b = 10
+    result = a + b
+    queue.put(result)
+    time.sleep(1)  # Simulate some processing time
+    print('Part 1 completed')  # Debugging statement
+
+def part_two(queue):
+    # Part 2: Wait for confirmation from Part 1 and perform multiplication
+    confirmation = queue.get()
+    if isinstance(confirmation, int):
+        c = 20
+        result = confirmation * c
+        queue.put(result)
+        time.sleep(1)  # Simulate some processing time
+        print('Part 2 completed')  # Debugging statement
+
+def part_three(queue,):
+    # Part 3: Wait for confirmation from Part 2 and perform division
+    confirmation = queue.get()
+    if isinstance(confirmation, int):
+        d = 4
+        result = confirmation / d
+        queue.put(result)
+        time.sleep(2)
+        print('Part 3 completed')  # Debugging statement
+        # Final processing
+        print(f"Final Result: {result:.2f}")
+
+@products_blueprint.route('/run_tasks', methods=['GET','POST'])
+def run_tasks():
+    candidate_id = request.json.get('candidate_id')
+    task_queue = queue.Queue()
+
+    # Start the analyze_video thread
+    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id))
+    analyze_thread.start()
+
+    # Wait for analyze_video to complete and check the result
+    analyze_thread.join()
+    confirmation = task_queue.get()
+    print(confirmation)
+    if confirmation:
+        print(f'helloosod {confirmation}')
+        # If confirmation is True, start the get_video_frames thread
+        get_frames_thread = threading.Thread(target=get_video_frames, args=(task_queue, candidate_id))
+        get_frames_thread.start()
+
+        # Wait for get_video_frames to complete and check the result
+        get_frames_thread.join()
+        final_result = task_queue.get()
+        if final_result:
+            get_timestamp_emotion_thread = threading.Thread(target=get_timestamp_emotion, args=(task_queue, candidate_id))
+            get_timestamp_emotion_thread.start()
+
+            # Wait for get_video_frames to complete and check the result
+            get_timestamp_emotion_thread.join()
+            final_result_2 = task_queue.get()
+            if final_result_2:
+                get_overall_report_thread = threading.Thread(target=save_overall_report_to_candidate_table, args=(task_queue, candidate_id))
+                get_overall_report_thread.start()
+
+                # Wait for get_video_frames to complete and check the result
+                get_overall_report_thread.join()
+                final_result = task_queue.get()
+            else:
+                final_result=False
+    else:
+        final_result = False
+
+    return jsonify({'result': final_result})
 
 app.register_blueprint(products_blueprint, url_prefix='/admin/interview-analyzer')
