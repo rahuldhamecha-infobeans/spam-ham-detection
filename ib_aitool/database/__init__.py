@@ -2,10 +2,15 @@ import os
 from ib_aitool import app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from app_config import database_config
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:Rahul21896@localhost/flask"
+config = database_config()
+
+database_string = config['USERNAME']+':'+config['PASSWORD']+'@'+config['HOST']+'/'+config['DATABASE']
+
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://"+database_string
 app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 
 
