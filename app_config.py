@@ -20,8 +20,8 @@ def mail_config():
 
 def database_config():
     return {
-        'USERNAME': 'root',
-        'PASSWORD': 'Rahul21896',
+        'USERNAME': 'phpmyadmin',
+        'PASSWORD': 'Root%401234',
         'HOST': 'localhost',
-        'DATABASE': 'flask'
+        'DATABASE': 'flask_17sept'
     }

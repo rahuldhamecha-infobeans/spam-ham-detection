@@ -11,6 +11,8 @@ config = database_config()
 database_string = config['USERNAME']+':'+config['PASSWORD']+'@'+config['HOST']+'/'+config['DATABASE']
 
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://"+database_string
+#use this if above database_uri not working
+#app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqldb://"+database_string+"?unix_socket=/run/mysqld/mysqld.sock"
 app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 
 

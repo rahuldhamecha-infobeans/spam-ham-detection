@@ -162,6 +162,4 @@ cython_debug/
 
 uploads/
 
-ib_aitool/database/__init__.py
-
 migrations/

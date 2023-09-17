@@ -83,6 +83,10 @@ def interview_video_upload():
     if request.method == 'POST':
         name = request.form.get('candidate_name')
         video_url = upload_video()
+        if video_url.startswith('/'):
+            video_url = video_url[1:]
+        else:
+            video_url = video_url
         message = ''
         if name and video_url:
             candidate = Candidate(
