@@ -1,71 +1,89 @@
 <table class="table table-responsive table-bordered" id="candidate_list">
-    <thead>
-        <th>Name</th>
-        <th>Added By</th>
-        <th>Report Generated</th>
-        <th>Action</th>
-    </thead>
-    <tbody>
-        {% if candidates %}
-            {% for candidate in candidates %}
-                <tr>
-                    <td>{{ candidate.name or 'N/A' }}</td>
-                    <td>{{ candidate.user_data().full_name or 'N/A' }}</td>
-                    <td>
-                        {% if candidate.is_report_generated %}
-                            <span class="badge generated">Generated</span>
-                        {% else %}
-                            <span class="badge not_generated">Not Generated</span>
-                        {% endif %}
-                    </td>
-                <td>
-                    {% if candidate.is_report_generated %}
-                        <a href="{{ url_for('interview_analyzer.view_report',id=candidate.id) }}" class="btn btn-theme-white btn-sm">View Report</a>
-                        <a href="{{ candidate.report_url }}" class="btn btn-theme-white btn-sm">Report PDF</a>
-                    {% else %}
-                        <a href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}" class="btn btn-theme-white btn-sm">Generate Report</a>
-                    {% endif %}
-                    <a href="#" data-candidate="{{ candidate.id }}" class="btn btn-theme-white btn-sm analyze-this">Analyze Video</a>
-                    <a href="#" class="btn btn-theme-white btn-sm">Video Status</a>
-                </td>
-                </tr>
-            {% endfor %}
+  <thead>
+    <th>Name</th>
+    <th>Added By</th>
+    <th>Report Generated</th>
+    <th>Action</th>
+  </thead>
+  <tbody>
+    {% if candidates %} {% for candidate in candidates %}
+    <tr>
+      <td>{{ candidate.name or 'N/A' }}</td>
+      <td>{{ candidate.user_data().full_name or 'N/A' }}</td>
+      <td>
+        {% if candidate.is_report_generated %}
+        <span class="badge generated">Generated</span>
         {% else %}
-            <tr>
-                <td colspan="4">No Candidates Found.</td>
-            </tr>
+        <span class="badge not_generated">Not Generated</span>
         {% endif %}
-    </tbody>
+      </td>
+      <td>
+        {% if candidate.is_report_generated %}
+<!--        <a-->
+<!--          href="{{ url_for('interview_analyzer.view_report',id=candidate.id) }}"-->
+<!--          class="btn btn-info btn-sm"-->
+<!--          >View Report</a-->
+<!--        >-->
+        <a
+          target="_blank" href="{{ candidate.interview_video  }}"
+          class="btn btn-info btn-sm"
+          >View Video</a
+        >
+        <a target="_blank" href="{{ candidate.report_url }}" class="btn btn-success btn-sm"
+          >Report PDF</a
+        >
+        {% else %}
+        <a
+          href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}"
+          class="btn btn-theme-white btn-sm"
+          >Generate Report</a
+        >
+        {% endif %}
+        {% if candidate.video_analysis_status == "pending" %}
+        <a href="#" data-candidate="{{ candidate.id }}" class="btn btn-theme-white btn-sm analyze-this">Analyze Video</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %} {% else %}
+    <tr>
+      <td colspan="4">No Candidates Found.</td>
+    </tr>
+    {% endif %}
+    
+  </tbody>
 </table>
 
 
-
 <script>
-$(document).ready(function() {
-// Attach a click event handler to links with the 'analyze-this' class
-    $('.analyze-this').click(function(event) {
-        event.preventDefault(); // Prevent the default link behavior
-
-        // Get the candidate ID from the 'data-candidate' attribute
-        var candidateId = $(this).data('candidate');
-        alert(candidateId);
-        // Perform your AJAX request here
-        $.ajax({
-        url: '{{ url_for('interview_analyzer.run_tasks') }}', // Replace with your actual AJAX endpoint URL
-        type: 'POST', // or 'GET', depending on your requirements
-        contentType: 'application/json', // Set the content type to JSON
-        data: JSON.stringify({ candidate_id: candidateId }), // Convert data to JSON format
-        success: function(response) {
-            // Handle the AJAX response here
-            console.log('AJAX success', response);
-            // You can update the UI or do other operations with the response data
-        },
-        error: function(xhr, status, error) {
-            // Handle AJAX errors here
-            console.error('AJAX error', status, error);
-        }
+    $(document).ready(function() {
+    // Attach a click event handler to links with the 'analyze-this' class
+        $('.analyze-this').click(function(event) {
+            event.preventDefault(); // Prevent the default link behavior
+            // Disable the link
+            $(this).css({"pointer-events": "none", "opacity": "0.6"});
+            $(this).text("Analyzing");
+            // Get the candidate ID from the 'data-candidate' attribute
+            var candidateId = $(this).data('candidate');
+            // Perform your AJAX request here
+            $.ajax({
+            url: '{{ url_for('interview_analyzer.run_tasks') }}', // Replace with your actual AJAX endpoint URL
+            type: 'POST', // or 'GET', depending on your requirements
+            contentType: 'application/json', // Set the content type to JSON
+            data: JSON.stringify({ candidate_id: candidateId }), // Convert data to JSON format
+            success: function(response) {
+                // Handle the AJAX response here
+                console.log('AJAX success', response);
+                if(response.result==true){
+                    location.reload(true);
+                }
+                // You can update the UI or do other operations with the response data
+            },
+            error: function(xhr, status, error) {
+                // Handle AJAX errors here
+                console.error('AJAX error', status, error);
+            }
+            });
+    
         });
-
     });
-});
-</script>
+    </script>

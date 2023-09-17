@@ -8,6 +8,7 @@ from fer import FER
 import json
 import glob
 emotion_detector = FER(mtcnn=True)
+import math
 
 def count_images_in_directory(directory_path, extensions=("*.jpg", "*.jpeg", "*.png", "*.gif")):
     # Create a list comprehension to generate a list of image files for each extension
@@ -102,10 +103,10 @@ def save_frames_for_timestamps(video_path, timestamps, dir_path, basename, ext='
     
     for i, timestamp in enumerate(timestamps):
         if timestamp.start_duration ==0:
-            start_time_sec = int(timestamp.start_duration)+1
+            start_time_sec = math.ceil(float(timestamp.start_duration))+1
         else:
-            start_time_sec = int(timestamp.start_duration)
-        end_time_sec = int(timestamp.end_duration)
+            start_time_sec = math.ceil(float(timestamp.start_duration))
+        end_time_sec = math.ceil(float(timestamp.end_duration))
         screenshot_count = 0
         current_time = start_time_sec
         frame_time_interval = 1.0 
@@ -136,25 +137,7 @@ def save_frames_for_timestamps(video_path, timestamps, dir_path, basename, ext='
 
 def analyze_timestamp_folder(timestamp_folder):
     # Initialize counters for each emotion for emotion_1 and emotion_2
-    emotion_totals_1 = {
-        "angry": 0,
-        "disgust": 0,
-        "fear": 0,
-        "happy": 0,
-        "sad": 0,
-        "surprise": 0,
-        "neutral": 0
-    }
 
-    emotion_totals_2 = {
-        "angry": 0,
-        "disgust": 0,
-        "fear": 0,
-        "happy": 0,
-        "sad": 0,
-        "surprise": 0,
-        "neutral": 0
-    }
     final_json_result=[]
     # Iterate over all timestamp folders
     for timestamp_dir in os.listdir(timestamp_folder):
@@ -163,6 +146,25 @@ def analyze_timestamp_folder(timestamp_folder):
         if os.path.isdir(timestamp_dir_path):  # Check if it's a directory
             # Initialize an empty list to store the analysis results for each image in the timestamp folder
             analysis_results = []
+            emotion_totals_1 = {
+                "angry": 0,
+                "disgust": 0,
+                "fear": 0,
+                "happy": 0,
+                "sad": 0,
+                "surprise": 0,
+                "neutral": 0
+            }
+
+            emotion_totals_2 = {
+                "angry": 0,
+                "disgust": 0,
+                "fear": 0,
+                "happy": 0,
+                "sad": 0,
+                "surprise": 0,
+                "neutral": 0
+            }
             print(timestamp_dir_path)
             count = count_images_in_directory(f'{timestamp_dir_path}/')
 
@@ -178,6 +180,7 @@ def analyze_timestamp_folder(timestamp_folder):
                     # Append the analysis result to the list
                     analysis_results.append(analysis)
                     analysis_results_len =   len(analysis)
+                    
                     if len(analysis)!=0 and len(analysis) < 2:
                         emotion_1 = analysis[0]['emotions']
                         emotion_totals_1["angry"] += emotion_1['angry'] 
@@ -213,12 +216,17 @@ def analyze_timestamp_folder(timestamp_folder):
             # Create JSON objects for emotion totals
             timestamp_string = timestamp_dir
             parts = timestamp_string.split("__")
-            result_1 = {key: round(value / count, 2) for key, value in emotion_totals_1.items()}
-
-            if emotion_totals_2:
-                result_2 = {key: round(value / count, 2) for key, value in emotion_totals_2.items()}
+            emotion_totals_1_all_zero = all(value == 0.0 for value in emotion_totals_1.values())
+            if emotion_totals_1_all_zero:
+                result_1={}
             else:
+                result_1 = {key: round(value / count, 2) for key, value in emotion_totals_1.items()}
+            emotion_totals_2_all_zero = all(value == 0.0 for value in emotion_totals_2.values())
+            if emotion_totals_2_all_zero:
                 result_2={}
+            else:
+                result_2 = {key: round(value / count, 2) for key, value in emotion_totals_2.items()}
+
             if  result_1 and result_2:
                 if result_1["neutral"] > result_2["neutral"] and result_1["happy"] > result_2["happy"]:
                     selected_json = result_1
@@ -228,8 +236,6 @@ def analyze_timestamp_folder(timestamp_folder):
             elif result_1 and not result_2:
                 json_result = {parts[0]: result_1}
                
-
-            json_result = {parts[0]: selected_json}
 
             final_json_result.append(json_result) 
         
