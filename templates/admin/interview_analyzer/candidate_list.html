@@ -25,12 +25,15 @@
 <!--          >View Report</a-->
 <!--        >-->
         <a
-          target="_blank" href="{{ candidate.interview_video  }}"
-          class="btn btn-info btn-sm"
+          target="_blank" href="/{{ candidate.interview_video  }}"
+          class="btn btn-theme-white btn-sm"
           >View Video</a
         >
-        <a target="_blank" href="{{ candidate.report_url }}" class="btn btn-success btn-sm"
+        <a target="_blank" href="{{ candidate.report_url }}" class="btn btn-theme-white btn-sm "
           >Report PDF</a
+        >
+        <a target="_blank" href="{{ url_for('interview_analyzer.view_report', id=candidate.id) }}" class="btn btn-theme-white btn-sm "
+        >Detail Report</a
         >
         {% else %}
         <a
