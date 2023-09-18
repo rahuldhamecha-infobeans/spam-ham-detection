@@ -11,6 +11,12 @@
                {% if title_brand %} {{title_brand| safe}}{% else %} {{ navbar_brand|safe }} {% endif %}
           </a>
 
+          {% if current_user.is_authenticated %}
+              <a class="navbar-brand" href="{{  url_for('auth.admin_logout') }}">
+                <span>Logout</span>
+              </a>
+          {% endif %}
+
 		  <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExample09" aria-controls="navbarsExample09" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="fa fa-bars"></span>
 		  </button>

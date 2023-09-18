@@ -1,0 +1,140 @@
+{% extends 'layouts/admin/dashboard/base.html' %} {% block page_title %} Smart
+Interview Assessment {% endblock %} {% block page_body_title %} Smart Interview
+Assessment {% endblock %} {% block body_block %}
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <div class="card-body">
+        <form id="upload-form" class="dropzone" enctype="multipart/form-data">
+          <div>
+            <!-- this is were the previews should be shown. -->
+            <div class="previews"></div>
+            <div class="dz-default dz-message">
+              <button class="dz-button" type="button">
+                Drop files here to upload
+              </button>
+            </div>
+            <div class="d-flex justify-content-center align-items-center gap-2">
+              <input
+                type="text"
+                id="candidate_name"
+                name="candidate_name"
+                class="form-control"
+                placeholder="Enter Interviewer Name"
+              />
+              <button
+                class="btn btn-primary"
+                type="button"
+                onclick="upload_video()"
+              >
+                Upload
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h4>Interviewer List</h4>
+        <div class="m-4">
+          <div class="table_div"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="test" id="test_rock"></div>
+{% endblock %} {% block body_scripts %}
+<script src="{{ url_for('static',filename='admin/assets/js/dropzone.min.js') }}"></script>
+<script>
+              {#'url': '{{ url_for('interview_analyzer.interview_video_upload') }}',#}
+  {#            $('#upload-form').dropzone({#}
+  {#                addRemoveLinks: true,#}
+  {#                acceptedFiles: 'video/*',#}
+  {#                init: function(){#}
+  {#                    alert('test')#}
+
+  {#                },#}
+  {#            })#}
+
+                let myDropzone = new Dropzone("#upload-form",
+                    {
+                       'url': '{{ url_for('interview_analyzer.interview_video_upload') }}',
+                        paramName: "file", // The name that will be used to transfer the file
+                        maxFilesize: 500, // MB
+                        autoProcessQueue: false,
+                        accept: function(file, done) {
+                          let candidate_name = $('#candidate_name').val();
+                          if (candidate_name == '' || candidate_name == undefined || candidate_name == null) {
+                              alert('Please Enter Interviewer Name.')
+                              done();
+                          } else {
+                              done();
+                          }
+                        },
+                        success:function(file,response){
+                           myDropzone.removeFile(file)
+                            $('#candidate_name').val('');
+                           reload_candidate_list();
+                        },
+                        addRemoveLinks: true,
+                        acceptedFiles: 'video/*',
+                    }
+                );
+
+                function reload_candidate_list(){
+                    $.ajax({
+                        url: '{{ url_for('interview_analyzer.fetch_candidate_list') }}',
+                        type: 'GET',
+                        dataType:'html',
+                        success:function (response){
+                              $('.table_div').html(response);
+                        }
+                    })
+                }
+
+            setInterval(function (){
+                //reload_candidate_list()
+            },4000)
+            $(document).ready(function(){
+              reload_candidate_list()
+              });
+              function upload_video(){
+                  let candidate_name = $('#candidate_name').val();
+                    if (candidate_name != '' && candidate_name != undefined && candidate_name != null) {
+                        myDropzone.processQueue()
+                    }else{
+                        alert('Please Enter Interviewer Name.')
+                    }
+              }
+            </script>
+{% endblock %}
+
+{% block head_styles %}
+    <link rel="stylesheet" href="{{ url_for('static',filename='admin/assets/css/dropzone.css') }}" type="text/css" />
+    <style>
+    .dropzone {
+        min-height: 250px;
+        border: 3px dashed #373742;
+        border-radius: 5px;
+        padding: 20px 20px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dropzone .dz-message .dz-button {
+        color: #373742;
+        font-size: 20px;
+    }
+
+    .table thead th{
+        background-color: #373450;
+        color: #FFFFFF !important;
+    }
+    </style>
+{% endblock %}

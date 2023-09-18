@@ -1,0 +1,68 @@
+{% extends 'layouts/admin/dashboard/base.html' %}
+
+{% block page_title %} Roles {% endblock %}
+
+{% block page_body_title %} Roles {% endblock %}
+
+{% block body_block %}
+  <!-- Basic Layout -->
+  <div class="row">
+    <div class="col-xl">
+      <div class="card mb-12">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Roles Permission</h5>
+          <small class="text-muted float-end">
+              <a href="{{ url_for('roles.index') }}" class="btn btn-outline-secondary">Back</a>
+          </small>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive text-nowrap">
+                <form method="post">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <td>
+                            <input type="checkbox" class="form-check-input" id="check_all" name="check_all">
+                            <input type="hidden" value="{{ role.id }}" name="role_id">
+                        </td>
+                        <th>Permission Name</th>
+                      </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                    {% with role_permissions = role.permissions() %}
+                    {% for permission in permissions %}
+                    	<tr>
+                        <td>
+                            <input class="form-check-input check_permission" name="permissions" id="permission_{{ permission.id }}" type="checkbox" value="{{ permission.id }}" {% if role_permissions and permission.name in role_permissions %} checked {% endif %}>
+                        </td>
+                        <td>
+                            <label for="permission_{{ permission.id }}">
+                                {{ permission.name }}
+                            </label>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    {% endwith %}
+                    </tbody>
+                  </table>
+                    <button class="btn btn-primary mt-4" type="submit">Update Permission</button>
+                </form>
+                </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block body_scripts %}
+    <script>
+        $('#check_all').on('change',function(){
+            if($(this).prop('checked')){
+                $('.check_permission').prop('checked',true)
+            }else{
+                $('.check_permission').prop('checked',false)
+            }
+        });
+    </script>
+{% endblock %}
