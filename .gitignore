@@ -163,3 +163,9 @@ cython_debug/
 uploads/
 
 migrations/
+poc/imageclassification/__pycache__/
+poc/objectdetection/__pycache__/
+poc/songsdetection/__pycache__/
+poc/songsdetection/__pycache__/
+poc/songsdetection/__pycache__/
+poc/spamham/__pycache__/
