@@ -138,6 +138,13 @@ def save_plot_image(candidate_name, data, keys, file_name):
 
 def generate_report_pdf(candidate_id):
     candidate = Candidate.query.get(candidate_id)
+    overall_interviewer_video_report=candidate.overall_interviewer_video_report
+    overall_interviewer_video_report = overall_interviewer_video_report.replace("'", "\"")
+    overall_interviewer_video_report = json.loads(overall_interviewer_video_report)
+
+    overall_interviewer_text_report=candidate.overall_interviewer_text_report
+    overall_interviewer_text_report = overall_interviewer_text_report.replace("'", "\"")
+    overall_interviewer_text_report = json.loads(overall_interviewer_text_report)
     data = get_video_data(candidate_id)
     print(data)
     for video_report, video_process in data:
@@ -153,7 +160,7 @@ def generate_report_pdf(candidate_id):
     current_date = datetime.now()
     current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
     outputText = template.render(
-        candidate=candidate, report_data=data, base_dir=BASE_DIR)
+        candidate=candidate,interviewer_video_report=overall_interviewer_video_report,interviewer_text_report=overall_interviewer_text_report ,report_data=data, base_dir=BASE_DIR)
 
     dir_path = get_dir_path('reports')
     file_name = candidate_name + str(current_time) + '_reports.pdf'
