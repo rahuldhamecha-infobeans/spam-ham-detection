@@ -1,11 +1,9 @@
-
+<span style="width:100%;display:flex;justify-content:center;">![title](static/public/images/company_logo.jpg)</span>
 ## Smart Video Interview Analyzer
-
------------------------------------
 
 #### Setup Steps :
 
-- ##### Step 1 : 
+- ##### <span style="color:red">Step 1</span> : 
     Clone Repository using below command
     Using Https
     ```GIT
@@ -13,7 +11,7 @@
     ```
     Using SSH
     ```GIT
-    git@github.com:rahuldhamecha-infobeans/spam-ham-detection.git
+    git clone git@github.com:rahuldhamecha-infobeans/spam-ham-detection.git
     ```
 - ##### Step 2 : 
     Now install all required dependencies using below command
