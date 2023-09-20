@@ -272,7 +272,8 @@ def get_video_frames(queue,candidate_id):
         print("part2  confirmation")
         data = Candidate.get_video_data(candidate_id)
         interviewer_data = VideoProcess.get_transcripts('Interviewer',candidate_id)
-        if data is not None and interviewer_data is not None:
+        candidate_data = VideoProcess.get_transcripts('candidate',candidate_id)
+        if data is not None and interviewer_data is not None and candidate_data is not None:
             videoPath=data.interview_video
             # Use os.path.basename to get the file name
             video_name = os.path.basename(videoPath)
@@ -280,8 +281,9 @@ def get_video_frames(queue,candidate_id):
             video_name_without_extension, extension = os.path.splitext(video_name)
             print("Video Name without Extension:", video_name_without_extension)
 
-            saving_frames=save_frames_for_timestamps(f'{videoPath}', interviewer_data, f'uploads/{video_name_without_extension}/videoframes/', 'frame')
-            if saving_frames:
+            saving_frames_interviewer=save_frames_for_timestamps(f'{videoPath}', interviewer_data, f'uploads/{video_name_without_extension}/interviewer/videoframes/', 'frame')
+            saving_frames_candidate=save_frames_for_timestamps(f'{videoPath}', candidate_data, f'uploads/{video_name_without_extension}/candidate/videoframes/', 'frame')
+            if saving_frames_interviewer and saving_frames_candidate:
                 result= True
             else:
                 result= False
@@ -303,9 +305,11 @@ def get_timestamp_emotion(queue,candidate_id):
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
             print("Video Name without Extension:", video_name_without_extension)
-            overall_timestamp=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/videoframes/')
-            save_timestamp_video_report=save_videots_report(overall_timestamp)
-            if overall_timestamp:
+            overall_timestamp_interviewer=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/interviewer/videoframes/')
+            overall_timestamp_candidate=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/candidate/videoframes/')
+            save_timestamp_video_report_inteviewer=save_videots_report(overall_timestamp_interviewer)
+            save_timestamp_video_report_candidate=save_videots_report(overall_timestamp_candidate)
+            if save_timestamp_video_report_inteviewer and save_timestamp_video_report_candidate:
                 result= True
             else:
                 result= False
@@ -321,7 +325,8 @@ def save_overall_report_to_candidate_table(queue,candidate_id):
     with app.app_context():
         if candidate_id:
             overall_interviewer_report=generate_and_save_overall_video_report(candidate_id,'Interviewer')
-            if overall_interviewer_report:
+            overall_candidate_report=generate_and_save_overall_video_report(candidate_id,'candidate')
+            if overall_interviewer_report or overall_candidate_report:
                 result= True
             else:
                 result= False

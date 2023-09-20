@@ -36,11 +36,13 @@
         >Detail Report</a
         >
         {% else %}
+        {% if candidate.video_analysis_status == "completed" %}
         <a
           href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}"
           class="btn btn-theme-white btn-sm"
           >Generate Report</a
         >
+        {% endif %}
         {% endif %}
         {% if candidate.video_analysis_status == "pending" %}
         <a href="#" data-candidate="{{ candidate.id }}" class="btn btn-theme-white btn-sm analyze-this">Analyze Video</a>
