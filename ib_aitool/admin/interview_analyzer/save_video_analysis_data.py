@@ -158,9 +158,16 @@ def generate_and_save_overall_video_report(videoid, speaker):
    # print(text_sentiments_result)
     candidate_data = Candidate.query.filter_by(id=videoid).first()
     if candidate_data:
-        candidate_data.overall_interviewer_video_report = timestamp_frame_result
-        candidate_data.overall_interviewer_text_report = text_sentiments_result
-        db.session.commit()
+        if speaker =="Interviewer":
+            candidate_data.overall_interviewer_video_report = timestamp_frame_result
+            candidate_data.overall_interviewer_text_report = text_sentiments_result
+            db.session.commit()
+        elif speaker =="candidate":
+            candidate_data.overall_candidate_video_report = timestamp_frame_result
+            candidate_data.overall_candidate_text_report = text_sentiments_result
+            db.session.commit()
+
+
     
     return True
 
