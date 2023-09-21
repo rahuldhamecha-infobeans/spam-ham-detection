@@ -24,7 +24,7 @@
 - ##### Step 3 : 
     Now execute  command one by one to install models and remaining dependencies
     ```shell
-    pip install git+https://github.com/openai/whisper.git
+    sudo pip install git+https://github.com/openai/whisper.git
     ```
     ```shell
     sudo apt update && sudo apt install ffmpeg
@@ -33,11 +33,14 @@
     conda install mysqlclient
     ```
     ```shell
-    pip install mysql-connector-python
+    sudo pip install mysql-connector-python
     ```
     ```shell
-    pip install kaleido
+    sudo pip install kaleido
     ```
+    ```shell
+    apt-get install wkhtmltopdf
+  
 - ##### Step 4 : 
     Now install all required dependencies using below command
     ```shell
