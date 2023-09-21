@@ -1,6 +1,6 @@
 <span style="width:100%;display:flex;justify-content:center;">![title](static/public/images/company_logo.jpg)</span>
 ## Smart Video Interview Analyzer
-## Python 3.10 and above is a currently supported version of Python
+## Python 3.8 and above is a currently supported version of Python
 #### Setup Steps :
 
 - ##### <span style="color:red">Step 1</span> : 
