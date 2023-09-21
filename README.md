@@ -39,7 +39,7 @@
     sudo pip install kaleido
     ```
     ```shell
-    apt-get install wkhtmltopdf
+    sudo apt-get install wkhtmltopdf
   
 - ##### Step 4 : 
     Now install all required dependencies using below command
