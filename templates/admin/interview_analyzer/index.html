@@ -37,7 +37,7 @@ Assessment {% endblock %} {% block body_block %}
 
     <div class="card mt-4">
       <div class="card-body">
-        <h4>Interviewer List</h4>
+        <h4>Interviewer Sessions</h4>
         <div class="m-4">
           <div class="table_div"></div>
         </div>
@@ -50,91 +50,160 @@ Assessment {% endblock %} {% block body_block %}
 {% endblock %} {% block body_scripts %}
 <script src="{{ url_for('static',filename='admin/assets/js/dropzone.min.js') }}"></script>
 <script>
-              {#'url': '{{ url_for('interview_analyzer.interview_video_upload') }}',#}
-  {#            $('#upload-form').dropzone({#}
-  {#                addRemoveLinks: true,#}
-  {#                acceptedFiles: 'video/*',#}
-  {#                init: function(){#}
-  {#                    alert('test')#}
+                {#'url': '{{ url_for('interview_analyzer.interview_video_upload') }}',#}
+    {#            $('#upload-form').dropzone({#}
+    {#                addRemoveLinks: true,#}
+    {#                acceptedFiles: 'video/*',#}
+    {#                init: function(){#}
+    {#                    alert('test')#}
 
-  {#                },#}
-  {#            })#}
+    {#                },#}
+    {#            })#}
 
-                let myDropzone = new Dropzone("#upload-form",
-                    {
-                       'url': '{{ url_for('interview_analyzer.interview_video_upload') }}',
-                        paramName: "file", // The name that will be used to transfer the file
-                        maxFilesize: 500, // MB
-                        autoProcessQueue: false,
-                        accept: function(file, done) {
-                          let candidate_name = $('#candidate_name').val();
-                          if (candidate_name == '' || candidate_name == undefined || candidate_name == null) {
-                              alert('Please Enter Interviewer Name.')
-                              done();
-                          } else {
-                              done();
-                          }
-                        },
-                        success:function(file,response){
-                           myDropzone.removeFile(file)
-                            $('#candidate_name').val('');
-                           reload_candidate_list();
-                        },
-                        addRemoveLinks: true,
-                        acceptedFiles: 'video/*',
-                    }
-                );
 
-                function reload_candidate_list(){
-                    $.ajax({
-                        url: '{{ url_for('interview_analyzer.fetch_candidate_list') }}',
-                        type: 'GET',
-                        dataType:'html',
-                        success:function (response){
-                              $('.table_div').html(response);
-                        }
-                    })
-                }
+  let myDropzone = new Dropzone("#upload-form", {
+    paramName: "file", // The name that will be used to transfer the file
+    maxFilesize: 500, // MB
+    autoProcessQueue: false,
+    'url': '{{ url_for('interview_analyzer.interview_video_upload') }}',
+    accept: function (file, done) {
+      let candidate_name = $("#candidate_name").val();
+      if (
+        candidate_name == "" ||
+        candidate_name == undefined ||
+        candidate_name == null
+      ) {
+        alert("Please Enter Interviewer Name.");
+        done();
+      } else {
+        done();
+      }
+    },
+    success: function (file, response) {
+      myDropzone.removeFile(file);
+      $("#candidate_name").val("");
+      reload_candidate_list();
+    },
+    addRemoveLinks: true,
+    acceptedFiles: "video/*",
+  });
 
-            setInterval(function (){
-                //reload_candidate_list()
-            },4000)
-            $(document).ready(function(){
-              reload_candidate_list()
-              });
-              function upload_video(){
-                  let candidate_name = $('#candidate_name').val();
-                    if (candidate_name != '' && candidate_name != undefined && candidate_name != null) {
-                        myDropzone.processQueue()
-                    }else{
-                        alert('Please Enter Interviewer Name.')
-                    }
-              }
-            </script>
-{% endblock %}
+  myDropzone.on("processing", function(file) {
+    $('loader_wrapper').removeClass('d-none')
+    location.reload(true)
+  });
 
-{% block head_styles %}
-    <link rel="stylesheet" href="{{ url_for('static',filename='admin/assets/css/dropzone.css') }}" type="text/css" />
-    <style>
-    .dropzone {
-        min-height: 250px;
-        border: 3px dashed #373742;
-        border-radius: 5px;
-        padding: 20px 20px;
 
-        display: flex;
-        justify-content: center;
-        align-items: center;
+  function reload_candidate_list() {
+    $.ajax({
+      type: "GET",
+      url: '{{ url_for('interview_analyzer.fetch_candidate_list') }}',
+      dataType: "html",
+      success: function (response) {
+        $(".table_div").html(response);
+      },
+    });
+  }
+
+  $(document).ready(function () {
+    reload_candidate_list();
+  });
+  function upload_video() {
+    let candidate_name = $("#candidate_name").val();
+    if (
+      candidate_name != "" &&
+      candidate_name != undefined &&
+      candidate_name != null
+    ) {
+      if (myDropzone.files.length === 0) {
+        alert("Please add a file before uploading.");
+      } else {
+        myDropzone.processQueue();
+      }
+    } else {
+      alert("Please Enter Interviewer Name.");
     }
+  }
+</script>
+{% endblock %} {% block head_styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static',filename='admin/assets/css/dropzone.css') }}"
+  type="text/css"
+/>
+<style>
+  .dropzone {
+    min-height: 250px;
+    border: 3px dashed #373742;
+    border-radius: 5px;
+    padding: 20px 20px;
 
-    .dropzone .dz-message .dz-button {
-        color: #373742;
-        font-size: 20px;
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .table thead th{
-        background-color: #373450;
-        color: #FFFFFF !important;
-    }
-    </style>
+  .dropzone .dz-message .dz-button {
+    color: #373742;
+    font-size: 20px;
+  }
+
+  .table thead th {
+    background-color: #373450;
+    color: #ffffff !important;
+  }
+</style>
+<div class="loader_wrapper d-none">
+  <div class="loader">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      style="margin: auto; display: block"
+      width="200px"
+      height="200px"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid"
+    >
+      <circle cx="30" cy="50" fill="#2f2f39" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+      </circle>
+      <circle cx="70" cy="50" fill="#ea1b3d" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="0s"
+        ></animate>
+      </circle>
+      <circle cx="30" cy="50" fill="#2f2f39" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+        <animate
+          attributeName="fill-opacity"
+          values="0;0;1;1"
+          calcMode="discrete"
+          keyTimes="0;0.499;0.5;1"
+          dur="1s"
+          repeatCount="indefinite"
+        ></animate>
+      </circle>
+    </svg>
+  </div>
+</div>
+
 {% endblock %}

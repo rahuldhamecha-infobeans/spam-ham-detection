@@ -21,7 +21,9 @@
 
 /* ! For .layout-navbar-fixed added fix padding top tpo .layout-page */
 /* Detached navbar */
-.layout-navbar-fixed .layout-wrapper:not(.layout-horizontal):not(.layout-without-menu) .layout-page {
+.layout-navbar-fixed
+  .layout-wrapper:not(.layout-horizontal):not(.layout-without-menu)
+  .layout-page {
   padding-top: 76px !important;
 }
 /* Default navbar */
@@ -77,7 +79,7 @@
   direction: ltr !important;
 }
 
-[dir='rtl'] .rtl-only {
+[dir="rtl"] .rtl-only {
   display: block !important;
 }
 
@@ -104,4 +106,98 @@
 .layout-demo-info {
   text-align: center;
   margin-top: 1rem;
+}
+
+.layout-navbar.navbar-detached {
+  width: 100%;
+  margin: 0;
+  border-radius: 0;
+  padding: 38px 20px;
+  max-width: 100% !important;
+}
+
+.layout-container #layout-menu {
+  display: none;
+}
+
+.layout-container .layout-page {
+  padding: 0 !important;
+}
+
+.logout-btn svg {
+  fill: #fff;
+  font-size: 11px;
+  margin: -2px 0 0 0;
+}
+
+.logout-btn {
+  padding: 0.5rem 1.5rem;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 10px;
+  background-color: #dc3545;
+  border-color: #dc3545;
+  text-transform: uppercase;
+}
+
+.logout-btn:hover {
+  background-color: #c82333 !important;
+  border-color: #bd2130 !important;
+  transform: translateY(0px);
+}
+.navbar.navbar-expand-lg {
+  height: 76px;
+  padding: 0.5rem 1rem;
+}
+
+.container-fluid {
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}
+
+#upload-form button,
+#upload-form input {
+  cursor: pointer !important;
+}
+
+.container-xxl.flex-grow-1 {
+  width: 100%;
+  max-width: 100%;
+}
+#upload-form .btn.btn-primary {
+  background-color: #ffffff;
+  color: #373742;
+  border: 1px solid #e6e6ed;
+  transition: 0.3s ease;
+}
+
+#upload-form .btn.btn-primary:hover {
+  background-color: #e6e6ed;
+  border-color: #e6e6ed;
+  transform: translateY(-3px);
+}
+
+#upload-form input:hover {
+  border-color: #3a3637;
+}
+
+.loader_wrapper {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 999;
+  left: 0;
+  background: rgb(255 255 255 / 60%);
+  cursor: not-allowed;
+}
+
+.loader_wrapper svg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
 }
