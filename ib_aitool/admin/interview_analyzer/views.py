@@ -190,7 +190,7 @@ def generate_report_pdf(candidate_id):
     overall_interviewer_text_report = overall_interviewer_text_report.replace("'", "\"")
     overall_interviewer_text_report = json.loads(overall_interviewer_text_report)
     data = get_video_data(candidate_id)
-    print(data)
+    #print(data)
     for video_report, video_process in data:
         generate_pie_chart(
             video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report)

@@ -12,9 +12,10 @@ import math
 import requests
 from pydub import AudioSegment
 from retrying import retry
+from transformers import pipeline
 
-API_URL = "https://api-inference.huggingface.co/models/SeyedAli/Persian-Speech-Emotion-HuBert-V1"
-headers = {"Authorization": "Bearer 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"}
+audio_sentiment_pipe = pipeline("audio-classification", model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition")
+
 
 def count_images_in_directory(directory_path, extensions=("*.jpg", "*.jpeg", "*.png", "*.gif")):
     # Create a list comprehension to generate a list of image files for each extension
@@ -298,24 +299,18 @@ def analyze_audio_timestamps_clips(timestamp_folder):
                 audio_path = os.path.join(timestamp_folder, filename)
                 parts = filename.split("__")
                 print(parts[0])
-                output = query(audio_path)
-                if output.status_code == 200:
-                    if output: 
-                        print(output.json())
-                        result_dict = {item['label']: item['score'] for item in output.json()}
-                        # Replace specific keys
-                        replacement_mapping = {
-                            'surprised':'surprise',
-                            'fearful':'fear'
-                        }
-                        # Create the updated dictionary with replaced keys
-                        updated_result_dict = {replacement_mapping.get(key, key): value for key, value in result_dict.items()}
-                    else:
-                        updated_result_dict={}
-                    final_result.append({parts[0]:updated_result_dict})
+                output = audio_sentiment_pipe(audio_path)
+                if output: 
+                    print(output)
+                    result_dict = {item['label']: item['score'] for item in output}
+                    # Replace specific keys
+                    replacement_mapping = {
+                        'surprised':'surprise',
+                        'fearful':'fear'
+                    }
+                    # Create the updated dictionary with replaced keys
+                    updated_result_dict = {replacement_mapping.get(key, key): value for key, value in result_dict.items()}
                 else:
-                    print(f"Failed to process {audio_path}. Retrying...")
-                    #analyze_audio_timestamps_clips(timestamp_folder)  # Recursive call
                     updated_result_dict={}
-                    final_result.append({parts[0]:updated_result_dict})
+                final_result.append({parts[0]:updated_result_dict})
     return final_result
