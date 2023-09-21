@@ -193,7 +193,7 @@ def generate_report_pdf(candidate_id):
     }
     
     data = get_video_data(candidate_id)
-    for index, (video_report, video_process) in enumerate(data[:-1]):
+    for (video_report, video_process) in data:
         generate_pie_chart(
                 video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,video_report.audio_report,overall)
 
@@ -508,13 +508,14 @@ def get_video_data(video_id):
         query = db.session.query(VideoReport, VideoProcess) \
             .join(VideoProcess, VideoReport.video_process_id == VideoProcess.id) \
             .filter(VideoProcess.vid == video_id)
-            
+        query = query.order_by(VideoReport.video_process_id.asc())
         # query = db.session.query(VideoReport, VideoProcess, Candidate) \
         #     .join(VideoProcess, VideoReport.video_process_id == VideoProcess.id) \
         #     .join(Candidate, VideoProcess.vid == Candidate.id) \
         #     .filter(VideoProcess.vid == video_id)
 
         data = query.all()
+        print(data)
         # print(query)
         # Print the SQL query
         return data

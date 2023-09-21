@@ -175,10 +175,16 @@
       </div>
 
       {% set list_length = report_data|length %} {% for video_report,
-      video_process in report_data %} {% set index = loop.index %} {% if index <
-      (list_length-1) %} {% set next_video_process=report_data[index][1] %} {%
-      if video_process.end_duration==next_video_process.start_duration and
-      video_process.speaker=='Interviewer' %}
+      video_process in report_data %} {% set index = loop.index %} {% if index <=
+      (list_length) %} 
+      
+      {% if index == list_length %}
+      {% set next_video_process=report_data[index-1][1] %}
+      {% else %}
+      {% set next_video_process=report_data[index][1] %}
+      {% endif %}
+
+      {% if (next_video_process.start_duration|int -3) <= video_process.end_duration|int <= ((next_video_process.start_duration|int) + 3) and video_process.speaker=='Interviewer' %}
 
       <div class="question-wrapper mt-3">
         <h3 class="font-weight-bold text-dark">
@@ -216,10 +222,8 @@
           {% endif %}
         </div>
       </div>
-
-      {% elif video_process.end_duration == next_video_process.start_duration
-      and video_process.speaker == 'candidate' and video_process.start_duration
-      != '0' %}
+ 
+      {% elif (next_video_process.start_duration|int -3) <= video_process.end_duration|int <= ((next_video_process.start_duration|int) + 3) and video_process.speaker == 'candidate' and video_process.start_duration != '0' %}
 
       <div class="question-wrapper mt-3">
         <h3 class="font-weight-bold text-dark">
@@ -269,7 +273,86 @@
       </div>
       <div style="page-break-before: always"></div>
 
-      {% endif %} {% endif %} {% endfor %}
+      {% endif %} 
+      
+      {% if index == list_length %}
+        {% if video_process.speaker == 'candidate' %}
+        <div class="question-wrapper mt-3">
+          <h3 class="font-weight-bold text-dark">
+            <i
+              class="fa fa-check-circle"
+              aria-hidden="true"
+              style="color: #228b22"
+            ></i>
+            {{video_process.interview_transcript}}
+          </h3>
+          <div class="question-graphs d-flex align-items-center text-center">
+            <div class="w-50 p-3">
+              <img
+                class="w-100"
+                src="{{ base_dir }}/uploads/reports/graphs/_text_analysis_chart_{{video_report.video_process_id}}.svg"
+              />
+              <h6 class="font-weight-bold text-dark">Text Sentiment Analysis</h6>
+            </div>
+            <div class="w-50 p-3">
+              <img
+                class="w-100"
+                src="{{ base_dir }}/uploads/reports/graphs/_frame_analysis_chart_{{video_report.video_process_id}}.svg"
+              />
+              <h6 class="font-weight-bold text-dark">Video Analysis</h6>
+            </div>
+            {% if video_report.audio_report %}
+            <div class="w-50 p-3">
+              <img
+                class="w-100"
+                src="{{ base_dir }}/uploads/reports/graphs/_audio_analysis_chart_{{video_report.video_process_id}}.svg"
+              />
+              <h6 class="font-weight-bold text-dark">Audio Analysis</h6>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {%elif video_process.speaker == 'Interviewer'%}
+        <div class="question-wrapper mt-3">
+          <h3 class="font-weight-bold text-dark">
+            <i
+              class="fa fa-question-circle"
+              aria-hidden="true"
+              style="color: #aa142d"
+            ></i>
+            {{video_process.interview_transcript}}
+          </h3>
+          <div class="question-graphs d-flex align-items-center text-center">
+            <div class="w-50 p-3">
+              <img
+                class="w-100"
+                src="{{ base_dir }}/uploads/reports/graphs/_text_analysis_chart_{{video_report.video_process_id}}.svg"
+              />
+              <h6 class="font-weight-bold text-dark">Text Sentiment Analysis</h6>
+            </div>
+            <div class="w-50 p-3">
+              <img
+                class="w-100"
+                src="{{ base_dir }}/uploads/reports/graphs/_frame_analysis_chart_{{video_report.video_process_id}}.svg"
+              />
+              <h6 class="font-weight-bold text-dark">Video Analysis</h6>
+            </div>
+
+            {% if video_report.audio_report %}
+            <div class="w-50 p-3">
+              <img
+                class="w-100"
+                src="{{ base_dir }}/uploads/reports/graphs/_audio_analysis_chart_{{video_report.video_process_id}}.svg"
+              />
+              <h6 class="font-weight-bold text-dark">Audio Analysis</h6>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}    
+      {% endif %}
+      
+      {% endif %} {% endfor %}
     </div>
     {% endif %}
   </body>
