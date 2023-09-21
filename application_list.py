@@ -46,7 +46,7 @@ application_list = [
         'project_demo_link': 'http://aipocdemo.creatingwow.in/',
         'project_demo_video': 'https://www.awesomescreenshot.com/video/20199304?key=ce8805adc24d99d9ce1056beb767b899',
         'project_demo_ppt': 'https://docs.google.com/presentation/d/1Er7I-SuYBdED1ZGxow_gBhKmeqCzG4cs/edit#slide=id.g275375f36b8_6_0',
-        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection/blob/main/jupyter-notbook-code/object_detection.py',
+        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection/blob/main/jupyter-notbook-code/live-object-detection.ipynb',
         'created_by': 'Priyanka Bhandare'
     },
     {

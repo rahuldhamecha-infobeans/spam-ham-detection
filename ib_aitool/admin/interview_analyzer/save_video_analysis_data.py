@@ -68,11 +68,11 @@ def get_text_sentiments(input_text):
         return updated_result_dict
 
 
-def save_videots_report(data_by_timestamps):
+def save_videots_report(data_by_timestamps,audio_emotions):
     if data_by_timestamps:
         for item in data_by_timestamps:
             key = list(item.keys())[0]  # Get the key from the dictionary
-            print(key)
+            #print(key)
         # print(item[key])
             trans_data= VideoProcess.get_transcripts_by_videoprocessid(key)
             interview_transcript=trans_data.interview_transcript
@@ -80,14 +80,20 @@ def save_videots_report(data_by_timestamps):
             added_by=trans_data.added_by
             speaker=trans_data.speaker
             #print(interview_transcript)
+            emotion_dict_data=''
+            if audio_emotions:
+                filtered_dicts = [item for item in audio_emotions if key in item]
+                if filtered_dicts:
+                    emotion_dict_data = filtered_dicts[0][key]
+                
             transcript_emotions=get_text_sentiments(interview_transcript)
-            print(transcript_emotions)
+            #print(transcript_emotions)
             if item[key] and transcript_emotions:
                 video_report = VideoReport(
                     video_process_id=key,
                     frame_dur_report=item[key],
                     text_dur_report=transcript_emotions,
-                    audio_report='',
+                    audio_report=emotion_dict_data,
                     speaker=speaker,
                     added_by=added_by,
                     video_id=vid,
@@ -123,6 +129,17 @@ def generate_and_save_overall_video_report(videoid, speaker):
         "neutral": 0
     }
 
+    timestamps_audio_report = {
+        "angry": 0,
+        "disgust": 0,
+        "fear": 0,
+        "happy": 0,
+        "sad": 0,
+        "surprise": 0,
+        "neutral": 0
+    }
+    
+
     for report in interviewer_data:
         
         timestamps_frame_report_json = report.frame_dur_report  # Already a dictionary, no need to load it.
@@ -134,6 +151,10 @@ def generate_and_save_overall_video_report(videoid, speaker):
         # Replace single quotes with double quotes
         text_sentiment_report_json = text_sentiment_report_json.replace("'", "\"")
         text_sentiment_report = json.loads(text_sentiment_report_json)
+
+        audio_report_sentiment_report_json = report.audio_report
+        audio_report_sentiment_report_json = audio_report_sentiment_report_json.replace("'", "\"")
+        audio_report_sentiment_report = json.loads(audio_report_sentiment_report_json)
 
         timestamps_interviewer_frame_report["angry"] += timestamps_frame_report['angry'] 
         timestamps_interviewer_frame_report["disgust"] += timestamps_frame_report['disgust'] 
@@ -150,10 +171,32 @@ def generate_and_save_overall_video_report(videoid, speaker):
         timestamps_text_report["sad"] += text_sentiment_report['sad'] 
         timestamps_text_report["surprise"] += text_sentiment_report['surprise'] 
         timestamps_text_report["neutral"] += text_sentiment_report['neutral']
+        
+        if 'angry' in audio_report_sentiment_report:
+            timestamps_audio_report["angry"] += audio_report_sentiment_report['angry']
 
+        if 'disgust' in audio_report_sentiment_report:
+            timestamps_audio_report["disgust"] += audio_report_sentiment_report['disgust']
+
+        if 'fear' in audio_report_sentiment_report:
+            timestamps_audio_report["fear"] += audio_report_sentiment_report['fear']
+
+        if 'happy' in audio_report_sentiment_report:
+            timestamps_audio_report["happy"] += audio_report_sentiment_report['happy']
+
+        if 'sad' in audio_report_sentiment_report:
+            timestamps_audio_report["sad"] += audio_report_sentiment_report['sad']
+
+        if 'surprise' in audio_report_sentiment_report:
+            timestamps_audio_report["surprise"] += audio_report_sentiment_report['surprise']
+
+        if 'neutral' in audio_report_sentiment_report:
+            timestamps_audio_report["neutral"] += audio_report_sentiment_report['neutral']
 
     timestamp_frame_result = {key: round(value / timestamps_data_report_count, 2) for key, value in timestamps_interviewer_frame_report.items()}
     text_sentiments_result = {key: round(value / timestamps_data_report_count, 2) for key, value in timestamps_text_report.items()}
+    audio_sentiments_result = {key: round(value / timestamps_data_report_count, 2) for key, value in timestamps_audio_report.items()}
+
    # print(timestamp_frame_result)
    # print(text_sentiments_result)
     candidate_data = Candidate.query.filter_by(id=videoid).first()
@@ -161,13 +204,16 @@ def generate_and_save_overall_video_report(videoid, speaker):
         if speaker =="Interviewer":
             candidate_data.overall_interviewer_video_report = timestamp_frame_result
             candidate_data.overall_interviewer_text_report = text_sentiments_result
+            candidate_data.overall_interviewer_audio_report = audio_sentiments_result
             db.session.commit()
         elif speaker =="candidate":
             candidate_data.overall_candidate_video_report = timestamp_frame_result
             candidate_data.overall_candidate_text_report = text_sentiments_result
+            candidate_data.overall_candidate_audio_report = audio_sentiments_result
             db.session.commit()
 
 
     
     return True
+
 

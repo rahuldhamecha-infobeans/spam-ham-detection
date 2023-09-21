@@ -8,6 +8,7 @@ class Candidate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64),nullable=True,default=None)
     interview_video = db.Column(db.Text,default=None)
+    interview_audio = db.Column(db.Text,default=None)
     is_report_generated = db.Column(db.Boolean,default=False)
     report_url = db.Column(db.Text,default=None, nullable=True)
     added_by = db.Column(db.Integer, default=0, nullable=True)
@@ -22,9 +23,10 @@ class Candidate(db.Model):
     def __str__(self):
         return str(self.name)
 
-    def __init__(self, name,interview_video=None,is_report_generated=False,report_url=None,added_by=0,overall_interviewer_video_report=None,overall_candidate_video_report=None,overall_interviewer_text_report=None,overall_candidate_text_report=None,overall_interviewer_audio_report=None,overall_candidate_audio_report=None,video_analysis_status='pending'):
+    def __init__(self, name,interview_video=None,interview_audio=None,is_report_generated=False,report_url=None,added_by=0,overall_interviewer_video_report=None,overall_candidate_video_report=None,overall_interviewer_text_report=None,overall_candidate_text_report=None,overall_interviewer_audio_report=None,overall_candidate_audio_report=None,video_analysis_status='pending'):
         self.name = name
         self.interview_video = interview_video
+        self.interview_audio = interview_audio
         self.is_report_generated = is_report_generated
         self.report_url = report_url
         self.added_by = added_by
