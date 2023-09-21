@@ -37,7 +37,7 @@ Assessment {% endblock %} {% block body_block %}
 
     <div class="card mt-4">
       <div class="card-body">
-        <h4>Interviewer Sessions</h4>
+        <h4>Interview Sessions</h4>
         <div class="m-4">
           <div class="table_div"></div>
         </div>
@@ -89,10 +89,12 @@ Assessment {% endblock %} {% block body_block %}
   });
 
   myDropzone.on("processing", function(file) {
-    $('loader_wrapper').removeClass('d-none')
-    location.reload(true)
+    $('.loader_wrapper').removeClass('d-none')
   });
 
+  myDropzone.on("complete", function(file) {
+    location.reload(true)
+  });
 
   function reload_candidate_list() {
     $.ajax({
@@ -164,7 +166,7 @@ Assessment {% endblock %} {% block body_block %}
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid"
     >
-      <circle cx="30" cy="50" fill="#2f2f39" r="20">
+      <circle cx="30" cy="50" fill="#373450" r="20">
         <animate
           attributeName="cx"
           repeatCount="indefinite"
@@ -184,7 +186,7 @@ Assessment {% endblock %} {% block body_block %}
           begin="0s"
         ></animate>
       </circle>
-      <circle cx="30" cy="50" fill="#2f2f39" r="20">
+      <circle cx="30" cy="50" fill="#373450" r="20">
         <animate
           attributeName="cx"
           repeatCount="indefinite"

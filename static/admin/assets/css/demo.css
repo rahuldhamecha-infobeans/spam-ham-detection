@@ -155,8 +155,7 @@
   padding-left: 1rem !important;
 }
 
-#upload-form button,
-#upload-form input {
+#upload-form button {
   cursor: pointer !important;
 }
 
