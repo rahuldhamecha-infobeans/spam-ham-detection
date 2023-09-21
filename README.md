@@ -14,6 +14,23 @@
     git clone git@github.com:rahuldhamecha-infobeans/spam-ham-detection.git
     ```
 - ##### Step 2 : 
+    Now execute  command one by one to install models and remaining dependencies
+    ```shell
+    pip install git+https://github.com/openai/whisper.git
+    ```
+    ```shell
+    sudo apt update && sudo apt install ffmpeg
+    ```
+    ```shell
+    conda install mysqlclient
+    ```
+    ```shell
+    pip install mysql-connector-python
+    ```
+    ```shell
+    pip install kaleido
+    ```
+- ##### Step 3 : 
     Now install all required dependencies using below command
     ```shell
     pip install -r requirements.txt
