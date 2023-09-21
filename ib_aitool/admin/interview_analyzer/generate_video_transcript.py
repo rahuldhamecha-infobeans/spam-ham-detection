@@ -301,7 +301,7 @@ def analyze_audio_timestamps_clips(timestamp_folder):
                 print(parts[0])
                 output = audio_sentiment_pipe(audio_path)
                 if output: 
-                    print(output)
+                    #print(output)
                     result_dict = {item['label']: item['score'] for item in output}
                     # Replace specific keys
                     replacement_mapping = {

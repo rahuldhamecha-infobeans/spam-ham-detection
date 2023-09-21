@@ -352,7 +352,7 @@ def get_timestamp_emotion(queue,candidate_id):
             video_name = os.path.basename(videoPath)
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
-            print("Video Name without Extension:", video_name_without_extension)
+            #print("Video Name without Extension:", video_name_without_extension)
 
             audio_emotions_interviewer = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/interviewer/audioclips/')
             audio_emotions_candidate = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/candidate/audioclips/')
