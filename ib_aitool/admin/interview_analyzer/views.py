@@ -11,7 +11,7 @@ from ib_aitool.admin.decorators import has_permission
 from ib_aitool.database.models.CandidateModel import Candidate
 from ib_aitool.database.models.VideoProcessModel import VideoProcess
 import math
-
+from moviepy.editor import VideoFileClip
 from ib_aitool.database import db
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -19,7 +19,7 @@ from flask_mail import Message
 import pdfkit
 import os
 import jinja2
-from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt,save_frames_for_timestamps,analyze_timestamp_folder
+from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt,save_frames_for_timestamps,save_audioclip_timestamps,analyze_timestamp_folder,analyze_audio_timestamps_clips
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report,generate_and_save_overall_video_report
 
 current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -46,6 +46,33 @@ def fetch_candidate_list():
     candidates = Candidate.query.filter_by(
         added_by=current_user.id).order_by('id')
     return render_template('admin/interview_analyzer/candidate_list.html', candidates=candidates)
+
+def convert_save_audio_file(video_path, dir_path, audio_mp3):
+    try:
+        # Load the video clip
+        video_clip = VideoFileClip(video_path)
+
+        # Extract the audio
+        audio_clip = video_clip.audio
+
+        # Create the output directory if it doesn't exist
+        output_dir = os.path.dirname(f'{dir_path}/')
+        os.makedirs(output_dir, exist_ok=True)
+         # Define the output audio file path (MP3 format)
+        output_audio_path = f'{dir_path}/{audio_mp3}.mp3'
+        # Write the audio to the output file (MP3 format)
+        audio_clip.write_audiofile(output_audio_path)
+        file_url = url_for('get_file_url', dir='audios', name=f'{audio_mp3}.mp3')
+        # Close the video and audio clips
+        video_clip.close()
+        audio_clip.close()
+
+        # Return True to indicate success
+        return file_url, True
+    except Exception as e:
+        # Handle any exceptions and return False
+        print(f"Error: {e}")
+        return None, False
 
 
 def upload_video():
@@ -88,9 +115,26 @@ def interview_video_upload():
         else:
             video_url = video_url
         message = ''
+        
         if name and video_url:
+            current_date = datetime.now()
+            current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
+            candidate_name_escaped = name.lower().replace(' ', '_')
+            audio_file_name    =      candidate_name_escaped+'_' + str(current_time)
+            directory = 'audios'
+            dir_path = os.path.join(app.config['UPLOAD_FOLDER'], directory)
+            audio_output_path, audio_result = convert_save_audio_file(video_url, dir_path, audio_file_name)
+            if audio_result:
+                if audio_output_path.startswith('/'):
+                    audio_output_path = audio_output_path[1:]
+                else:
+                    audio_output_path = audio_output_path
+                audio_file=audio_output_path
+            else:
+                audio_file=None
+
             candidate = Candidate(
-                name=name, interview_video=video_url, added_by=current_user.id)
+                name=name, interview_video=video_url,interview_audio=audio_output_path, added_by=current_user.id)
             db.session.add(candidate)
             db.session.commit()
             message = 'Candidate Added Successfully.'
@@ -275,14 +319,18 @@ def get_video_frames(queue,candidate_id):
         candidate_data = VideoProcess.get_transcripts('candidate',candidate_id)
         if data is not None and interviewer_data is not None and candidate_data is not None:
             videoPath=data.interview_video
+            audioPath=data.interview_audio
             # Use os.path.basename to get the file name
             video_name = os.path.basename(videoPath)
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
-            print("Video Name without Extension:", video_name_without_extension)
+            #print("Video Name without Extension:", video_name_without_extension)
 
             saving_frames_interviewer=save_frames_for_timestamps(f'{videoPath}', interviewer_data, f'uploads/{video_name_without_extension}/interviewer/videoframes/', 'frame')
             saving_frames_candidate=save_frames_for_timestamps(f'{videoPath}', candidate_data, f'uploads/{video_name_without_extension}/candidate/videoframes/', 'frame')
+            saving_audioclips_interviewer=save_audioclip_timestamps(f'{audioPath}', interviewer_data, f'uploads/{video_name_without_extension}/interviewer/')
+            saving_audioclips_candidate=save_audioclip_timestamps(f'{audioPath}', candidate_data, f'uploads/{video_name_without_extension}/candidate/')
+
             if saving_frames_interviewer and saving_frames_candidate:
                 result= True
             else:
@@ -305,10 +353,15 @@ def get_timestamp_emotion(queue,candidate_id):
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
             print("Video Name without Extension:", video_name_without_extension)
+
+            audio_emotions_interviewer = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/interviewer/audioclips/')
+            audio_emotions_candidate = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/candidate/audioclips/')
+
             overall_timestamp_interviewer=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/interviewer/videoframes/')
             overall_timestamp_candidate=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/candidate/videoframes/')
-            save_timestamp_video_report_inteviewer=save_videots_report(overall_timestamp_interviewer)
-            save_timestamp_video_report_candidate=save_videots_report(overall_timestamp_candidate)
+            save_timestamp_video_report_inteviewer=save_videots_report(overall_timestamp_interviewer,audio_emotions_interviewer)
+            save_timestamp_video_report_candidate=save_videots_report(overall_timestamp_candidate,audio_emotions_candidate)
+
             if save_timestamp_video_report_inteviewer and save_timestamp_video_report_candidate:
                 result= True
             else:
