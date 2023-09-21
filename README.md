@@ -13,6 +13,15 @@
     git clone git@github.com:rahuldhamecha-infobeans/spam-ham-detection.git
     ```
 - ##### Step 2 : 
+  Now Create the conda enviroment for the project
+  ```shell
+  conda create -n ENV_NAME flask
+  ```
+  ```shell
+  conda activate ENV_NAME
+    ```
+
+- ##### Step 3 : 
     Now execute  command one by one to install models and remaining dependencies
     ```shell
     pip install git+https://github.com/openai/whisper.git
@@ -29,13 +38,13 @@
     ```shell
     pip install kaleido
     ```
-- ##### Step 3 : 
+- ##### Step 4 : 
     Now install all required dependencies using below command
     ```shell
     pip install -r requirement.txt
     ```
   
-- ##### Step 4 : 
+- ##### Step 5 : 
     Now Change the Config in app_config folder 
     For Sign in with Google
     ```python
@@ -70,7 +79,7 @@
         }
     ```
 
-- ##### Step 5 : 
+- ##### Step 6 : 
     Now set the flask app file to FLASK_APP path
     ```shell
     export FLASK_APP=app.py
@@ -79,7 +88,7 @@
     ```shell
     export FLASK_DEBUG=1
     ```
-- #### Step 6:
+- #### Step 7:
   Run the Database migration command
   ```shell
   flask db init
@@ -94,7 +103,7 @@
   flask migrate-data
   ```  
 
-- ##### Step 6 : 
+- ##### Step 8 : 
     Now run the flask application using below command
     ```shell
     flask run
