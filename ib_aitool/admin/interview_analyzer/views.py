@@ -138,19 +138,31 @@ def save_plot_image(candidate_name, data, keys, file_name):
 
 def generate_report_pdf(candidate_id):
     candidate = Candidate.query.get(candidate_id)
-    overall_interviewer_video_report=candidate.overall_interviewer_video_report
-    overall_interviewer_video_report = overall_interviewer_video_report.replace("'", "\"")
-    overall_interviewer_video_report = json.loads(overall_interviewer_video_report)
 
-    overall_interviewer_text_report=candidate.overall_interviewer_text_report
-    overall_interviewer_text_report = overall_interviewer_text_report.replace("'", "\"")
-    overall_interviewer_text_report = json.loads(overall_interviewer_text_report)
+    overall = {"candidate_id": str(candidate_id),
+        "interviewer_video_report": ib_format_json(data=candidate.overall_interviewer_video_report),
+        "candidate_video_report": ib_format_json(data=candidate.overall_candidate_video_report),
+        "interviewer_text_report": ib_format_json(data=candidate.overall_interviewer_text_report),
+        "candidate_text_report": ib_format_json(data=candidate.overall_candidate_text_report),
+        "interviewer_audio_report": ib_format_json(data=candidate.overall_interviewer_audio_report),
+        "candidate_audio_report": ib_format_json(data=candidate.overall_candidate_audio_report)
+    }
+    
     data = get_video_data(candidate_id)
-    print(data)
-    for video_report, video_process in data:
-        generate_pie_chart(
-            video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report)
 
+    for index, (video_report, video_process) in enumerate(data[:-1]):
+        generate_pie_chart(
+                video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,video_report.audio_report,overall)
+
+        # if(video_process.end_duration == data[index + 1][1].start_duration and video_process.speaker=='Interviewer'):
+        #     generate_pie_chart(
+        #         video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,overall)
+
+        # if(video_process.end_duration == data[index + 1][1].start_duration and video_process.speaker=='Candidate'):
+        #     generate_pie_chart(
+        #         video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,overall)
+
+        
     templateLoader = jinja2.FileSystemLoader(searchpath="./")
     templateEnv = jinja2.Environment(loader=templateLoader)
     TEMPLATE_FILE = "templates/admin/interview_analyzer/report.html"
@@ -159,8 +171,9 @@ def generate_report_pdf(candidate_id):
     candidate_name = candidate.name.replace(' ', '_').lower()
     current_date = datetime.now()
     current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
+    
     outputText = template.render(
-        candidate=candidate,interviewer_video_report=overall_interviewer_video_report,interviewer_text_report=overall_interviewer_text_report ,report_data=data, base_dir=BASE_DIR)
+        candidate=candidate,report_data=data, base_dir=BASE_DIR,overall=overall)
 
     dir_path = get_dir_path('reports')
     file_name = candidate_name + str(current_time) + '_reports.pdf'
@@ -175,35 +188,65 @@ def generate_report_pdf(candidate_id):
     return report_url
 
 
-def generate_pie_chart(video_process_id, frame_dur_report, text_dur_report):
-    frame_dur_report = frame_dur_report.replace("'", "\"")
-    frame_data = json.loads(frame_dur_report)
+def generate_pie_chart(video_process_id, frame_dur_report, text_dur_report,audio_report,overall):
+    #Video analysis
+    frame_data = ib_format_json(frame_dur_report)
+    labels, values = generate_label_value_chart(frame_data)
+    generate_pie_chart_helper(labels,
+                              values, id=video_process_id, name='_frame_analysis_chart_')
+    
+    #Text sentiments
+    text_data = ib_format_json(text_dur_report)
+    labels, values = generate_label_value_chart(text_data)
+    generate_pie_chart_helper(labels,
+                              values, id=video_process_id, name='_text_analysis_chart_')
+    
+    #Audio analysis
+    text_data = ib_format_json(audio_report)
+    labels, values = generate_label_value_chart(text_data)
+    generate_pie_chart_helper(labels,
+                              values, id=video_process_id, name='_audio_analysis_chart_')
 
-    labels = []
-    values = []
+    
+    
+    #Overall Interviewer sentiments
+    candidate_id = overall['candidate_id']
+    
+    #video report
+    labels, values = generate_label_value_chart(overall['interviewer_video_report'])    
+    generate_pie_chart_helper(labels,
+                              values, id=candidate_id, name='_overall_interviewer_video_report_')
 
-    for emotion, value in frame_data.items():
-        labels.append(emotion)
-        values.append(value)
+    #text report
+    labels, values = generate_label_value_chart(overall['interviewer_text_report'])    
+    generate_pie_chart_helper(labels,
+                              values, id=candidate_id, name='_overall_interviewer_text_report_')
+    
+    #audio report
+    labels, values = generate_label_value_chart(overall['interviewer_audio_report'])    
+    generate_pie_chart_helper(labels,
+                              values, id=candidate_id, name='_overall_interviewer_audio_report_')
+    
+    #Overall Candidate sentiments
 
-    generate_pie_chart_helper(video_process_id, labels,
-                              values, name='_frame_analysis_chart_')
-    text_dur_report = text_dur_report.replace("'", "\"")
-    text_data = json.loads(text_dur_report)
+    #video report
+    labels, values = generate_label_value_chart(overall['candidate_video_report'])    
+    generate_pie_chart_helper(labels,
+                              values, id=candidate_id, name='_overall_candidate_video_report_')
 
-    labels = []
-    values = []
+    #text report
+    labels, values = generate_label_value_chart(overall['candidate_text_report'])    
+    generate_pie_chart_helper(labels,
+                              values, id=candidate_id, name='_overall_candidate_text_report_')
+    
+    #audio report
+    labels, values = generate_label_value_chart(overall['candidate_audio_report'])    
+    generate_pie_chart_helper(labels,
+                              values, id=candidate_id, name='_overall_candidate_audio_report_')
 
-    for emotion, value in text_data.items():
-        labels.append(emotion)
-        values.append(value)
 
-    generate_pie_chart_helper(video_process_id, labels,
-                              values, name='_text_analysis_chart_')
-
-
-def generate_pie_chart_helper(video_process_id, labels, values, name):
-    video_process_id = str(video_process_id)
+def generate_pie_chart_helper( labels, values, id, name):
+    _id = str(id)
     colors = ["#373742", "#E6E6ED", "#EA1B3D", "#676775", "#EB4C5E"]
 
     # Define the directory path
@@ -213,15 +256,32 @@ def generate_pie_chart_helper(video_process_id, labels, values, name):
     if not os.path.exists(graph_dir):
         os.makedirs(graph_dir)
 
-    # Create a pie chart using Plotly
-    fig = make_subplots(rows=1, cols=1)
-    fig.add_trace(go.Pie(showlegend=False, labels=labels, values=values,
-                         textinfo="label+percent", marker=dict(colors=colors), hole=.3))
+    if len(labels) > 0 and len(values) > 0:
+        # Create a pie chart using Plotly
+        fig = make_subplots(rows=1, cols=1)
+        fig.add_trace(go.Pie(showlegend=False, labels=labels, values=values,textinfo="label+percent", marker=dict(colors=colors), hole=.3,textfont_size=17))
+        
+        chart_image_path = os.path.join(graph_dir, name + _id + '.svg')
+        pio.write_image(fig, chart_image_path, format='svg')
 
-    chart_image_path = os.path.join(
-        graph_dir, name + video_process_id + '.png')
-    pio.write_image(fig, chart_image_path, format='png')
+def generate_label_value_chart(data):
+    labels = []
+    values = []
 
+    if data is not None and data != '':
+        for emotion, value in data.items():
+            if value > .01:
+                labels.append(emotion)
+                values.append(value)
+
+    return labels,values
+    
+def ib_format_json(data):
+    if data is None or data == '':
+        return data
+    data = data.replace("'", "\"")
+    data = json.loads(data)
+    return data
 
 def remove_files(template_data):
     os.remove(BASE_DIR + template_data['overall']['url'])
@@ -396,9 +456,15 @@ def get_video_data(video_id):
         query = db.session.query(VideoReport, VideoProcess) \
             .join(VideoProcess, VideoReport.video_process_id == VideoProcess.id) \
             .filter(VideoProcess.vid == video_id)
+            
+        # query = db.session.query(VideoReport, VideoProcess, Candidate) \
+        #     .join(VideoProcess, VideoReport.video_process_id == VideoProcess.id) \
+        #     .join(Candidate, VideoProcess.vid == Candidate.id) \
+        #     .filter(VideoProcess.vid == video_id)
+
         data = query.all()
+        # print(query)
         # Print the SQL query
-        print(query.statement)
         return data
     except Exception as e:
         print(f"Error: {e}")

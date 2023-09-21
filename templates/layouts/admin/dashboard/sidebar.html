@@ -3,7 +3,7 @@
     class="app-brand demo"
     style="display: flex; justify-content: center; align-items: center"
   >
-    <a href="{{ url_for('dashboard.index') }}" class="app-brand-link">
+    <a href="{{ url_for('home_page') }}" class="app-brand-link">
       <span class="app-brand-logo demo">
         <img style="max-width: 150px;" src="{{
         url_for('static',filename="public/images/company_logo.jpg") }}" alt="">
@@ -21,7 +21,7 @@
   <div class="menu-inner-shadow"></div>
 
   <ul class="menu-inner py-1">
-    <!-- Dashboard -->
+    <!-- Dashboard 
     {% if user_has_permission('Dashboard') %}
     <li
       class="menu-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
