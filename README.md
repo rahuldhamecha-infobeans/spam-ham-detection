@@ -109,3 +109,4 @@
     flask run
     ```
 
+- ##### Note*: Restart the server after installation of all modules
