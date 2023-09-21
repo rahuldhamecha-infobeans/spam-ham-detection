@@ -9,6 +9,13 @@ import json
 import glob
 emotion_detector = FER(mtcnn=True)
 import math
+import requests
+from pydub import AudioSegment
+from retrying import retry
+from transformers import pipeline
+
+audio_sentiment_pipe = pipeline("audio-classification", model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition")
+
 
 def count_images_in_directory(directory_path, extensions=("*.jpg", "*.jpeg", "*.png", "*.gif")):
     # Create a list comprehension to generate a list of image files for each extension
@@ -240,3 +247,70 @@ def analyze_timestamp_folder(timestamp_folder):
             final_json_result.append(json_result) 
         
     return final_json_result
+
+
+def save_audioclip_timestamps(audio_path, timestamps, dir_path):
+
+    # Load the audio file
+    audio = AudioSegment.from_mp3(audio_path)
+    for i, timestamp in enumerate(timestamps):
+        if timestamp.start_duration ==0:
+            start_time_sec = math.ceil(float(timestamp.start_duration))+1
+        else:
+            start_time_sec = math.ceil(float(timestamp.start_duration))
+        end_time_sec = math.ceil(float(timestamp.end_duration))
+        # Define the start and end times in seconds
+
+        # Convert seconds to milliseconds
+        start_time_ms = start_time_sec * 1000
+        end_time_ms = end_time_sec * 1000
+
+        # Cut the audio
+        cut_audio = audio[start_time_ms:end_time_ms]
+        sub_dir_path = os.path.join(dir_path, 'audioclips')
+        os.makedirs(sub_dir_path, exist_ok=True)
+        # Export the cut audio to a new file
+               # Define the output audio file path (MP3 format)
+        output_audio_path = os.path.join(sub_dir_path, f'{timestamp.id}__timestamp_{start_time_sec}_{end_time_sec}_audio.mp3')
+        cut_audio.export(output_audio_path, format='mp3')
+
+    return True
+
+
+
+
+def query(filename):
+    with open(filename, "rb") as f:
+        data = f.read()
+    response = requests.post(API_URL, headers=headers, data=data)
+    return response
+
+@retry(
+    stop_max_attempt_number=3,  # Maximum number of retry attempts
+    wait_fixed=1000  # Wait 1000 milliseconds (1 second) between retries
+)
+def analyze_audio_timestamps_clips(timestamp_folder):
+    # Initialize counters for each emotion for emotion_1 and emotion_2
+    final_result = []
+    if os.path.isdir(timestamp_folder): 
+        #print('analyzeing_audio_timestamps_clips')
+        for filename in os.listdir(timestamp_folder):
+            if filename.endswith(".mp3"):  # Ensure you are processing only image files
+                audio_path = os.path.join(timestamp_folder, filename)
+                parts = filename.split("__")
+                print(parts[0])
+                output = audio_sentiment_pipe(audio_path)
+                if output: 
+                    #print(output)
+                    result_dict = {item['label']: item['score'] for item in output}
+                    # Replace specific keys
+                    replacement_mapping = {
+                        'surprised':'surprise',
+                        'fearful':'fear'
+                    }
+                    # Create the updated dictionary with replaced keys
+                    updated_result_dict = {replacement_mapping.get(key, key): value for key, value in result_dict.items()}
+                else:
+                    updated_result_dict={}
+                final_result.append({parts[0]:updated_result_dict})
+    return final_result
