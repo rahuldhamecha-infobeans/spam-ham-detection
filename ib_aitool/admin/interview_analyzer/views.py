@@ -317,6 +317,11 @@ def generate_label_value_chart(data):
                 labels.append(emotion)
                 values.append(value)
 
+        if len(labels) == 0 and len(values) == 0 : 
+            for emotion, value in data.items():
+                labels.append(emotion)
+                values.append(value)
+
     return labels,values
     
 def ib_format_json(data):
