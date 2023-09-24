@@ -418,9 +418,10 @@ def get_timestamp_emotion(queue,candidate_id):
             video_name_without_extension, extension = os.path.splitext(video_name)
             #print("Video Name without Extension:", video_name_without_extension)
 
-            audio_emotions_interviewer = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/interviewer/audioclips/')
-            audio_emotions_candidate = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/candidate/audioclips/')
-
+#            audio_emotions_interviewer = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/interviewer/audioclips/')
+#            audio_emotions_candidate = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/candidate/audioclips/')
+            audio_emotions_interviewer={}
+            audio_emotions_candidate={}
             overall_timestamp_interviewer=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/interviewer/videoframes/')
             overall_timestamp_candidate=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/candidate/videoframes/')
             save_timestamp_video_report_inteviewer=save_videots_report(overall_timestamp_interviewer,audio_emotions_interviewer)
@@ -464,7 +465,7 @@ def run_tasks():
     analyze_thread.start()
 
     # Wait for analyze_video to complete and check the result
-    analyze_thread.join()
+    analyze_thread.join(timeout=7200)
     confirmation = task_queue.get()
     if confirmation:
         # If confirmation is True, start the get_video_frames thread
@@ -479,7 +480,7 @@ def run_tasks():
             get_timestamp_emotion_thread.start()
 
             # Wait for get_video_frames to complete and check the result
-            get_timestamp_emotion_thread.join()
+            get_timestamp_emotion_thread.join(timeout=7200)
             final_result_2 = task_queue.get()
             if final_result_2:
                 get_overall_report_thread = threading.Thread(target=save_overall_report_to_candidate_table, args=(task_queue, candidate_id))

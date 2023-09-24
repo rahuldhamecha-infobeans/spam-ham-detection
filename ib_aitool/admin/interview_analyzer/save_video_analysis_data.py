@@ -85,7 +85,8 @@ def save_videots_report(data_by_timestamps,audio_emotions):
                 filtered_dicts = [item for item in audio_emotions if key in item]
                 if filtered_dicts:
                     emotion_dict_data = filtered_dicts[0][key]
-                
+            else:
+                emotion_dict_data=''    
             transcript_emotions=get_text_sentiments(interview_transcript)
             #print(transcript_emotions)
             if item[key] and transcript_emotions:
@@ -151,10 +152,12 @@ def generate_and_save_overall_video_report(videoid, speaker):
         # Replace single quotes with double quotes
         text_sentiment_report_json = text_sentiment_report_json.replace("'", "\"")
         text_sentiment_report = json.loads(text_sentiment_report_json)
-
+        
+        audio_report_sentiment_report={}
         audio_report_sentiment_report_json = report.audio_report
-        audio_report_sentiment_report_json = audio_report_sentiment_report_json.replace("'", "\"")
-        audio_report_sentiment_report = json.loads(audio_report_sentiment_report_json)
+        if audio_report_sentiment_report_json:
+            audio_report_sentiment_report_json = audio_report_sentiment_report_json.replace("'", "\"")
+            audio_report_sentiment_report = json.loads(audio_report_sentiment_report_json)
 
         timestamps_interviewer_frame_report["angry"] += timestamps_frame_report['angry'] 
         timestamps_interviewer_frame_report["disgust"] += timestamps_frame_report['disgust'] 
@@ -172,26 +175,27 @@ def generate_and_save_overall_video_report(videoid, speaker):
         timestamps_text_report["surprise"] += text_sentiment_report['surprise'] 
         timestamps_text_report["neutral"] += text_sentiment_report['neutral']
         
-        if 'angry' in audio_report_sentiment_report:
-            timestamps_audio_report["angry"] += audio_report_sentiment_report['angry']
+        if audio_report_sentiment_report:
+            if 'angry' in audio_report_sentiment_report:
+                timestamps_audio_report["angry"] += audio_report_sentiment_report['angry']
 
-        if 'disgust' in audio_report_sentiment_report:
-            timestamps_audio_report["disgust"] += audio_report_sentiment_report['disgust']
+            if 'disgust' in audio_report_sentiment_report:
+                timestamps_audio_report["disgust"] += audio_report_sentiment_report['disgust']
 
-        if 'fear' in audio_report_sentiment_report:
-            timestamps_audio_report["fear"] += audio_report_sentiment_report['fear']
+            if 'fear' in audio_report_sentiment_report:
+                timestamps_audio_report["fear"] += audio_report_sentiment_report['fear']
 
-        if 'happy' in audio_report_sentiment_report:
-            timestamps_audio_report["happy"] += audio_report_sentiment_report['happy']
+            if 'happy' in audio_report_sentiment_report:
+                timestamps_audio_report["happy"] += audio_report_sentiment_report['happy']
 
-        if 'sad' in audio_report_sentiment_report:
-            timestamps_audio_report["sad"] += audio_report_sentiment_report['sad']
+            if 'sad' in audio_report_sentiment_report:
+                timestamps_audio_report["sad"] += audio_report_sentiment_report['sad']
 
-        if 'surprise' in audio_report_sentiment_report:
-            timestamps_audio_report["surprise"] += audio_report_sentiment_report['surprise']
+            if 'surprise' in audio_report_sentiment_report:
+                timestamps_audio_report["surprise"] += audio_report_sentiment_report['surprise']
 
-        if 'neutral' in audio_report_sentiment_report:
-            timestamps_audio_report["neutral"] += audio_report_sentiment_report['neutral']
+            if 'neutral' in audio_report_sentiment_report:
+                timestamps_audio_report["neutral"] += audio_report_sentiment_report['neutral']
 
     timestamp_frame_result = {key: round(value / timestamps_data_report_count, 2) for key, value in timestamps_interviewer_frame_report.items()}
     text_sentiments_result = {key: round(value / timestamps_data_report_count, 2) for key, value in timestamps_text_report.items()}
