@@ -203,6 +203,10 @@ def generate_and_save_overall_video_report(videoid, speaker):
 
    # print(timestamp_frame_result)
    # print(text_sentiments_result)
+    all_zeros_audio_sentiments = all(value == 0.0 for value in audio_sentiments_result.values())
+    if all_zeros_audio_sentiments:
+        audio_sentiments_result=''
+
     candidate_data = Candidate.query.filter_by(id=videoid).first()
     if candidate_data:
         if speaker =="Interviewer":
