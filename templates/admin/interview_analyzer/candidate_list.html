@@ -65,6 +65,17 @@
 </table>
 
 <script>
+    function reload_candidate_list_table() {
+    $.ajax({
+      type: "GET",
+      url: '{{ url_for('interview_analyzer.fetch_candidate_list') }}',
+      dataType: "html",
+      success: function (response) {
+        $(".table_div").html(response);
+      },
+    });
+  }
+
   $(document).ready(function() {
   // Attach a click event handler to links with the 'analyze-this' class
       $('.analyze-this').click(function(event) {
@@ -83,9 +94,7 @@
           success: function(response) {
               // Handle the AJAX response here
               console.log('AJAX success', response);
-              if(response.result==true){
-                  location.reload(true);
-              }
+              reload_candidate_list();
               // You can update the UI or do other operations with the response data
           },
           error: function(xhr, status, error) {
