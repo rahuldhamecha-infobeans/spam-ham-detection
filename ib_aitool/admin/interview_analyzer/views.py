@@ -351,6 +351,10 @@ def view_report(id):
 def analyze_video(queue,candidate_id):
     with app.app_context():
         data = Candidate.get_video_data(candidate_id)
+        candidate_data = Candidate.query.filter_by(id=candidate_id).first()
+        if candidate_data:
+            candidate_data.video_analysis_status = 'inprogress'
+            db.session.commit()
         if data is not None:
             videoPath=data.interview_video
             transcriptJson = generate_transcipt(videoPath)

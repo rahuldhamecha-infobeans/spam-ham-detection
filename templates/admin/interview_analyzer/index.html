@@ -110,6 +110,9 @@ Assessment {% endblock %} {% block body_block %}
   $(document).ready(function () {
     reload_candidate_list();
   });
+  setInterval(function() {
+    reload_candidate_list();
+  }, 600000);
   function upload_video() {
     let candidate_name = $("#candidate_name").val();
     if (

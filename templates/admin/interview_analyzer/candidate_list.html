@@ -54,6 +54,7 @@
           >Analyze Video</a
         >
         {% endif %}
+        {% if candidate.video_analysis_status == "inprogress" %} Please wait for 15 -30 minutes...  {% endif %}
       </td>
     </tr>
     {% endfor %} {% else %}
@@ -75,6 +76,8 @@
       },
     });
   }
+
+
 
   $(document).ready(function() {
   // Attach a click event handler to links with the 'analyze-this' class
