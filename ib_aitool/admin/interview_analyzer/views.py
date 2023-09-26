@@ -110,6 +110,7 @@ def interview_video_upload():
     if request.method == 'POST':
         name = request.form.get('candidate_name')
         video_url = upload_video()
+        print(video_url)
         if video_url.startswith('/'):
             video_url = video_url[1:]
         else:
@@ -141,7 +142,7 @@ def interview_video_upload():
         else:
             message = 'Please Provide Video and Name.'
 
-        return message
+        return redirect(url_for('interview_analyzer.index'))
     raise Exception('Invalid Method')
 
 
@@ -314,12 +315,12 @@ def generate_label_value_chart(data):
     if data is not None and data != '':
         for emotion, value in data.items():
             if value > .01:
-                labels.append(emotion)
+                labels.append(emotion.capitalize())
                 values.append(value)
 
         if len(labels) == 0 and len(values) == 0 : 
             for emotion, value in data.items():
-                labels.append(emotion)
+                labels.append(emotion.capitalize())
                 values.append(value)
 
     return labels,values
