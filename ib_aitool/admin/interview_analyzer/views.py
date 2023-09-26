@@ -110,6 +110,7 @@ def interview_video_upload():
     if request.method == 'POST':
         name = request.form.get('candidate_name')
         video_url = upload_video()
+        print(video_url)
         if video_url.startswith('/'):
             video_url = video_url[1:]
         else:
@@ -141,7 +142,7 @@ def interview_video_upload():
         else:
             message = 'Please Provide Video and Name.'
 
-        return message
+        return redirect(url_for('interview_analyzer.index'))
     raise Exception('Invalid Method')
 
 
