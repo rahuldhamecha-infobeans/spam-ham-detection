@@ -12,9 +12,9 @@
       <td>{{ candidate.user_data().full_name or 'N/A' }}</td>
       <td>
         {% if candidate.is_report_generated %}
-        <span class="badge generated">Generated</span>
+        <span class="badge generated">YES</span>
         {% else %}
-        <span class="badge not_generated">Not Generated</span>
+        <span class="badge not_generated">NO</span>
         {% endif %}
       </td>
       <td>
@@ -34,7 +34,7 @@
           target="_blank"
           href="{{ candidate.report_url }}"
           class="btn btn-theme-white btn-sm"
-          >Report PDF</a
+          >Check Report</a
         >
         <!--<a target="_blank" href="{{ url_for('interview_analyzer.view_report', id=candidate.id) }}" class="btn btn-theme-white btn-sm "
         >Detail Report</a
@@ -42,7 +42,7 @@
         {% else %} {% if candidate.video_analysis_status == "completed" %}
         <a
           href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}"
-          class="btn btn-theme-white btn-sm"
+          class="btn btn-theme-white btn-sm gr_loader"
           >Generate Report</a
         >
         {% endif %} {% endif %} {% if candidate.video_analysis_status ==
