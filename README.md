@@ -22,7 +22,7 @@
   ````shell
   conda activate ENV_NAME
     ```
-  To check existing Environment list
+  To check existing Environment list.
   ````
 
 ```shell
@@ -30,26 +30,34 @@
 ```
 
 - ##### Step 3 :
+
   Now execute command one by one to install models and remaining dependencies
+
   ```shell
   sudo pip install git+https://github.com/openai/whisper.git
   ```
+
   ```shell
   sudo apt update && sudo apt install ffmpeg
   ```
+
   ```shell
   conda install mysqlclient
   ```
+
   ```shell
   sudo pip install mysql-connector-python
   ```
+
   ```shell
   sudo pip install kaleido
   ```
+
   ```shell
   sudo apt-get install wkhtmltopdf
 
   ```
+
 - ##### Step 4 :
   Now install all required dependencies using below command
   ```shell
