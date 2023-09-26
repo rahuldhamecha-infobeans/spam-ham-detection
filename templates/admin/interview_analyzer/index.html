@@ -109,6 +109,18 @@ Assessment {% endblock %} {% block body_block %}
 
   $(document).ready(function () {
     reload_candidate_list();
+    $(document).on('click','.gr_loader',function(e){
+        e.preventDefault()
+      $('.loader_wrapper').removeClass('d-none')
+      const currentLink = $(this).attr("href");
+
+// Simulate an asynchronous operation (replace this with your actual logic)
+    setTimeout(function() {
+        // After the operation is complete, navigate to the URL
+        window.location.href = currentLink;
+    }, 2000); // Simulated 2-second delay (adjust as needed)
+
+    })
   });
   setInterval(function() {
     reload_candidate_list();
