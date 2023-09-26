@@ -28,6 +28,7 @@ Assessment {% endblock %} {% block body_block %}
                 class="d-flex justify-content-center align-items-center gap-2 "
                 type="file"
                 name="file"
+                id="file"
                 required
                 accept="video/*"
                 style="width: 100%;border:1px solid #d9dee3"
@@ -86,7 +87,13 @@ Assessment {% endblock %} {% block body_block %}
   });
 
   $(document).on('click','.upload_video_btn',function(){
-      $('.loader_wrapper').removeClass('d-none')
+     var name = document.getElementById('candidate_name').value;
+      var fileInput = document.getElementById('file');
+      var file = fileInput.files[0]; // Get the first selected file (if any)
+
+      if (name !== '' && file) {
+        $('.loader_wrapper').removeClass('d-none');
+      }
   })
 
   setInterval(function() {
