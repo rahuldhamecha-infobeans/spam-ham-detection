@@ -1,0 +1,18 @@
+<div class="row">
+    {% if images %}
+        {% for image in images %}
+        <div class="col-2 image_section">
+            <img src="{{ image.image_url }}" alt="Image">
+            <button type="button" data-href="{{ url_for('attendance.delete_image',id=image.id) }}" class="btn btn-danger" onclick="delete_image(this)">Delete</button>
+        </div>
+    {% endfor %}
+    {% else %}
+        <div class="card">
+            <div class="card-body">
+                <div class="col-12 text-center">
+                    <h4>No Images Found</h4>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

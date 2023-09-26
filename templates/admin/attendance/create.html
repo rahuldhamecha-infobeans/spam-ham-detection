@@ -1,0 +1,170 @@
+{% extends 'layouts/admin/dashboard/base.html' %}
+
+{% block page_title %}
+    {% if employee %}
+        Update Employee
+    {% else %}
+        Create Employee
+    {% endif %}
+
+{% endblock %}
+
+{% block page_body_title %} Roles {% endblock %}
+
+{% block body_block %}
+  <!-- Basic Layout -->
+  <div class="row">
+    <div class="col-xl">
+      <div class="card mb-12">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          {% if role %}
+            <h5 class="mb-0">Update Employee</h5>
+          {% else %}
+              <h5 class="mb-0">Create Employee</h5>
+          {% endif %}
+          <small class="text-muted float-end">
+              <a href="{{ url_for('attendance.employee_list') }}" class="btn btn-outline-secondary">Back</a>
+          </small>
+        </div>
+        <div class="card-body">
+        {% for field, errors in form.errors.items() %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                {{ form[field].label }}: {{ ', '.join(errors) }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+          <form method="post">
+              {{ form.hidden_tag() }}
+            <div class="mb-3">
+              <label class="form-label" for="basic-default-fullname">Employee Name</label>
+                {% if employee %}
+                     {{ form.name(class="form-control",id="basic-default-fullname",placeholder="Enter your employee name",value=employee.name) }}
+                {% else %}
+                     {{ form.name(class="form-control",id="basic-default-fullname",placeholder="Enter your employee name") }}
+                {% endif %}
+
+            </div>
+              {% if employee %}
+                    <div class="mb-4">
+                         <label class="form-label" for="basic-default-fullname">Employee Images</label>
+                        <div id="upload-form" class="dropzone" enctype="multipart/form-data">
+                            <input type="hidden" value="{{ employee.id }}" name="emp_id">
+                          <div>
+                            <!-- this is were the previews should be shown. -->
+                            <div class="previews"></div>
+                            <div class="dz-default dz-message">
+                              <button class="dz-button" type="button">
+                                Drop files here to upload
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="images_list">
+
+                        </div>
+                    </div>
+              {% endif %}
+            {{ form.submit(class="btn btn-primary") }}
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block body_scripts %}
+<script src="{{ url_for('static',filename='admin/assets/js/dropzone.min.js') }}"></script>
+{% if employee %}
+    <script>
+      let myDropzone = new Dropzone("#upload-form", {
+        paramName: "file", // The name that will be used to transfer the file
+        maxFilesize: 500, // MB
+        autoProcessQueue: true,
+        'url': '{{ url_for('attendance.upload_images') }}',
+        params: function (params) {
+            params['emp_id'] = "{{ employee.id or None }}";
+            return params;
+        },
+        success: function (file, response) {
+          reload_images_list(file)
+        },
+        addRemoveLinks: true,
+        acceptedFiles: "image/*",
+      });
+
+      myDropzone.on("processing", function(file) {
+        $('.loader_wrapper').removeClass('d-none')
+      });
+
+      $(document).ready(function (){
+          reload_images_list();
+      });
+
+      function reload_images_list(file = '') {
+        $.ajax({
+          type: "GET",
+          url: '{{ url_for('attendance.images_list') }}?emp_id={{ employee.id or 0 }}',
+          dataType: "html",
+          success: function (response) {
+              if(file != ''){
+                  myDropzone.removeFile(file);
+              }
+            $(".images_list").html(response);
+          },
+        });
+      }
+
+      function delete_image(element){
+          let url = $(element).attr('data-href')
+          $.ajax({
+          type: "GET",
+          url: url,
+          success: function (response) {
+                reload_images_list();
+                console.log(response);
+          },
+        });
+      }
+
+    </script>
+{% endif %}
+{% endblock %}
+
+
+{% block head_styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static',filename='admin/assets/css/dropzone.css') }}"
+  type="text/css"
+/>
+<style>
+  .dropzone {
+    min-height: 250px;
+    border: 3px dashed #373742;
+    border-radius: 5px;
+    padding: 20px 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dropzone .dz-message .dz-button {
+    color: #373742;
+    font-size: 20px;
+  }
+
+  .table thead th {
+    background-color: #373450;
+    color: #ffffff !important;
+  }
+
+  .image_section img{
+      width: 100%;
+  }
+</style>
+{% endblock %}

@@ -36,6 +36,11 @@ def get_file_url(dir,name):
     path = os.path.join(app.config['UPLOAD_FOLDER'],dir)
     return send_from_directory(path, name)
 
+@app.route('/uploads/<dir>/<dir_2>/<name>')
+def get_multi_dir_url(dir,dir_2,name):
+    path = os.path.join(app.config['UPLOAD_FOLDER'],dir,dir_2)
+    return send_from_directory(path, name)
+
 app.add_url_rule(
     "/uploads/<dir>/<name>", endpoint="get_file_url", build_only=True
 )
