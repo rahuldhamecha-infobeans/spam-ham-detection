@@ -314,9 +314,9 @@ def generate_label_value_chart(data):
 
     if data is not None and data != '':
         for emotion, value in data.items():
-            if value > .01:
-                labels.append(emotion.capitalize())
-                values.append(value)
+            #if value > .01:
+            labels.append(emotion.capitalize())
+            values.append(value)
 
         if len(labels) == 0 and len(values) == 0 : 
             for emotion, value in data.items():
