@@ -180,6 +180,14 @@
   border-color: #3a3637;
 }
 
+#upload-form label.btn {
+  transition: 0.3s ease;
+}
+
+#upload-form label.btn:hover {
+  transform: translateY(-5px);
+}
+
 .loader_wrapper {
   position: fixed;
   height: 100%;
@@ -199,4 +207,8 @@
   right: 0;
   top: 0;
   bottom: 0;
+}
+
+footer.navigation {
+  margin-top: 20px;
 }
