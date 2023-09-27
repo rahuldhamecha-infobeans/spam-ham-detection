@@ -1,0 +1,219 @@
+{% extends 'layouts/admin/dashboard/base.html' %} {% block page_title %} Smart
+Interview Assessment {% endblock %} {% block page_body_title %} Smart Interview
+Assessment {% endblock %} {% block body_block %}
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+.center{
+text-align:center;
+}
+.css-b6ndjn{
+margin: 0px 0px 20px;
+    font-family: Lexend, sans-serif;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    font-weight: 600;
+    color: rgb(52, 58, 79);
+}
+.css-1jekfck {
+    margin: 0px 0px 22.4px;
+    font-family: Lexend, sans-serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    font-weight: 300;
+    color: rgb(52, 58, 79);
+}
+.css-4vhwja{
+background-color: rgb(255, 255, 255);
+    padding: 24px 24px 6px;
+    margin-top: 12px;
+    border-radius: 8px;
+    border: 1px solid rgb(210, 214, 233);
+}
+</style>
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card css-4vhwja">
+      <h6 class="css-b6ndjn">Import from file</h6><h6 class="css-1jekfck">Upload the Video file for Smart Interview Assessment.</h6><div>
+      <div class="card-body dropzone">
+
+        <div class="container center ">
+      <form id="upload-form"  enctype="multipart/form-data" method="post" action="{{ url_for('interview_analyzer.interview_video_upload') }}" >
+          <div class="container center ">
+            <div class="row">
+                <div class="col-md-12 col-md-offset-3 center">
+                    <div class="btn-container">
+                        <label class="btn" for="file"> <i class="material-icons d-flex justify-content-center align-items-center gap-2"  style="font-size:150px;color:#ea1d3b">cloud_upload</i></label>
+                        <p id="namefile">Click the icon to upload the file (mp4)</p>
+                        <input class="input_text" type="text" id="candidate_name" name="candidate_name" class="form-control" placeholder="Enter Interviewer Name" required />
+
+                       <input hidden="true" type="file" name="file" id="file" required accept="video/*"/>
+                        </br></br>
+                            <div class="row">
+			<div class="col-md-12 center">
+				<!--the defauld disabled btn and the actual one shown only if the three fields are valid-->
+				   <button class="btn btn-primary upload_video_btn" type="submit">Submit</button>
+			</div>
+		</div>
+                    </div>
+                </div>
+            </div>
+          </div>
+			<!--additional fields-->
+<!--          <div class="container center ">-->
+<!--		    <div class="row">-->
+<!--			<div class="col-md-12 center">-->
+<!--				&lt;!&ndash;the defauld disabled btn and the actual one shown only if the three fields are valid&ndash;&gt;-->
+<!--				   <button class="btn btn-primary upload_video_btn" type="submit">Submit</button>-->
+<!--			</div>-->
+<!--		</div>-->
+<!--          </div>-->
+	</form>
+</div>
+    </div>
+
+
+<div class="test" id="test_rock"></div>
+{% endblock %} {% block body_scripts %}
+<script>
+  function reload_candidate_list() {
+    $.ajax({
+      type: "GET",
+      url: '{{ url_for('interview_analyzer.fetch_candidate_list') }}',
+      dataType: "html",
+      success: function (response) {
+        $(".table_div").html(response);
+      },
+    });
+  }
+
+  $(document).ready(function () {
+    reload_candidate_list();
+    $(document).on('click','.gr_loader',function(e){
+        e.preventDefault()
+      $('.loader_wrapper').removeClass('d-none')
+      const currentLink = $(this).attr("href");
+
+// Simulate an asynchronous operation (replace this with your actual logic)
+    setTimeout(function() {
+        // After the operation is complete, navigate to the URL
+        window.location.href = currentLink;
+    }, 2000); // Simulated 2-second delay (adjust as needed)
+
+    })
+  });
+
+  $(document).on('click','.upload_video_btn',function(){
+     var name = document.getElementById('candidate_name').value;
+      var fileInput = document.getElementById('file');
+      var file = fileInput.files[0]; // Get the first selected file (if any)
+       if (!file) {
+    alert("Please upload the video!");
+}
+      if (name !== '' && file) {
+        $('.loader_wrapper').removeClass('d-none');
+      }
+  })
+
+  setInterval(function() {
+    reload_candidate_list();
+  }, 600000);
+
+</script>
+{% endblock %} {% block head_styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static',filename='admin/assets/css/dropzone.css') }}"
+  type="text/css"
+/>
+<style>
+  .dropzone {
+    min-height: 250px;
+    border: 3px dashed #ba0517;
+    border-radius: 5px;
+    padding: 20px 20px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dropzone .dz-message .dz-button {
+    color: #373742;
+    font-size: 20px;
+  }
+
+  .table thead th {
+    background-color: #373450;
+    color: #ffffff !important;
+  }
+
+  .input_text{
+padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.btn-primary{
+border-color: #ff3f3f !important;
+color: #ffffff;
+text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+background-color: #ff3f3f !important;
+border-color: #ff3f3f !important;
+}
+</style>
+<div class="loader_wrapper d-none">
+  <div class="loader">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      style="margin: auto; display: block"
+      width="200px"
+      height="200px"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid"
+    >
+      <circle cx="30" cy="50" fill="#373450" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+      </circle>
+      <circle cx="70" cy="50" fill="#ea1b3d" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="0s"
+        ></animate>
+      </circle>
+      <circle cx="30" cy="50" fill="#373450" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+        <animate
+          attributeName="fill-opacity"
+          values="0;0;1;1"
+          calcMode="discrete"
+          keyTimes="0;0.499;0.5;1"
+          dur="1s"
+          repeatCount="indefinite"
+        ></animate>
+      </circle>
+    </svg>
+  </div>
+</div>
+
+{% endblock %}

@@ -102,6 +102,11 @@ def upload_video():
         return file_url
     return None
 
+@products_blueprint.route('/upload_video_file')
+@login_required
+@has_permission('Interview Analyzer')
+def interview_video_upload_file():
+    return render_template('admin/interview_analyzer/upload_video_file.html')
 
 @products_blueprint.route('upload-video', methods=['POST'])
 @login_required
@@ -537,3 +542,4 @@ def get_video_data(video_id):
 
 app.register_blueprint(
     products_blueprint, url_prefix='/admin/smart-interview-assessment')
+
