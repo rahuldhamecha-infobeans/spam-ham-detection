@@ -165,7 +165,7 @@
 }
 #upload-form .btn.btn-primary {
   background-color: #ffffff;
-  color: #373742;
+  color: #fff;
   border: 1px solid #e6e6ed;
   transition: 0.3s ease;
 }
@@ -178,6 +178,14 @@
 
 #upload-form input:hover {
   border-color: #3a3637;
+}
+
+#upload-form label.btn {
+  transition: 0.3s ease;
+}
+
+#upload-form label.btn:hover {
+  transform: translateY(-5px);
 }
 
 .loader_wrapper {
@@ -199,4 +207,8 @@
   right: 0;
   top: 0;
   bottom: 0;
+}
+
+footer.navigation {
+  margin-top: 20px;
 }

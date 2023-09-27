@@ -1,6 +1,21 @@
+
 <!DOCTYPE html>
 <!-- Header Start -->
-<header class="navigation">
+<header class="navigation" style="
+    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    left: auto;
+    right: 0px;
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 255, 255);
+    position: fixed;
+    z-index: 10;
+    top: 0px;">
   <nav class="navbar navbar-expand-lg" id="navbar">
     <div class="container-fluid">
       <a class="navbar-brand" href="{{ url_for('home_page') }}">
