@@ -189,6 +189,7 @@ def calculate_overall_confidence(facial_emotion_data):
 
     facial_emotion_data = facial_emotion_data.replace("'", "\"")
     facial_emotion_data = json.loads(facial_emotion_data)
+
     neutral_percentage = facial_emotion_data['neutral'] * 100
     happy_percentage = facial_emotion_data['happy'] * 100
     fear_percentage = facial_emotion_data['fear'] * 100
@@ -214,18 +215,37 @@ def calculate_overall_confidence(facial_emotion_data):
     else:
         weighted_average = 55
     weighted_average=weighted_average+surprise_percentage
-        #weighted_average=weighted_average+ facial_emotion_data['surprise']
+
+    CS = (happy_percentage + neutral_percentage+surprise_percentage) - (fear_percentage + sad_percentage)
+    NS = fear_percentage + sad_percentage
+    CL = round(CS / (CS + NS), 2)  
+    #weighted_average=weighted_average+ facial_emotion_data['surprise']
     # Subtract the percentages of 'angry' and 'fear' emotions
     # Ensure that the overall confidence is within the range of 0% to 100%
     overall_confidence = max(0, min(weighted_average, 100))
-    return overall_confidence
+    return overall_confidence,CS,NS,CL
 
 
 def generate_report_pdf(candidate_id):
     candidate = Candidate.query.get(candidate_id)
     
-    overall_interviewer_confidence=calculate_overall_confidence(candidate.overall_interviewer_video_report)
-    overall_candidate_confidence=calculate_overall_confidence(candidate.overall_candidate_video_report)
+    # Create dictionaries to store the values
+    interviewer_confidence_dict = {}
+    candidate_confidence_dict = {}
+
+    # Calculate and store the values for the interviewer
+    overall_interviewer_confidence, CS, NS, CL = calculate_overall_confidence(candidate.overall_interviewer_video_report)
+    interviewer_confidence_dict['overall_confidence'] = overall_interviewer_confidence
+    interviewer_confidence_dict['CS'] = CS
+    interviewer_confidence_dict['NS'] = NS
+    interviewer_confidence_dict['CL'] = CL
+
+    # Calculate and store the values for the candidate
+    overall_candidate_confidence, CS, NS, CL = calculate_overall_confidence(candidate.overall_candidate_video_report)
+    candidate_confidence_dict['overall_confidence'] = overall_candidate_confidence
+    candidate_confidence_dict['CS'] = CS
+    candidate_confidence_dict['NS'] = NS
+    candidate_confidence_dict['CL'] = CL
 
     overall = {"candidate_id": str(candidate_id),
         "interviewer_video_report": ib_format_json(data=candidate.overall_interviewer_video_report),
@@ -234,8 +254,9 @@ def generate_report_pdf(candidate_id):
         "candidate_text_report": ib_format_json(data=candidate.overall_candidate_text_report),
         "interviewer_audio_report": ib_format_json(data=candidate.overall_interviewer_audio_report),
         "candidate_audio_report": ib_format_json(data=candidate.overall_candidate_audio_report),
-        "overall_interviewer_confidence":overall_interviewer_confidence,
-        "overall_candidate_confidence":overall_candidate_confidence
+        "overall_interviewer_confidence":interviewer_confidence_dict,
+        "overall_candidate_confidence":candidate_confidence_dict,
+
     }
     
     data = get_video_data(candidate_id)
