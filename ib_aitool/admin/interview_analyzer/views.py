@@ -185,9 +185,47 @@ def save_plot_image(candidate_name, data, keys, file_name):
     plt.clf()
     return overall_url
 
+def calculate_overall_confidence(facial_emotion_data):
+
+    facial_emotion_data = facial_emotion_data.replace("'", "\"")
+    facial_emotion_data = json.loads(facial_emotion_data)
+    neutral_percentage = facial_emotion_data['neutral'] * 100
+    happy_percentage = facial_emotion_data['happy'] * 100
+    fear_percentage = facial_emotion_data['fear'] * 100
+    angry_percentage = facial_emotion_data['angry'] * 100
+    sad_percentage = facial_emotion_data['sad'] * 100
+    surprise_percentage = facial_emotion_data['surprise'] * 100
+
+    #print(f"{neutral_percentage}{happy_percentage}{fear_percentage}{angry_percentage}{sad_percentage}{surprise_percentage}")
+
+    if neutral_percentage >= 70 and happy_percentage >= 20:
+        weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
+    elif (
+        happy_percentage <= 20
+        and neutral_percentage <= 70
+        and angry_percentage > 5
+        and fear_percentage > 5
+    ):
+        weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
+    elif angry_percentage >= 40 and fear_percentage >= 30:
+        weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
+    elif neutral_percentage >= 40 and happy_percentage >= 5:
+        weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
+    else:
+        weighted_average = 55
+    weighted_average=weighted_average+surprise_percentage
+        #weighted_average=weighted_average+ facial_emotion_data['surprise']
+    # Subtract the percentages of 'angry' and 'fear' emotions
+    # Ensure that the overall confidence is within the range of 0% to 100%
+    overall_confidence = max(0, min(weighted_average, 100))
+    return overall_confidence
+
 
 def generate_report_pdf(candidate_id):
     candidate = Candidate.query.get(candidate_id)
+    
+    overall_interviewer_confidence=calculate_overall_confidence(candidate.overall_interviewer_video_report)
+    overall_candidate_confidence=calculate_overall_confidence(candidate.overall_candidate_video_report)
 
     overall = {"candidate_id": str(candidate_id),
         "interviewer_video_report": ib_format_json(data=candidate.overall_interviewer_video_report),
@@ -195,7 +233,9 @@ def generate_report_pdf(candidate_id):
         "interviewer_text_report": ib_format_json(data=candidate.overall_interviewer_text_report),
         "candidate_text_report": ib_format_json(data=candidate.overall_candidate_text_report),
         "interviewer_audio_report": ib_format_json(data=candidate.overall_interviewer_audio_report),
-        "candidate_audio_report": ib_format_json(data=candidate.overall_candidate_audio_report)
+        "candidate_audio_report": ib_format_json(data=candidate.overall_candidate_audio_report),
+        "overall_interviewer_confidence":overall_interviewer_confidence,
+        "overall_candidate_confidence":overall_candidate_confidence
     }
     
     data = get_video_data(candidate_id)
@@ -246,6 +286,9 @@ def generate_pie_chart(video_process_id, frame_dur_report, text_dur_report,audio
     
     #Text sentiments
     text_data = ib_format_json(text_dur_report)
+    desired_order = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
+
+    text_data = {key: text_data[key] for key in desired_order}
     labels, values = generate_label_value_chart(text_data)
     generate_pie_chart_helper(labels,
                               values, id=video_process_id, name='_text_analysis_chart_')
