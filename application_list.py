@@ -128,7 +128,7 @@ application_list = [
         'project_demo_video': '#',
         'project_demo_ppt': '#',
         'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection',
-        'created_by': 'Sandeep Gupta and Team'
+        'created_by': 'Aman goel, Pragati Nande, Sharad kr.Gupta, Rahul Dhamecha '
     },
 
     # {
