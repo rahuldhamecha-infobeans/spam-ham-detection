@@ -36,9 +36,9 @@
           class="btn btn-theme-white btn-sm"
           >Check Report</a
         >
-        <!--<a target="_blank" href="{{ url_for('interview_analyzer.view_report', id=candidate.id) }}" class="btn btn-theme-white btn-sm "
+        <a target="_blank" href="{{ url_for('interview_analyzer.view_report', id=candidate.id) }}" class="btn btn-theme-white btn-sm "
         >Detail Report</a
-        >-->
+        >
         {% else %} {% if candidate.video_analysis_status == "completed" %}
         <a
           href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}"

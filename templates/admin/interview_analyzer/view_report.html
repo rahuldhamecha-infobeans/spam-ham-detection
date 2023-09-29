@@ -1,6 +1,98 @@
 {% extends 'layouts/admin/dashboard/base.html' %} {% block page_title %} Smart
 Interview Assessment {% endblock %} {% block page_body_title %} Report | Smart
 Interview Assessment {% endblock %} {% block body_block %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="{{ url_for('static', filename='assets/css/details_report.css') }}" rel="stylesheet"/>
+
+<div class="container">
+<div class="row row-css-1" >
+ <div class="report-container">
+  <h3 class="report-title">Interviewer Report</h3>
+<!--     <a   data-toggle="modal" data-target=".bs-example-modal-new">-->
+   <i class="fa fa-info-circle model-css-1" aria-hidden="true" title="Tooltip Text" data-bs-toggle="modal" data-bs-target="#myModal"></i>
+
+<!--  <i class="fa fa-info-circle" aria-hidden="true" style="color:#ff3e1d;font-size:22px;cursor: pointer;" title="Tooltip Text"></i>-->
+<!--</a>-->
+ </div>
+  <div class="col-md-4 stretch-card grid-margin">
+    <div class="card  bg-gradient-info card-img-holder text-white">
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+        <p class="font-weight-normal mb-3 box-p-tag">Confidence Score (CS) <i class="mdi mdi-chart-line mdi-24px float-right;" ></i>
+        </p>
+        <p class="percentage-font">24.00%</p>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 stretch-card grid-margin">
+    <div class="card bg-gradient-danger card-img-holder text-white">
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+        <p class="font-weight-normal mb-3 box-p-tag">Nervousness Score (NS) <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+        </p>
+        <p class="percentage-font">26.00%</p>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 stretch-card grid-margin">
+    <div class="card bg-gradient-success card-img-holder text-white">
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+        <p class="font-weight-normal mb-3 box-p-tag">Confidence Level (CL) <i class="mdi mdi-diamond mdi-24px float-right"></i>
+        </p>
+        <p class="percentage-font">24.00%</p>
+
+      </div>
+    </div>
+  </div>
+</div>
+<br/>
+  <div class="row row-background">
+  <div class="report-container">
+  <h3 class="report-title">Candidate Report</h3>
+  <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Tooltip Text"></i>
+</div>
+  <div class="col-md-4 stretch-card grid-margin">
+    <div class="card  bg-gradient-info card-img-holder text-white">
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+        <p class="font-weight-normal mb-3 box-p-tag">Confidence Score (CS) <i class="mdi mdi-chart-line mdi-24px float-right"></i>
+        </p>
+        <p class="percentage-font">24.00%</p>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 stretch-card grid-margin">
+    <div class="card bg-gradient-danger card-img-holder text-white">
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+        <p class="font-weight-normal mb-3 box-p-tag">Nervousness Score (NS) <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+        </p>
+        <p class="percentage-font">26.00%</p>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 stretch-card grid-margin">
+    <div class="card bg-gradient-success card-img-holder text-white">
+      <div class="card-body">
+        <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute" alt="circle-image" />
+        <p class="font-weight-normal mb-3 box-p-tag">Confidence Level (CL) <i class="mdi mdi-diamond mdi-24px float-right"></i>
+        </p>
+        <p class="percentage-font">24.00%</p>
+
+      </div>
+    </div>
+  </div>
+</div>
+</br></br>
 <div class="row">
   <div class="col-xl-12">
     <div class="card">
@@ -30,7 +122,7 @@ Interview Assessment {% endblock %} {% block body_block %}
                 id="accordionOne"
                 class="accordion-collapse collapse"
                 data-bs-parent="#accordionExample"
-                style=""
+
               >
                 <div class="accordion-body">
                   Lemon drops chocolate cake gummies carrot cake chupa chups
@@ -105,5 +197,33 @@ Interview Assessment {% endblock %} {% block body_block %}
     </div>
   </div>
 </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Modal Heading</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Modal body..
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
 {% endblock %}
