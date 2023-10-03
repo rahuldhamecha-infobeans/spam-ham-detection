@@ -14,6 +14,10 @@ Interview Assessment {% endblock %} {% block head_styles %}
   href="{{ url_for('static', filename='assets/css/details_report.css') }}"
   rel="stylesheet"
 />
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -23,11 +27,19 @@ Interview Assessment {% endblock %} {% block head_styles %}
 {% endblock %} {% block body_block %}
 <div class="container">
   <div class="row mb-4">
-    <h2 class="m-4 text-center">
-      <u>Interview Report of {{ candidate.name }}</u>
-    </h2>
+    <div class="report_header">
+      <h2 class="m-4 text-center">
+        <u>Interview Report of {{ candidate.name }}</u>
+      </h2>
+      <a class="download_report" href="{{ candidate.report_url }}"
+        target="_blank"><button class="file-upload-button css-1ikvom0">
+          <i class="fa fa-download"></i> Download Report
+        </button></a
+      >
+    </div>
     <div class="report-container">
       <h3 class="report-title">Interviewer's Score</h3>
+
       <i
         class="fa fa-info-circle icon-css"
         aria-hidden="true"
@@ -52,7 +64,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-chart-line mdi-24px float-right;"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_interviewer_confidence['CS']}}%
+            {{overall.overall_interviewer_confidence['CS']|round(2)}}%
           </p>
         </div>
       </div>
@@ -70,7 +82,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_interviewer_confidence['NS']}}%
+            {{overall.overall_interviewer_confidence['NS']|round(2)}}%
           </p>
         </div>
       </div>
@@ -121,7 +133,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-chart-line mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_candidate_confidence['CS']}}%
+            {{overall.overall_candidate_confidence['CS']|round(2)}}%
           </p>
         </div>
       </div>
@@ -139,7 +151,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_candidate_confidence['NS']}}%
+            {{overall.overall_candidate_confidence['NS']|round(2)}}%
           </p>
         </div>
       </div>
@@ -202,11 +214,39 @@ Interview Assessment {% endblock %} {% block head_styles %}
                   </button>
                 </h2>
 
-                {% elif ((next_video_process.start_duration|int - 3) <=
-                video_process.end_duration|int <=
-                ((next_video_process.start_duration|int) + 3) and
-                video_process.speaker == 'candidate' and
-                video_process.start_duration != '0' ) %}
+                 <div class="percentage-wrapper">
+                  <div class="interviewer">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Check Graph"
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report="{{video_report.frame_dur_report}}"
+                      data-text-report="{{video_report.text_dur_report}}"
+                      data-audio-report="{{video_report.audio_report}}"
+                    ></i>
+                    Interviewer's Score = CS:%, NS:%, CL:%
+                  </div>
+                {% elif ((next_video_process.start_duration|int -
+                  3) <= video_process.end_duration|int <=
+                  ((next_video_process.start_duration|int) + 3) and
+                  video_process.speaker == 'candidate' and
+                  video_process.start_duration != '0' ) %}
+                  <div class="candidate">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Check Graph"
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report="{{video_report.frame_dur_report}}"
+                      data-text-report="{{video_report.text_dur_report}}"
+                      data-audio-report="{{video_report.audio_report}}"
+                    ></i>
+                    Candidate's Score = CS:%, NS:%, CL:%
+                  </div>
+                </div>
                 <div
                   id="accordion_{{ index - 1 }}"
                   class="accordion-collapse collapse"
@@ -221,38 +261,24 @@ Interview Assessment {% endblock %} {% block head_styles %}
                     ></i
                     >&nbsp;{{ video_process.interview_transcript }}
                   </div>
-                  <div class="percentage-wrapper">
-                    <div class="interviewer">
-                      <i
-                        class="fa fa-info-circle icon-css"
-                        aria-hidden="true"
-                        title="Check Graph"
-                        data-bs-toggle="modal"
-                        data-bs-target="#graphmodal"
-                        data-video-report="{{video_report.frame_dur_report}}"
-                        data-text-report="{{video_report.text_dur_report}}"
-                        data-audio-report="{{video_report.audio_report}}"
-                      ></i>
-                      Interviewer's Score = CS:%, NS:%, CL:%
-                    </div>
-                    <div class="candidate">
-                      <i
-                        class="fa fa-info-circle icon-css"
-                        aria-hidden="true"
-                        title="Check Graph"
-                        data-bs-toggle="modal"
-                        data-bs-target="#graphmodal"
-                        data-video-report="{{video_report.frame_dur_report}}"
-                        data-text-report="{{video_report.text_dur_report}}"
-                        data-audio-report="{{video_report.audio_report}}"
-                      ></i>
-                      Candidate's Score = CS:%, NS:%, CL:%
-                    </div>
-                  </div>
                 </div>
 
                 {% elif index == list_length and video_process.speaker ==
                 'candidate' %}
+                <div class="candidate">
+                  <i
+                    class="fa fa-info-circle icon-css"
+                    aria-hidden="true"
+                    title="Check Graph"
+                    data-bs-toggle="modal"
+                    data-bs-target="#graphmodal"
+                    data-video-report="{{video_report.frame_dur_report}}"
+                    data-text-report="{{video_report.text_dur_report}}"
+                    data-audio-report="{{video_report.audio_report}}"
+                  ></i>
+                  Candidate's Score = CS:%, NS:%, CL:%
+                </div>
+              </div>
                 <div
                   id="accordion_{{ index - 1 }}"
                   class="accordion-collapse collapse"
@@ -265,34 +291,6 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       style="color: #228b22"
                     ></i
                     >&nbsp;{{ video_process.interview_transcript }}
-                  </div>
-                  <div class="percentage-wrapper">
-                    <div class="interviewer">
-                      <i
-                        class="fa fa-info-circle icon-css"
-                        aria-hidden="true"
-                        title="Check Graph"
-                        data-bs-toggle="modal"
-                        data-bs-target="#graphmodal"
-                        data-video-report="{{video_report.frame_dur_report}}"
-                        data-text-report="{{video_report.text_dur_report}}"
-                        data-audio-report="{{video_report.audio_report}}"
-                      ></i>
-                      Interviewer's Score = CS:%, NS:%, CL:%
-                    </div>
-                    <div class="candidate">
-                      <i
-                        class="fa fa-info-circle icon-css"
-                        aria-hidden="true"
-                        title="Check Graph"
-                        data-bs-toggle="modal"
-                        data-bs-target="#graphmodal"
-                        data-video-report="{{video_report.frame_dur_report}}"
-                        data-text-report="{{video_report.text_dur_report}}"
-                        data-audio-report="{{video_report.audio_report}}"
-                      ></i>
-                      Candidate's Score = CS:%, NS:%, CL:%
-                    </div>
                   </div>
                 </div>
                 {%elif video_process.speaker == 'Interviewer'%}
@@ -308,34 +306,6 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       style="color: #228b22"
                     ></i
                     >&nbsp;{{ video_process.interview_transcript }}
-                  </div>
-                  <div class="percentage-wrapper">
-                    <div class="interviewer">
-                      <i
-                        class="fa fa-info-circle icon-css"
-                        aria-hidden="true"
-                        title="Check Graph"
-                        data-bs-toggle="modal"
-                        data-bs-target="#graphmodal"
-                        data-video-report="{{video_report.frame_dur_report}}"
-                        data-text-report="{{video_report.text_dur_report}}"
-                        data-audio-report="{{video_report.audio_report}}"
-                      ></i>
-                      Interviewer's Score = CS:%, NS:%, CL:%
-                    </div>
-                    <div class="candidate">
-                      <i
-                        class="fa fa-info-circle icon-css"
-                        aria-hidden="true"
-                        title="Check Graph"
-                        data-bs-toggle="modal"
-                        data-bs-target="#graphmodal"
-                        data-video-report="{{video_report.frame_dur_report}}"
-                        data-text-report="{{video_report.text_dur_report}}"
-                        data-audio-report="{{video_report.audio_report}}"
-                      ></i>
-                      Candidate's Score = CS:%, NS:%, CL:%
-                    </div>
                   </div>
                 </div>
 
