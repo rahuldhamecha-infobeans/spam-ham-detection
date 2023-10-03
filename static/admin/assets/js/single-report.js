@@ -1,5 +1,6 @@
 $(function () {
   generated_chart = "";
+  let legendWithinBarsPlugin = "";
   $(document).on("click", ".fa-info-circle", function () {
     if (generated_chart) {
       //   var charts = Chart.instances;
@@ -8,6 +9,8 @@ $(function () {
         Chart.instances[key].destroy();
       }
     }
+    registerChartPlugin();
+
     createDoughnutChart($(this), "video-report");
     createDoughnutChart($(this), "text-report");
   });
@@ -81,6 +84,38 @@ function generateLabels(data) {
   return [labels, values];
 }
 
+function registerChartPlugin() {
+  legendWithinBarsPlugin = {
+    afterDraw: (chart) => {
+      console.log("in");
+      if (!chart.options.plugins.legendWithinBars) {
+        return;
+      }
+      console.log("in");
+
+      const ctx = chart.ctx;
+      const dataset = chart.data.datasets[0];
+
+      for (let i = 0; i < dataset.data.length; i++) {
+        const x = dataset.data[i].x;
+        const y = dataset.data[i].y;
+
+        // Adjust the legend position within the bars
+        const legendX = chart.scales.x.getPixelForValue(x);
+        const legendY = chart.scales.y.getPixelForValue(y);
+
+        // Customize the legend appearance (e.g., color, size)
+        ctx.fillStyle = "blue"; // Set the legend color
+        ctx.fillRect(legendX, legendY - 10, 30, 10); // Customize the legend box size
+
+        // Add text label next to the legend box
+        ctx.fillStyle = "black"; // Set the text color
+        ctx.fillText("Label " + (i + 1), legendX + 40, legendY + 4); // Customize text positioning
+      }
+    },
+  };
+}
+
 function getChartOptions() {
   return {
     plugins: {
@@ -99,6 +134,11 @@ function getChartOptions() {
           },
         },
       },
+      legend: {
+        display: true,
+        position: "bottom",
+      },
+      // legendWithinBars: true, // Enable the custom plugin
     },
     responsive: true, // Make the chart responsive
   };
