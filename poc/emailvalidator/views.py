@@ -1,6 +1,6 @@
 
 import requests
-from flask import request, jsonify, render_template, Blueprint
+from flask import request, jsonify, render_template, Blueprint,make_response
 from flask_restful import Resource, Api
 import spacy
 import string
@@ -38,17 +38,18 @@ class SpamHamDetection(Resource):
         try:
             # Get the JSON data from the POST request
             data = request.get_json()
+            unanswered_qsn = []
+            answered_qsn = []
             # Check if the 'email_content' field exists in the JSON data
             if 'emailto_content' in data:
                 email_content = data['emailto_content']
                 email_reply = data['email_reply']
+                email_reply = email_reply.replace('\n', "")
                 detected_questions = preprocess_email_content(email_content)
                 # Return the detected questions as JSON response
                 total_qsn = len(detected_questions)
-                unanswered_qsn = []
-                answered_qsn = []
                 is_ans = 0
-                if detected_questions:
+                if len(detected_questions):
                     for question in detected_questions:
                         output = query({
                             "inputs": {
@@ -57,18 +58,21 @@ class SpamHamDetection(Resource):
                             },
                         })
                         if output:
-                            if output['score'] > 0.2:
+                            if output['score'] > 0.7:
                                 is_ans = is_ans+1
                                 answered_qsn.append(str(question))
                             else:
                                 unanswered_qsn.append(str(question))
 
-                correct_reply_accuracy = (is_ans/total_qsn)*100
-                return jsonify({"detected_questions": detected_questions, "unanswered_qsn": unanswered_qsn, "answered_qsn": answered_qsn, "accuracy": correct_reply_accuracy})
+                correct_reply_accuracy = '{:.2f}'.format((is_ans/total_qsn)*100)
+                response_data = jsonify({"detected_questions": detected_questions, "unanswered_qsn": unanswered_qsn, "answered_qsn": answered_qsn, "accuracy": correct_reply_accuracy})
+                return make_response(response_data, 200)
             else:
-                return jsonify({"error": "Missing 'email_content' field in the request data"}), 400
+                response_data = jsonify({"error": "Missing 'email_content' field in the request data"})
+                return make_response(response_data, 400)
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            response_data = jsonify({"error": str(e)})
+            return make_response(response_data,500)
 
 
 def preprocess_email_content(email_content):
@@ -85,7 +89,6 @@ def preprocess_email_content(email_content):
 
     # Process the email content using spaCy
     doc = nlp(email_lower)
-
     # Initialize a list to store detected questions
     questions = []
 
@@ -99,7 +102,10 @@ def preprocess_email_content(email_content):
 
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
-    return response.json()
+    if response:
+        return response.json()
+    else:
+        return {}
 
 
 api.add_resource(SpamHamDetection, '/api/spam-ham-email-detection')

@@ -133,8 +133,8 @@ endblock %} {% block body_block %}
       success: function (response) {
         $("#block-feed").removeClass("d-none");
         $("#loading-icon").toggleClass("active");
+        let html = "";
         if (response.detected_questions.length > 0) {
-          let html = "";
           $.each(response.detected_questions, function (key, item) {
             html +=
               '<div class="col-lg-12 mt-4">' +
@@ -147,9 +147,11 @@ endblock %} {% block body_block %}
           $("#ans-accuracy")
             .html("Overall Accuracy: " + response.accuracy + "%")
             .css("color", "green");
+        }else{
+            $(".suggestion_list").html('');
         }
+        let html1 = "";
         if (response.unanswered_qsn.length > 0) {
-          let html1 = "";
           console.log(response.unanswered_qsn);
           $.each(response.unanswered_qsn, function (key1, item1) {
             html1 +=
@@ -161,11 +163,12 @@ endblock %} {% block body_block %}
           });
           $(".unans_list").html(html1);
         } else {
-          // $('#unans-qsn').html().css('display:none')
+          $('#unans-qsn').html('');
           $("#unans-qsn").addClass("d-none");
         }
+
+        let html2 = "";
         if (response.answered_qsn.length > 0) {
-          let html2 = "";
           console.log(response.answered_qsn);
           $.each(response.answered_qsn, function (key2, item2) {
             html2 +=
@@ -178,6 +181,7 @@ endblock %} {% block body_block %}
           $(".ans_list").html(html2);
         } else {
           // $('#unans-qsn').html().css('display:none')
+          $("#ans-qsn").html('');
           $("#ans-qsn").addClass("d-none");
         }
       },

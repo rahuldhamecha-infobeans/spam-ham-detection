@@ -103,19 +103,19 @@ application_list = [
         'created_by': 'Sharad Kumar Gupta & Aman Goel'
     },
 
-    # {
-    #     'route': 'emailvalidator.email_validator',
-    #     'image_path': 'pictures/spam.jpg',
-    #     'title': 'Email<br><span>Validator</span>',
-    #     # New Data
-    #     'project_name': 'Email Validator',
-    #     'project_description': 'The "Email Validator" typically involves a user or recipient failing to review or acknowledge their emails in a timely manner. This can result in missed communication, important messages going unnoticed, and potential disruptions in professional or personal interactions.',
-    #     'project_demo_link': 'http://aipocdemo.creatingwow.in/',
-    #     'project_demo_video': '#',
-    #     'project_demo_ppt': 'https://docs.google.com/presentation/d/166y33tUod1R_omgqPIeIwHTI-s-P8TFE/edit',
-    #     'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection',
-    #     'created_by': 'Pragati Nande & Sharad Kumar Gupta'
-    # },
+    {
+        'route': 'emailvalidator.email_validator',
+        'image_path': 'pictures/spam.jpg',
+        'title': 'Email<br><span>Validator</span>',
+        # New Data
+        'project_name': 'Email Validator',
+        'project_description': 'The "Email Validator" typically involves a user or recipient failing to review or acknowledge their emails in a timely manner. This can result in missed communication, important messages going unnoticed, and potential disruptions in professional or personal interactions.',
+        'project_demo_link': 'http://aipocdemo.creatingwow.in/',
+        'project_demo_video': '#',
+        'project_demo_ppt': 'https://docs.google.com/presentation/d/166y33tUod1R_omgqPIeIwHTI-s-P8TFE/edit',
+        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection',
+        'created_by': 'Pragati Nande & Sharad Kumar Gupta'
+    },
 
     {
         'route': 'interview_analyzer.index',
