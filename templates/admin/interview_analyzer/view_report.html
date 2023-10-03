@@ -1,109 +1,383 @@
 {% extends 'layouts/admin/dashboard/base.html' %} {% block page_title %} Smart
 Interview Assessment {% endblock %} {% block page_body_title %} Report | Smart
-Interview Assessment {% endblock %} {% block body_block %}
-<div class="row">
-  <div class="col-xl-12">
-    <div class="card">
-      <div class="card-header">
-        <h4>Report</h4>
-      </div>
-      <div class="card-body">
-        <h5>Candidate Name : {{ candidate.name }}</h5>
-        <div class="col-md mb-4 mb-md-0">
-          <small class="text-light fw-semibold">Question Analysis</small>
-          <div class="accordion mt-3" id="accordionExample">
-            <div class="card accordion-item">
-              <h2 class="accordion-header" id="headingOne">
-                <button
-                  type="button"
-                  class="accordion-button collapsed"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#accordionOne"
-                  aria-expanded="false"
-                  aria-controls="accordionOne"
-                >
-                  Question 1
-                </button>
-              </h2>
+Interview Assessment {% endblock %} {% block head_styles %}
 
-              <div
-                id="accordionOne"
-                class="accordion-collapse collapse"
-                data-bs-parent="#accordionExample"
-                style=""
-              >
-                <div class="accordion-body">
-                  Lemon drops chocolate cake gummies carrot cake chupa chups
-                  muffin topping. Sesame snaps icing marzipan gummi bears
-                  macaroon dragée danish caramels powder. Bear claw dragée
-                  pastry topping soufflé. Wafer gummi bears marshmallow pastry
-                  pie.
-                </div>
-              </div>
-            </div>
-            <div class="card accordion-item">
-              <h2 class="accordion-header" id="headingTwo">
-                <button
-                  type="button"
-                  class="accordion-button collapsed"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#accordionTwo"
-                  aria-expanded="false"
-                  aria-controls="accordionTwo"
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='assets/css/details_report.css') }}"
+  rel="stylesheet"
+/>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='admin/assets/js/single-report.js') }}"></script>
+
+{% endblock %} {% block body_block %}
+<div class="container">
+  <div class="row mb-4">
+    <h2 class="m-4 text-center">
+      <u>Interview Report of {{ candidate.name }}</u>
+    </h2>
+    <div class="report-container">
+      <h3 class="report-title">Interviewer's Score</h3>
+      <i
+        class="fa fa-info-circle icon-css"
+        aria-hidden="true"
+        title="Check Graph"
+        data-bs-toggle="modal"
+        data-bs-target="#graphmodal"
+        data-video-report="{{candidate.overall_interviewer_video_report}}"
+        data-text-report="{{candidate.overall_interviewer_text_report}}"
+        data-audio-report="{{candidate.overall_interviewer_audio_report}}"
+      ></i>
+    </div>
+    <div class="col-md-4 stretch-card grid-margin">
+      <div class="card bg-gradient-info card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Confidence Score (CS)
+            <i class="mdi mdi-chart-line mdi-24px float-right;"></i>
+          </p>
+          <p class="percentage-font">
+            {{overall.overall_interviewer_confidence['CS']}}%
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 stretch-card grid-margin">
+      <div class="card bg-gradient-danger card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Nervousness Score (NS)
+            <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            {{overall.overall_interviewer_confidence['NS']}}%
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 stretch-card grid-margin">
+      <div class="card bg-gradient-success card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Confidence Level (CL)
+            <i class="mdi mdi-diamond mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            {{overall.overall_interviewer_confidence['CL']*100}}%
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="report-container">
+      <h3 class="report-title">Candidate's Score</h3>
+      <i
+        class="fa fa-info-circle icon-css"
+        aria-hidden="true"
+        title="Check Graph"
+        data-bs-toggle="modal"
+        data-bs-target="#graphmodal"
+        data-video-report="{{candidate.overall_candidate_video_report}}"
+        data-text-report="{{candidate.overall_candidate_text_report}}"
+        data-audio-report="{{candidate.overall_candidate_audio_report}}"
+      ></i>
+    </div>
+    <div class="col-md-4 stretch-card grid-margin">
+      <div class="card bg-gradient-info card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Confidence Score (CS)
+            <i class="mdi mdi-chart-line mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            {{overall.overall_candidate_confidence['CS']}}%
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 stretch-card grid-margin">
+      <div class="card bg-gradient-danger card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Nervousness Score (NS)
+            <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            {{overall.overall_candidate_confidence['NS']}}%
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 stretch-card grid-margin">
+      <div class="card bg-gradient-success card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Confidence Level (CL)
+            <i class="mdi mdi-diamond mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            {{overall.overall_candidate_confidence['CL']*100}}%
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <h4>Question Analysis</h4>
+        </div>
+        <div class="card-body">
+          <div class="col-md mb-4 mb-md-0">
+            <div class="accordion mt-3" id="question_answer_accordion">
+              {% set list_length = report_data|length %} {% for video_report,
+              video_process in report_data %} {% set index = loop.index %} {% if
+              index <= list_length %} {% if index == list_length %} {% set
+              next_video_process = report_data[index-1][1] %} {% else %} {% set
+              next_video_process = report_data[index][1] %} {% endif %} {% if
+              (next_video_process.start_duration|int - 3) <=
+              video_process.end_duration|int <=
+              (next_video_process.start_duration|int + 3) and
+              video_process.speaker == 'Interviewer' %}
+
+              <div class="card accordion-item">
+                <h2 class="accordion-header" id="heading_{{ index }}">
+                  <button
+                    type="button"
+                    class="accordion-button collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#accordion_{{ index }}"
+                    aria-expanded="false"
+                    aria-controls="accordion_{{ index }}"
+                  >
+                    <i
+                      class="fa fa-question-circle"
+                      aria-hidden="true"
+                      style="color: #aa142d"
+                    ></i
+                    >&nbsp;{{ video_process.interview_transcript }}
+                  </button>
+                </h2>
+
+                {% elif ((next_video_process.start_duration|int - 3) <=
+                video_process.end_duration|int <=
+                ((next_video_process.start_duration|int) + 3) and
+                video_process.speaker == 'candidate' and
+                video_process.start_duration != '0' ) %}
+                <div
+                  id="accordion_{{ index - 1 }}"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#question_answer_accordion"
+                  aria-labelledby="heading_{{ index }}"
                 >
-                  Question 2
-                </button>
-              </h2>
-              <div
-                id="accordionTwo"
-                class="accordion-collapse collapse"
-                aria-labelledby="headingTwo"
-                data-bs-parent="#accordionExample"
-                style=""
-              >
-                <div class="accordion-body">
-                  Dessert ice cream donut oat cake jelly-o pie sugar plum
-                  cheesecake. Bear claw dragée oat cake dragée ice cream halvah
-                  tootsie roll. Danish cake oat cake pie macaroon tart donut
-                  gummies. Jelly beans candy canes carrot cake. Fruitcake
-                  chocolate chupa chups.
+                  <div class="accordion-body">
+                    <i
+                      class="fa fa-check-circle"
+                      aria-hidden="true"
+                      style="color: #228b22"
+                    ></i
+                    >&nbsp;{{ video_process.interview_transcript }}
+                  </div>
+                  <div class="percentage-wrapper">
+                    <div class="interviewer">
+                      <i
+                        class="fa fa-info-circle icon-css"
+                        aria-hidden="true"
+                        title="Check Graph"
+                        data-bs-toggle="modal"
+                        data-bs-target="#graphmodal"
+                        data-video-report="{{video_report.frame_dur_report}}"
+                        data-text-report="{{video_report.text_dur_report}}"
+                        data-audio-report="{{video_report.audio_report}}"
+                      ></i>
+                      Interviewer's Score = CS:%, NS:%, CL:%
+                    </div>
+                    <div class="candidate">
+                      <i
+                        class="fa fa-info-circle icon-css"
+                        aria-hidden="true"
+                        title="Check Graph"
+                        data-bs-toggle="modal"
+                        data-bs-target="#graphmodal"
+                        data-video-report="{{video_report.frame_dur_report}}"
+                        data-text-report="{{video_report.text_dur_report}}"
+                        data-audio-report="{{video_report.audio_report}}"
+                      ></i>
+                      Candidate's Score = CS:%, NS:%, CL:%
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="card accordion-item">
-              <h2 class="accordion-header" id="headingThree">
-                <button
-                  type="button"
-                  class="accordion-button collapsed"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#accordionThree"
-                  aria-expanded="false"
-                  aria-controls="accordionThree"
+
+                {% elif index == list_length and video_process.speaker ==
+                'candidate' %}
+                <div
+                  id="accordion_{{ index - 1 }}"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#question_answer_accordion"
                 >
-                  Question 3
-                </button>
-              </h2>
-              <div
-                id="accordionThree"
-                class="accordion-collapse collapse"
-                aria-labelledby="headingThree"
-                data-bs-parent="#accordionExample"
-                style=""
-              >
-                <div class="accordion-body">
-                  Oat cake toffee chocolate bar jujubes. Marshmallow brownie
-                  lemon drops cheesecake. Bonbon gingerbread marshmallow sweet
-                  jelly beans muffin. Sweet roll bear claw candy canes oat cake
-                  dragée caramels. Ice cream wafer danish cookie caramels
-                  muffin.
+                  <div class="accordion-body">
+                    <i
+                      class="fa fa-check-circle"
+                      aria-hidden="true"
+                      style="color: #228b22"
+                    ></i
+                    >&nbsp;{{ video_process.interview_transcript }}
+                  </div>
+                  <div class="percentage-wrapper">
+                    <div class="interviewer">
+                      <i
+                        class="fa fa-info-circle icon-css"
+                        aria-hidden="true"
+                        title="Check Graph"
+                        data-bs-toggle="modal"
+                        data-bs-target="#graphmodal"
+                        data-video-report="{{video_report.frame_dur_report}}"
+                        data-text-report="{{video_report.text_dur_report}}"
+                        data-audio-report="{{video_report.audio_report}}"
+                      ></i>
+                      Interviewer's Score = CS:%, NS:%, CL:%
+                    </div>
+                    <div class="candidate">
+                      <i
+                        class="fa fa-info-circle icon-css"
+                        aria-hidden="true"
+                        title="Check Graph"
+                        data-bs-toggle="modal"
+                        data-bs-target="#graphmodal"
+                        data-video-report="{{video_report.frame_dur_report}}"
+                        data-text-report="{{video_report.text_dur_report}}"
+                        data-audio-report="{{video_report.audio_report}}"
+                      ></i>
+                      Candidate's Score = CS:%, NS:%, CL:%
+                    </div>
+                  </div>
                 </div>
+                {%elif video_process.speaker == 'Interviewer'%}
+                <div
+                  id="accordion_{{ index - 1 }}"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#question_answer_accordion"
+                >
+                  <div class="accordion-body">
+                    <i
+                      class="fa fa-check-circle"
+                      aria-hidden="true"
+                      style="color: #228b22"
+                    ></i
+                    >&nbsp;{{ video_process.interview_transcript }}
+                  </div>
+                  <div class="percentage-wrapper">
+                    <div class="interviewer">
+                      <i
+                        class="fa fa-info-circle icon-css"
+                        aria-hidden="true"
+                        title="Check Graph"
+                        data-bs-toggle="modal"
+                        data-bs-target="#graphmodal"
+                        data-video-report="{{video_report.frame_dur_report}}"
+                        data-text-report="{{video_report.text_dur_report}}"
+                        data-audio-report="{{video_report.audio_report}}"
+                      ></i>
+                      Interviewer's Score = CS:%, NS:%, CL:%
+                    </div>
+                    <div class="candidate">
+                      <i
+                        class="fa fa-info-circle icon-css"
+                        aria-hidden="true"
+                        title="Check Graph"
+                        data-bs-toggle="modal"
+                        data-bs-target="#graphmodal"
+                        data-video-report="{{video_report.frame_dur_report}}"
+                        data-text-report="{{video_report.text_dur_report}}"
+                        data-audio-report="{{video_report.audio_report}}"
+                      ></i>
+                      Candidate's Score = CS:%, NS:%, CL:%
+                    </div>
+                  </div>
+                </div>
+
+                {% endif %} {% if video_process.speaker == 'candidate' %}
               </div>
+              {% endif %} {% endif %} {% endfor %}
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-{% endblock %}
+  <!-- The Modal -->
+  <div class="modal" id="graphmodal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="chart-wrapper">
+            <canvas id="video_report_canvas"></canvas>
+            <div id="chart-text">Video Analysis</div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="text_report_canvas"></canvas>
+            <div id="chart-text">Text Analysis</div>
+          </div>
+          <!-- <div class="chart-wrapper">
+            <canvas id="audio_report_canvas"></canvas>
+            <div id="chart-text">Center Text</div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}
+</div>

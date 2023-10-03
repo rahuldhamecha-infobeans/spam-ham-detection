@@ -29,6 +29,7 @@ import subprocess
 import time
 import queue
 import threading
+import plotly
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 import plotly.io as pio
@@ -197,8 +198,6 @@ def calculate_overall_confidence(facial_emotion_data):
     sad_percentage = facial_emotion_data['sad'] * 100
     surprise_percentage = facial_emotion_data['surprise'] * 100
 
-    #print(f"{neutral_percentage}{happy_percentage}{fear_percentage}{angry_percentage}{sad_percentage}{surprise_percentage}")
-
     if neutral_percentage >= 70 and happy_percentage >= 20:
         weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
     elif (
@@ -219,7 +218,8 @@ def calculate_overall_confidence(facial_emotion_data):
     CS = (happy_percentage + neutral_percentage+surprise_percentage) - (fear_percentage + sad_percentage)
     NS = fear_percentage + sad_percentage
     CL = round(CS / (CS + NS), 2)  
-    #weighted_average=weighted_average+ facial_emotion_data['surprise']
+
+    # weighted_average= weighted_average+ facial_emotion_data['surprise']
     # Subtract the percentages of 'angry' and 'fear' emotions
     # Ensure that the overall confidence is within the range of 0% to 100%
     overall_confidence = max(0, min(weighted_average, 100))
@@ -227,6 +227,39 @@ def calculate_overall_confidence(facial_emotion_data):
 
 
 def generate_report_pdf(candidate_id):
+    candidate = Candidate.query.get(candidate_id)
+    data,overall = create_overall_data_by_candidate_id(candidate_id)
+
+    for (video_report, video_process) in data:
+        generate_pie_chart(
+                video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,video_report.audio_report,overall)
+
+    templateLoader = jinja2.FileSystemLoader(searchpath="./")
+    templateEnv = jinja2.Environment(loader=templateLoader)
+    TEMPLATE_FILE = "templates/admin/interview_analyzer/report.html"
+    template = templateEnv.get_template(TEMPLATE_FILE)
+
+    candidate_name = candidate.name.replace(' ', '_').lower()
+    current_date = datetime.now()
+    current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
+    
+    outputText = template.render(
+        candidate=candidate,report_data=data, base_dir=BASE_DIR,overall=overall)
+
+    dir_path = get_dir_path('reports')
+    file_name = candidate_name + str(current_time) + '_reports.pdf'
+    report_path = dir_path + '/' + file_name
+    report_url = '/uploads/reports/' + file_name
+    pdfkit.from_string(outputText, report_path, options={
+        "enable-local-file-access": ""})
+    candidate_data = Candidate.query.filter_by(id=candidate_id).first()
+    if candidate_data:
+        candidate_data.report_url = report_url
+        db.session.commit()
+    return report_url
+
+
+def create_overall_data_by_candidate_id(candidate_id):
     candidate = Candidate.query.get(candidate_id)
     
     # Create dictionaries to store the values
@@ -256,47 +289,10 @@ def generate_report_pdf(candidate_id):
         "candidate_audio_report": ib_format_json(data=candidate.overall_candidate_audio_report),
         "overall_interviewer_confidence":interviewer_confidence_dict,
         "overall_candidate_confidence":candidate_confidence_dict,
-
     }
     
     data = get_video_data(candidate_id)
-    for (video_report, video_process) in data:
-        generate_pie_chart(
-                video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,video_report.audio_report,overall)
-
-        # if(video_process.end_duration == data[index + 1][1].start_duration and video_process.speaker=='Interviewer'):
-        #     generate_pie_chart(
-        #         video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,overall)
-
-        # if(video_process.end_duration == data[index + 1][1].start_duration and video_process.speaker=='Candidate'):
-        #     generate_pie_chart(
-        #         video_report.video_process_id, video_report.frame_dur_report, video_report.text_dur_report,overall)
-
-        
-    templateLoader = jinja2.FileSystemLoader(searchpath="./")
-    templateEnv = jinja2.Environment(loader=templateLoader)
-    TEMPLATE_FILE = "templates/admin/interview_analyzer/report.html"
-    template = templateEnv.get_template(TEMPLATE_FILE)
-
-    candidate_name = candidate.name.replace(' ', '_').lower()
-    current_date = datetime.now()
-    current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
-    
-    outputText = template.render(
-        candidate=candidate,report_data=data, base_dir=BASE_DIR,overall=overall)
-
-    dir_path = get_dir_path('reports')
-    file_name = candidate_name + str(current_time) + '_reports.pdf'
-    report_path = dir_path + '/' + file_name
-    report_url = '/uploads/reports/' + file_name
-    pdfkit.from_string(outputText, report_path, options={
-        "enable-local-file-access": ""})
-    candidate_data = Candidate.query.filter_by(id=candidate_id).first()
-    if candidate_data:
-        candidate_data.report_url = report_url
-        db.session.commit()
-    return report_url
-
+    return data,overall
 
 def generate_pie_chart(video_process_id, frame_dur_report, text_dur_report,audio_report,overall):
     #Video analysis
@@ -373,7 +369,7 @@ def generate_pie_chart_helper( labels, values, id, name):
         # Create a pie chart using Plotly
         fig = make_subplots(rows=1, cols=1)
         fig.add_trace(go.Pie(showlegend=False, labels=labels, values=values,textinfo="label+percent", marker=dict(colors=colors), hole=.3,textfont_size=17))
-        
+
         chart_image_path = os.path.join(graph_dir, name + _id + '.svg')
         pio.write_image(fig, chart_image_path, format='svg')
 
@@ -414,7 +410,9 @@ def remove_files(template_data):
 @has_permission('Interview Analyzer')
 def view_report(id):
     candidate = Candidate.query.get(id)
-    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate)
+    data,overall = create_overall_data_by_candidate_id(id)
+
+    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate,report_data=data,overall=overall)
 
 
 
@@ -490,10 +488,6 @@ def get_timestamp_emotion(queue,candidate_id):
             video_name = os.path.basename(videoPath)
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
-            #print("Video Name without Extension:", video_name_without_extension)
-
-#            audio_emotions_interviewer = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/interviewer/audioclips/')
-#            audio_emotions_candidate = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/candidate/audioclips/')
             audio_emotions_interviewer={}
             audio_emotions_candidate={}
             overall_timestamp_interviewer=analyze_timestamp_folder(f'uploads/{video_name_without_extension}/interviewer/videoframes/')
@@ -589,15 +583,7 @@ def get_video_data(video_id):
             .join(VideoProcess, VideoReport.video_process_id == VideoProcess.id) \
             .filter(VideoProcess.vid == video_id)
         query = query.order_by(VideoReport.video_process_id.asc())
-        # query = db.session.query(VideoReport, VideoProcess, Candidate) \
-        #     .join(VideoProcess, VideoReport.video_process_id == VideoProcess.id) \
-        #     .join(Candidate, VideoProcess.vid == Candidate.id) \
-        #     .filter(VideoProcess.vid == video_id)
-
         data = query.all()
-        print(data)
-        # print(query)
-        # Print the SQL query
         return data
     except Exception as e:
         print(f"Error: {e}")

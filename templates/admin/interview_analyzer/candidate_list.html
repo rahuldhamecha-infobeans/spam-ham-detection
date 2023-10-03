@@ -19,11 +19,6 @@
       </td>
       <td>
         {% if candidate.is_report_generated %}
-        <!--        <a-->
-        <!--          href="{{ url_for('interview_analyzer.view_report',id=candidate.id) }}"-->
-        <!--          class="btn btn-info btn-sm"-->
-        <!--          >View Report</a-->
-        <!--        >-->
         <a
           target="_blank"
           href="/{{ candidate.interview_video  }}"
@@ -36,9 +31,12 @@
           class="btn btn-theme-white btn-sm"
           >Check Report</a
         >
-        <!--<a target="_blank" href="{{ url_for('interview_analyzer.view_report', id=candidate.id) }}" class="btn btn-theme-white btn-sm "
-        >Detail Report</a
-        >-->
+        <a
+          target="_blank"
+          href="{{ url_for('interview_analyzer.view_report', id=candidate.id) }}"
+          class="btn btn-theme-white btn-sm"
+          >View Report</a
+        >
         {% else %} {% if candidate.video_analysis_status == "completed" %}
         <a
           href="{{ url_for('interview_analyzer.generate_report_command') }}?candidate={{ candidate.id }}"
@@ -53,8 +51,8 @@
           class="btn btn-theme-white btn-sm analyze-this"
           >Analyze Video</a
         >
-        {% endif %}
-        {% if candidate.video_analysis_status == "inprogress" %} Analyzing Please wait... for 15 -30 minutes  {% endif %}
+        {% endif %} {% if candidate.video_analysis_status == "inprogress" %}
+        Analyzing Please wait... for 15 -30 minutes {% endif %}
       </td>
     </tr>
     {% endfor %} {% else %}
