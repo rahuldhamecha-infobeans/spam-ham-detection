@@ -52,7 +52,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-chart-line mdi-24px float-right;"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_interviewer_confidence['CS']}}%
+            {{overall.overall_interviewer_confidence['CS']|round(2)}}%
           </p>
         </div>
       </div>
@@ -70,7 +70,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_interviewer_confidence['NS']}}%
+            {{overall.overall_interviewer_confidence['NS']|round(2)}}%
           </p>
         </div>
       </div>
@@ -121,7 +121,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-chart-line mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_candidate_confidence['CS']}}%
+            {{overall.overall_candidate_confidence['CS']|round(2)}}%
           </p>
         </div>
       </div>
@@ -139,7 +139,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_candidate_confidence['NS']}}%
+            {{overall.overall_candidate_confidence['NS']|round(2)}}%
           </p>
         </div>
       </div>
