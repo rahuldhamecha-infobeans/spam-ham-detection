@@ -21,8 +21,8 @@ import os
 import jinja2
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt,save_frames_for_timestamps,save_audioclip_timestamps,analyze_timestamp_folder,analyze_audio_timestamps_clips
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report,generate_and_save_overall_video_report
-from jinja2 import Environment
 
+import glob
 current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 products_blueprint = Blueprint('interview_analyzer', __name__)
@@ -563,6 +563,8 @@ def run_tasks():
                     if candidate_data:
                         candidate_data.video_analysis_status = 'completed'
                         db.session.commit()
+                    c_data = Candidate.get_video_data(candidate_id)
+                    remove_all_model_created_files(c_data.interview_video)
             else:
                 final_result=False
     else:
@@ -577,6 +579,24 @@ def view_video(id):
     candidate_data = Candidate.query.filter_by(id=id).first()
     return render_template(candidate_data.interview_video)
 
+def remove_all_model_created_files(videopath):
+    #current_dir = os.getcwd()
+    # Extract the base name (without extension) from the video file path
+    video_file_path = videopath
+    base_name = os.path.splitext(os.path.basename(video_file_path))[0]
+    folder_path = video_file_path
+
+    # List all files in the folder
+    all_files = glob.glob(os.path.join(BASE_DIR, '*'))
+
+    # Iterate through the files and delete those with matching base names
+    for file_path in all_files:
+        print(file_path)
+        file_base_name, file_extension = os.path.splitext(os.path.basename(file_path))
+        if file_base_name.startswith(base_name):
+            os.remove(file_path)
+            print(f"Deleted file: {file_path}")
+    return jsonify({'result': True}) 
 
 def get_video_data(video_id):
     try:
