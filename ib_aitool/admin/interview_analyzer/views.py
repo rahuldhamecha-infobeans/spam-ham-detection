@@ -21,8 +21,8 @@ import os
 import jinja2
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt,save_frames_for_timestamps,save_audioclip_timestamps,analyze_timestamp_folder,analyze_audio_timestamps_clips
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report,generate_and_save_overall_video_report
+from jinja2 import Environment
 
-import glob
 current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 products_blueprint = Blueprint('interview_analyzer', __name__)
@@ -216,7 +216,7 @@ def calculate_overall_confidence(facial_emotion_data):
         weighted_average = 55
     weighted_average=weighted_average+surprise_percentage
 
-    CS = (happy_percentage + neutral_percentage+surprise_percentage) - (fear_percentage + sad_percentage)
+    CS = (happy_percentage + neutral_percentage+surprise_percentage)
     NS = fear_percentage + sad_percentage
     CL = CS / (CS + NS)  
 
@@ -563,8 +563,6 @@ def run_tasks():
                     if candidate_data:
                         candidate_data.video_analysis_status = 'completed'
                         db.session.commit()
-                    c_data = Candidate.get_video_data(candidate_id)
-                    remove_all_model_created_files(c_data.interview_video)
             else:
                 final_result=False
     else:
@@ -579,24 +577,6 @@ def view_video(id):
     candidate_data = Candidate.query.filter_by(id=id).first()
     return render_template(candidate_data.interview_video)
 
-def remove_all_model_created_files(videopath):
-    #current_dir = os.getcwd()
-    # Extract the base name (without extension) from the video file path
-    video_file_path = videopath
-    base_name = os.path.splitext(os.path.basename(video_file_path))[0]
-    folder_path = video_file_path
-
-    # List all files in the folder
-    all_files = glob.glob(os.path.join(BASE_DIR, '*'))
-
-    # Iterate through the files and delete those with matching base names
-    for file_path in all_files:
-        print(file_path)
-        file_base_name, file_extension = os.path.splitext(os.path.basename(file_path))
-        if file_base_name.startswith(base_name):
-            os.remove(file_path)
-            print(f"Deleted file: {file_path}")
-    return jsonify({'result': True}) 
 
 def get_video_data(video_id):
     try:
@@ -610,6 +590,36 @@ def get_video_data(video_id):
         print(f"Error: {e}")
         return None
 
+def calculate_qna_confidence(facial_emotion_data):
+
+    facial_emotion_data = facial_emotion_data.replace("'", "\"")
+    facial_emotion_data = json.loads(facial_emotion_data)
+
+    neutral_percentage = facial_emotion_data['neutral'] * 100
+    happy_percentage = facial_emotion_data['happy'] * 100
+    fear_percentage = facial_emotion_data['fear'] * 100
+    angry_percentage = facial_emotion_data['angry'] * 100
+    sad_percentage = facial_emotion_data['sad'] * 100
+    surprise_percentage = facial_emotion_data['surprise'] * 100
+    CS = (happy_percentage + neutral_percentage+surprise_percentage)
+    NS = fear_percentage + sad_percentage
+    CL = CS / (CS + NS)  
+    
+    if CS <0:
+        CS=0
+    if NS <0:
+        NS=0
+    if  CL<0:
+        CL=0 
+
+    CL=round(CL* 100, 2) 
+    # weighted_average= weighted_average+ facial_emotion_data['surprise']
+    # Subtract the percentages of 'angry' and 'fear' emotions
+    # Ensure that the overall confidence is within the range of 0% to 100%
+    return f"CS:{round(CS,2)}%, NS:{round(NS,2)}%, CL:{CL}%"
+
+# Register the custom Jinja2 filter
+app.jinja_env.filters['emotion_scores'] = calculate_qna_confidence
 
 app.register_blueprint(
     products_blueprint, url_prefix='/admin/smart-interview-assessment')
