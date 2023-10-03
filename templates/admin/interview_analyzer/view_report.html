@@ -88,7 +88,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-diamond mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_interviewer_confidence['CL']*100}}%
+            {{overall.overall_interviewer_confidence['CL']|round(2)}}%
           </p>
         </div>
       </div>
@@ -157,7 +157,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-diamond mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_candidate_confidence['CL']*100}}%
+            {{overall.overall_candidate_confidence['CL']|round(2)  }}%
           </p>
         </div>
       </div>
