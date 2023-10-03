@@ -217,7 +217,7 @@ def calculate_overall_confidence(facial_emotion_data):
 
     CS = (happy_percentage + neutral_percentage+surprise_percentage) - (fear_percentage + sad_percentage)
     NS = fear_percentage + sad_percentage
-    CL = round(CS / (CS + NS), 2)  
+    CL = CS / (CS + NS)  
 
     # weighted_average= weighted_average+ facial_emotion_data['surprise']
     # Subtract the percentages of 'angry' and 'fear' emotions
@@ -271,14 +271,14 @@ def create_overall_data_by_candidate_id(candidate_id):
     interviewer_confidence_dict['overall_confidence'] = overall_interviewer_confidence
     interviewer_confidence_dict['CS'] = CS
     interviewer_confidence_dict['NS'] = NS
-    interviewer_confidence_dict['CL'] = CL
+    interviewer_confidence_dict['CL'] = CL*100
 
     # Calculate and store the values for the candidate
     overall_candidate_confidence, CS, NS, CL = calculate_overall_confidence(candidate.overall_candidate_video_report)
     candidate_confidence_dict['overall_confidence'] = overall_candidate_confidence
     candidate_confidence_dict['CS'] = CS
     candidate_confidence_dict['NS'] = NS
-    candidate_confidence_dict['CL'] = CL
+    candidate_confidence_dict['CL'] = CL*100
 
     overall = {"candidate_id": str(candidate_id),
         "interviewer_video_report": ib_format_json(data=candidate.overall_interviewer_video_report),
