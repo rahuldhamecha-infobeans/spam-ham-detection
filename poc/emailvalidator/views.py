@@ -60,7 +60,9 @@ class SpamHamDetection(Resource):
                         if output:
                             if output['score'] > 0.7:
                                 is_ans = is_ans+1
-                                answered_qsn.append(str(question))
+                                output['score'] = '{:.2f}'.format(output['score'] * 100)+'%'
+                                ans_data = {'question' : str(question),'output' : output}
+                                answered_qsn.append(ans_data)
                             else:
                                 unanswered_qsn.append(str(question))
 
@@ -96,6 +98,7 @@ def preprocess_email_content(email_content):
     for sentence in doc.sents:
         if "?" in sentence.text or any(token.lower_ in ("who", "what", "when", "where", "why", "how", "can", "is", "are", "do", "did", "could") for token in sentence):
             questions.append(str(sentence.text))  # Convert to string
+
 
     return questions
 
