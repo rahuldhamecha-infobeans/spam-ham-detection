@@ -147,6 +147,7 @@ h5 {
   color: #373450;
   font-weight: bold;
   font-size: 14px;
+  order: 3;
 }
 
 .percentage-wrapper .icon-css {
@@ -170,7 +171,7 @@ h5 {
 
 .chart-wrapper {
   min-height: 500px;
-  width: 600px;
+  width: 500px;
   position: relative;
   cursor: pointer;
 }
@@ -185,11 +186,14 @@ div#chart-text {
   top: 20%;
 }
 
-@media only screen and (max-width: 650px) {
-  .chart-wrapper {
-    min-height: auto;
-    width: auto;
-  }
+.report_header {
+  position: relative;
+}
+
+.report_header .download_report {
+  position: absolute;
+  right: 13px;
+  top: 27px;
 }
 
 @media only screen and (max-width: 1024px) {
@@ -198,5 +202,33 @@ div#chart-text {
   }
   .chart-wrapper {
     margin-bottom: 30px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .report_header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem !important;
+  }
+
+  .report_header .m-4 {
+    margin: 0 !important;
+  }
+
+  .report_header .download_report {
+    position: relative;
+    right: 13px;
+    top: 27px;
+  }
+}
+
+@media only screen and (max-width: 650px) {
+  .chart-wrapper {
+    min-height: auto;
+    width: auto;
   }
 }
