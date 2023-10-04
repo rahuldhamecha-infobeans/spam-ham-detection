@@ -24,6 +24,7 @@ import glob
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt,save_frames_for_timestamps,save_audioclip_timestamps,analyze_timestamp_folder,analyze_audio_timestamps_clips
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report,generate_and_save_overall_video_report
 from jinja2 import Environment
+import shutil
 
 current_datetime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
@@ -42,6 +43,7 @@ import plotly.io as pio
 @login_required
 @has_permission('Interview Analyzer')
 def index():
+    return render_template('admin/interview_analyzer/index.html')
     return render_template('admin/interview_analyzer/index.html')
 
 
@@ -264,7 +266,7 @@ def generate_report_pdf(candidate_id):
     dir_path = get_dir_path('reports')
     file_name = candidate_name + str(current_time) + '_reports.pdf'
     report_path = dir_path + '/' + file_name
-    report_url = '/uploads/reports/' + file_name
+    report_url = 'uploads/reports/' + file_name
     pdfkit.from_string(outputText, report_path, options={
         "enable-local-file-access": ""})
     candidate_data = Candidate.query.filter_by(id=candidate_id).first()
@@ -681,7 +683,12 @@ def delete_route(item_id):
     try:
         candidate = Candidate.query.get(item_id)
         video_url = candidate.interview_video
-
+        video_pdf = candidate.report_url
+        video_audio = candidate.interview_audio
+        video_name = os.path.basename(video_url)
+        # Remove the file extension if needed
+        video_name_without_extension, extension = os.path.splitext(video_name)
+        video_name_without_extension = f'uploads/{video_name_without_extension}'
         # Delete the item from each table
         with db.session.begin_nested():
             db.session.query(VideoReport).filter(VideoReport.video_id == item_id).delete()
@@ -691,6 +698,10 @@ def delete_route(item_id):
         # Commit the transaction
         if os.path.exists(video_url):
             os.remove(video_url)
+            os.remove(video_pdf)
+            os.remove(video_audio)
+            shutil.rmtree(video_name_without_extension)
+
         db.session.commit()
 
     except Exception as e:
@@ -699,7 +710,6 @@ def delete_route(item_id):
         return f"Error: {str(e)}", 500
 
     return redirect(url_for('interview_analyzer.index'))
-
 
 app.register_blueprint(
     products_blueprint, url_prefix='/smart-interview-assessment')
