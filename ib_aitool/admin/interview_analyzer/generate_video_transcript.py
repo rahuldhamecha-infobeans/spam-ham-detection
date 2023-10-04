@@ -13,6 +13,8 @@ import requests
 from pydub import AudioSegment
 from retrying import retry
 from transformers import pipeline
+import whisper
+import datetime
 
 audio_sentiment_pipe = pipeline("audio-classification", model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition")
 
@@ -43,8 +45,10 @@ def timestamp_to_seconds(timestamp):
 
 def generate_transcipt(videopath):
     # Run the Whisper command and capture its output
-    command = f"whisper '{videopath}' --model tiny --language English"  # Use videopath variable
-    output = subprocess.check_output(command, shell=True, text=True)
+    model=whisper.load_model('base.en')
+    options = whisper.DecodingOptions(language="en", fp16=False)
+    result = model.transcribe(f"{videopath}")
+
 
     # Initialize a list to store the timestamped transcript lines
     timestamps = []
@@ -53,27 +57,22 @@ def generate_transcipt(videopath):
     current_speaker = None
 
     # Process the Whisper output and extract timestamped transcript lines
-    lines = output.strip().split('\n')
-    for line in lines:
-        line = line.strip()
-        if line:  # Check if the line is not empty
-            # Extract timestamps and transcript text using regular expression
-            match = re.match(r'\[(\d+:\d+\.\d+) --> (\d+:\d+\.\d+)\] (.+)', line)
-            if match:
-                start_time, end_time, transcript = match.groups()
-            
-                # Determine the speaker based on the presence of a "?" mark
-                if "?" in transcript:
-                    current_speaker = "Interviewer"
-                else:
-                    current_speaker = "candidate"
-            
-                timestamps.append({
-                    'speaker': current_speaker,
-                    'start': timestamp_to_seconds(start_time),
-                    'end': timestamp_to_seconds(end_time),
-                    'transcript': transcript
-                })
+                
+    for index, segment in enumerate(result['segments']):
+            #print(str(datetime.timedelta(seconds=segment['start'])))
+            #print(str(datetime.timedelta(seconds=segment['end'])))
+            #print(segment['text'].strip())
+        if "?" in segment['text'].strip():
+                current_speaker = "Interviewer"
+        else:
+                current_speaker = "candidate"
+                
+        timestamps.append({
+                'speaker': current_speaker,
+                'start': timestamp_to_seconds(str(datetime.timedelta(seconds=segment['start']))),
+                'end': timestamp_to_seconds(str(datetime.timedelta(seconds=segment['end']))),
+                'transcript': segment['text'].strip()
+            })
 
     merged_data = []
     current_entry = None
