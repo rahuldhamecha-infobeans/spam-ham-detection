@@ -47,8 +47,15 @@ def index():
 
 @products_blueprint.route('/fetch-candidate-list')
 def fetch_candidate_list():
-    candidates = Candidate.query.filter_by(
-        added_by=current_user.id).order_by('id')
+    if str(current_user.role()) == 'SuperAdmin':
+        # If the current user is a superadmin, list all candidates
+        candidates = Candidate.query.order_by(Candidate.id).all()
+    else:
+        # If the current user is not a superadmin, list candidates added by them
+        candidates = Candidate.query.filter_by(added_by=current_user.id).order_by(Candidate.id).all()
+
+    # candidates = Candidate.query.filter_by(
+    #     added_by=current_user.id).order_by('id')
     return render_template('admin/interview_analyzer/candidate_list.html', candidates=candidates)
 
 
@@ -695,4 +702,4 @@ def delete_route(item_id):
 
 
 app.register_blueprint(
-    products_blueprint, url_prefix='/admin/smart-interview-assessment')
+    products_blueprint, url_prefix='/smart-interview-assessment')
