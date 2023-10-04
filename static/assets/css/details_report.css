@@ -88,12 +88,18 @@
 
 .box-p-tag {
   color: #212529;
-  font-size: 21px;
+  font-size: 28px;
 }
+
 .percentage-font {
-  font-size: 30px;
+  font-size: 20px;
   color: #212529;
   margin: 0;
+  display: flex;
+}
+
+.percentage-font span:first-child {
+  margin-right: 20px;
 }
 
 .report-container {
@@ -177,8 +183,8 @@ h5 {
 }
 div#chart-text {
   position: absolute;
-  top: 53%;
-  left: 42%;
+  top: 48%;
+  left: 27%;
   font-weight: bold;
 }
 
