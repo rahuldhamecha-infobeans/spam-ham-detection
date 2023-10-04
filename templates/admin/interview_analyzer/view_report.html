@@ -31,15 +31,14 @@ Interview Assessment {% endblock %} {% block head_styles %}
       <h2 class="m-4 text-center">
         <u>Interview Report of {{ candidate.name }}</u>
       </h2>
-      <a class="download_report" href="{{ candidate.report_url }}"
-        target="_blank"><button class="file-upload-button css-1ikvom0">
+      <a class="download_report" href="#"
+        ><button class="file-upload-button css-1ikvom0">
           <i class="fa fa-download"></i> Download Report
         </button></a
       >
     </div>
     <div class="report-container">
       <h3 class="report-title">Interviewer's Score</h3>
-
       <i
         class="fa fa-info-circle icon-css"
         aria-hidden="true"
@@ -51,7 +50,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
         data-audio-report="{{candidate.overall_interviewer_audio_report}}"
       ></i>
     </div>
-    <div class="col-md-4 stretch-card grid-margin">
+    <!-- <div class="col-md-4 stretch-card grid-margin">
       <div class="card bg-gradient-info card-img-holder text-white">
         <div class="card-body">
           <img
@@ -68,8 +67,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
           </p>
         </div>
       </div>
-    </div>
-    <div class="col-md-4 stretch-card grid-margin">
+    </div> -->
+    <div class="col-md-6 stretch-card grid-margin">
       <div class="card bg-gradient-danger card-img-holder text-white">
         <div class="card-body">
           <img
@@ -82,12 +81,19 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_interviewer_confidence['NS']|round(2)}}%
+            <span
+              >Video Analysis:
+              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+            >
+            <span
+              >Text Analysis:
+              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+            >
           </p>
         </div>
       </div>
     </div>
-    <div class="col-md-4 stretch-card grid-margin">
+    <div class="col-md-6 stretch-card grid-margin">
       <div class="card bg-gradient-success card-img-holder text-white">
         <div class="card-body">
           <img
@@ -100,7 +106,14 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-diamond mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_interviewer_confidence['CL']|round(2)}}%
+            <span
+              >Video Analysis:
+              {{overall.overall_interviewer_confidence['CS']|round(2)}}%</span
+            >
+            <span
+              >Text Analysis:
+              {{overall.overall_interviewer_confidence['CS']|round(2)}}%</span
+            >
           </p>
         </div>
       </div>
@@ -120,7 +133,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
         data-audio-report="{{candidate.overall_candidate_audio_report}}"
       ></i>
     </div>
-    <div class="col-md-4 stretch-card grid-margin">
+    <!-- <div class="col-md-4 stretch-card grid-margin">
       <div class="card bg-gradient-info card-img-holder text-white">
         <div class="card-body">
           <img
@@ -137,8 +150,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
           </p>
         </div>
       </div>
-    </div>
-    <div class="col-md-4 stretch-card grid-margin">
+    </div> -->
+    <div class="col-md-6 stretch-card grid-margin">
       <div class="card bg-gradient-danger card-img-holder text-white">
         <div class="card-body">
           <img
@@ -151,12 +164,19 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_candidate_confidence['NS']|round(2)}}%
+            <span
+              >Video Analysis:
+              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+            >
+            <span
+              >Text Analysis:
+              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+            >
           </p>
         </div>
       </div>
     </div>
-    <div class="col-md-4 stretch-card grid-margin">
+    <div class="col-md-6 stretch-card grid-margin">
       <div class="card bg-gradient-success card-img-holder text-white">
         <div class="card-body">
           <img
@@ -169,7 +189,14 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-diamond mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            {{overall.overall_candidate_confidence['CL']|round(2)  }}%
+            <span
+              >Video Analysis:
+              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+            >
+            <span
+              >Text Analysis:
+              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+            >
           </p>
         </div>
       </div>
@@ -214,7 +241,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
                   </button>
                 </h2>
 
-                 <div class="percentage-wrapper">
+                <div class="percentage-wrapper">
                   <div class="interviewer">
                     <i
                       class="fa fa-info-circle icon-css"
@@ -228,8 +255,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
                     ></i>
                     Interviewer's Score = CS:%, NS:%, CL:%
                   </div>
-                {% elif ((next_video_process.start_duration|int -
-                  3) <= video_process.end_duration|int <=
+                  {% elif ((next_video_process.start_duration|int - 3) <=
+                  video_process.end_duration|int <=
                   ((next_video_process.start_duration|int) + 3) and
                   video_process.speaker == 'candidate' and
                   video_process.start_duration != '0' ) %}
@@ -279,75 +306,74 @@ Interview Assessment {% endblock %} {% block head_styles %}
                   Candidate's Score = CS:%, NS:%, CL:%
                 </div>
               </div>
-                <div
-                  id="accordion_{{ index - 1 }}"
-                  class="accordion-collapse collapse"
-                  data-bs-parent="#question_answer_accordion"
-                >
-                  <div class="accordion-body">
-                    <i
-                      class="fa fa-check-circle"
-                      aria-hidden="true"
-                      style="color: #228b22"
-                    ></i
-                    >&nbsp;{{ video_process.interview_transcript }}
-                  </div>
+              <div
+                id="accordion_{{ index - 1 }}"
+                class="accordion-collapse collapse"
+                data-bs-parent="#question_answer_accordion"
+              >
+                <div class="accordion-body">
+                  <i
+                    class="fa fa-check-circle"
+                    aria-hidden="true"
+                    style="color: #228b22"
+                  ></i
+                  >&nbsp;{{ video_process.interview_transcript }}
                 </div>
-                {%elif video_process.speaker == 'Interviewer'%}
-                <div
-                  id="accordion_{{ index - 1 }}"
-                  class="accordion-collapse collapse"
-                  data-bs-parent="#question_answer_accordion"
-                >
-                  <div class="accordion-body">
-                    <i
-                      class="fa fa-check-circle"
-                      aria-hidden="true"
-                      style="color: #228b22"
-                    ></i
-                    >&nbsp;{{ video_process.interview_transcript }}
-                  </div>
-                </div>
-
-                {% endif %} {% if video_process.speaker == 'candidate' %}
               </div>
-              {% endif %} {% endif %} {% endfor %}
+              {%elif video_process.speaker == 'Interviewer'%}
+              <div
+                id="accordion_{{ index - 1 }}"
+                class="accordion-collapse collapse"
+                data-bs-parent="#question_answer_accordion"
+              >
+                <div class="accordion-body">
+                  <i
+                    class="fa fa-check-circle"
+                    aria-hidden="true"
+                    style="color: #228b22"
+                  ></i
+                  >&nbsp;{{ video_process.interview_transcript }}
+                </div>
+              </div>
+
+              {% endif %} {% if video_process.speaker == 'candidate' %}
             </div>
+            {% endif %} {% endif %} {% endfor %}
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- The Modal -->
-  <div class="modal" id="graphmodal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-          ></button>
+<!-- The Modal -->
+<div class="modal" id="graphmodal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="chart-wrapper">
+          <canvas id="video_report_canvas"></canvas>
+          <div id="chart-text">Video Analysis</div>
         </div>
-
-        <div class="modal-body">
-          <div class="chart-wrapper">
-            <canvas id="video_report_canvas"></canvas>
-            <div id="chart-text">Video Analysis</div>
-          </div>
-          <div class="chart-wrapper">
-            <canvas id="text_report_canvas"></canvas>
-            <div id="chart-text">Text Analysis</div>
-          </div>
-          <!-- <div class="chart-wrapper">
+        <div class="chart-wrapper">
+          <canvas id="text_report_canvas"></canvas>
+          <div id="chart-text">Text Analysis</div>
+        </div>
+        <!-- <div class="chart-wrapper">
             <canvas id="audio_report_canvas"></canvas>
             <div id="chart-text">Center Text</div>
           </div> -->
-        </div>
       </div>
     </div>
   </div>
-
-  {% endblock %}
 </div>
+
+{% endblock %}

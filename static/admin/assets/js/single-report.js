@@ -1,15 +1,11 @@
 $(function () {
   generated_chart = "";
-  let legendWithinBarsPlugin = "";
   $(document).on("click", ".fa-info-circle", function () {
     if (generated_chart) {
-      //   var charts = Chart.instances;
-
       for (const key in Chart.instances) {
         Chart.instances[key].destroy();
       }
     }
-    registerChartPlugin();
 
     createDoughnutChart($(this), "video-report");
     createDoughnutChart($(this), "text-report");
@@ -42,11 +38,13 @@ function getChartData(chartData) {
       {
         data: chartValuesLabels[1],
         backgroundColor: [
-          "#373742",
-          "#E6E6ED",
-          "#EA1B3D",
-          "#676775",
-          "#EB4C5E",
+          "#FF0000",
+          "#00FF00",
+          "#800080",
+          "#FFFF00",
+          "#0000FF",
+          "#FFA500",
+          "#808080",
         ],
         hoverOffset: 4,
       },
@@ -84,38 +82,6 @@ function generateLabels(data) {
   return [labels, values];
 }
 
-function registerChartPlugin() {
-  legendWithinBarsPlugin = {
-    afterDraw: (chart) => {
-      console.log("in");
-      if (!chart.options.plugins.legendWithinBars) {
-        return;
-      }
-      console.log("in");
-
-      const ctx = chart.ctx;
-      const dataset = chart.data.datasets[0];
-
-      for (let i = 0; i < dataset.data.length; i++) {
-        const x = dataset.data[i].x;
-        const y = dataset.data[i].y;
-
-        // Adjust the legend position within the bars
-        const legendX = chart.scales.x.getPixelForValue(x);
-        const legendY = chart.scales.y.getPixelForValue(y);
-
-        // Customize the legend appearance (e.g., color, size)
-        ctx.fillStyle = "blue"; // Set the legend color
-        ctx.fillRect(legendX, legendY - 10, 30, 10); // Customize the legend box size
-
-        // Add text label next to the legend box
-        ctx.fillStyle = "black"; // Set the text color
-        ctx.fillText("Label " + (i + 1), legendX + 40, legendY + 4); // Customize text positioning
-      }
-    },
-  };
-}
-
 function getChartOptions() {
   return {
     plugins: {
@@ -135,11 +101,43 @@ function getChartOptions() {
         },
       },
       legend: {
-        display: true,
-        position: "bottom",
+        position: "right", // Display legends to the right of labels
+        labels: {
+          boxWidth: 10, // Adjust the width of the legend color box
+          padding: 10, // Adjust the padding between legend items
+          generateLabels: function (chart) {
+            var data = chart.data.datasets[0].data;
+            var labels = chart.data.labels;
+            var total = data.reduce((acc, value) => acc + value, 0);
+
+            labels = labels.map(function (label, index) {
+              var percentage = ((data[index] / total) * 100).toFixed(2) + "%";
+
+              return {
+                text: label + " (" + percentage + ")",
+                percentage: percentage,
+                fillStyle: chart.data.datasets[0].backgroundColor[index],
+                hidden: false,
+              };
+            });
+
+            labels = sortByPercentage(labels);
+            return labels;
+          },
+        },
       },
-      // legendWithinBars: true, // Enable the custom plugin
     },
+
     responsive: true, // Make the chart responsive
   };
+}
+
+function sortByPercentage(arr) {
+  arr.sort(function (a, b) {
+    const percentageA = parseFloat(a.percentage);
+    const percentageB = parseFloat(b.percentage);
+    return percentageB - percentageA;
+  });
+
+  return arr;
 }
