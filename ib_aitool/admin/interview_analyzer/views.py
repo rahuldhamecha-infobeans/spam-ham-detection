@@ -206,40 +206,6 @@ def calculate_overall_confidence(facial_emotion_data):
     facial_emotion_data = facial_emotion_data.replace("'", "\"")
     facial_emotion_data = json.loads(facial_emotion_data)
 
-    # neutral_percentage = facial_emotion_data['neutral'] * 100
-    # happy_percentage = facial_emotion_data['happy'] * 100
-    # fear_percentage = facial_emotion_data['fear'] * 100
-    # angry_percentage = facial_emotion_data['angry'] * 100
-    # sad_percentage = facial_emotion_data['sad'] * 100
-    # surprise_percentage = facial_emotion_data['surprise'] * 100
-
-    # if neutral_percentage >= 70 and happy_percentage >= 20:
-    #     weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
-    # elif (
-    #         happy_percentage <= 20
-    #         and neutral_percentage <= 70
-    #         and angry_percentage > 5
-    #         and fear_percentage > 5
-    # ):
-    #     weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
-    # elif angry_percentage >= 40 and fear_percentage >= 30:
-    #     weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
-    # elif neutral_percentage >= 40 and happy_percentage >= 5:
-    #     weighted_average = 100 - (fear_percentage + angry_percentage + sad_percentage)
-    # else:
-    #     weighted_average = 55
-    # weighted_average = weighted_average + surprise_percentage
-    #
-    # CS = (happy_percentage + neutral_percentage+surprise_percentage)
-    #
-    # NS = fear_percentage + sad_percentage
-    # CL = CS / (CS + NS)
-    #
-    # # weighted_average= weighted_average+ facial_emotion_data['surprise']
-    # # Subtract the percentages of 'angry' and 'fear' emotions
-    # # Ensure that the overall confidence is within the range of 0% to 100%
-    # overall_confidence = max(0, min(weighted_average, 100))
-
     # Define weights for selected emotions (neutral, happy, and surprise)
     weight_neutral = 0.7
     weight_happy = 0.2
