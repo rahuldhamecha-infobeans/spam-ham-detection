@@ -1,6 +1,7 @@
 from flask import Flask, render_template,send_from_directory
 from flask_mail import Mail,Message
 from app_config import mail_config
+import logging
 import os
 
 BASE_DIR = os.path.dirname(__file__)
@@ -11,6 +12,7 @@ def create_ecommerce_app():
     app = Flask(__name__)
     return app
 
+logging.basicConfig(filename='debug.log', level=logging.INFO)
 app = create_ecommerce_app()
 app.config['SECRET_KEY'] = 'infobeans_app_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

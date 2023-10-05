@@ -12,6 +12,7 @@
          <h4>Infobeans Employees</h4>
          <div>
              <a href="{{ url_for('attendance.employee_create') }}" class="btn btn-theme-white">Add Employee</a>
+             <a href="javascript:train_model()" class="btn btn-theme-white">Train Model</a>
          </div>
      </div>
      <div class="card-body pt-2 pb-2">
@@ -106,4 +107,28 @@
     color: #ffffff !important;
   }
 </style>
+{% endblock %}
+
+{% block body_scripts %}
+    <script>
+        function train_model(){
+            $.ajax({
+                url: '{{ url_for('attendance.employee_train_model') }}',
+                type: 'POST',
+                dataType:'json',
+                beforeSend: function(){
+                    $('.loader_wrapper').removeClass('d-none');
+                },
+                success:function(response){
+                    console.log(response);
+                    alert(response.status);
+                    $('.loader_wrapper').addClass('d-none');
+                },
+                error: function (e){
+                    console.log(e);
+                    $('.loader_wrapper').addClass('d-none');
+                }
+            });
+        }
+    </script>
 {% endblock %}
