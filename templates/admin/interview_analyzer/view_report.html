@@ -69,6 +69,31 @@ Interview Assessment {% endblock %} {% block head_styles %}
       </div>
     </div> -->
     <div class="col-md-6 stretch-card grid-margin">
+      <div class="card bg-gradient-success card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Confidence Level (CL)
+            <i class="mdi mdi-diamond mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            <span
+              >Video Analysis:
+              {{overall.overall_interviewer_confidence['CL']|round(2)}}%</span
+            >
+            <span
+              >Text Analysis:
+              {{overall.overall_interviewer_confidence_text['CL']|round(2)}}%</span
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 stretch-card grid-margin">
       <div class="card bg-gradient-danger card-img-holder text-white">
         <div class="card-body">
           <img
@@ -87,32 +112,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
             >
             <span
               >Text Analysis:
-              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
-            >
-          </p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6 stretch-card grid-margin">
-      <div class="card bg-gradient-success card-img-holder text-white">
-        <div class="card-body">
-          <img
-            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
-            class="card-img-absolute"
-            alt="circle-image"
-          />
-          <p class="font-weight-normal mb-3 box-p-tag">
-            Confidence Level (CL)
-            <i class="mdi mdi-diamond mdi-24px float-right"></i>
-          </p>
-          <p class="percentage-font">
-            <span
-              >Video Analysis:
-              {{overall.overall_interviewer_confidence['CS']|round(2)}}%</span
-            >
-            <span
-              >Text Analysis:
-              {{overall.overall_interviewer_confidence['CS']|round(2)}}%</span
+              {{overall.overall_interviewer_confidence_text['NS']|round(2)}}%</span
             >
           </p>
         </div>
@@ -151,31 +151,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
         </div>
       </div>
     </div> -->
-    <div class="col-md-6 stretch-card grid-margin">
-      <div class="card bg-gradient-danger card-img-holder text-white">
-        <div class="card-body">
-          <img
-            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
-            class="card-img-absolute"
-            alt="circle-image"
-          />
-          <p class="font-weight-normal mb-3 box-p-tag">
-            Nervousness Score (NS)
-            <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
-          </p>
-          <p class="percentage-font">
-            <span
-              >Video Analysis:
-              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
-            >
-            <span
-              >Text Analysis:
-              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
-            >
-          </p>
-        </div>
-      </div>
-    </div>
+
     <div class="col-md-6 stretch-card grid-margin">
       <div class="card bg-gradient-success card-img-holder text-white">
         <div class="card-body">
@@ -191,11 +167,36 @@ Interview Assessment {% endblock %} {% block head_styles %}
           <p class="percentage-font">
             <span
               >Video Analysis:
-              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+              {{overall.overall_candidate_confidence['CS']|round(2)}}%</span
             >
             <span
               >Text Analysis:
-              {{overall.overall_interviewer_confidence['NS']|round(2)}}%</span
+              {{overall.overall_candidate_confidence_text['CS']|round(2)}}%</span
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 stretch-card grid-margin">
+      <div class="card bg-gradient-danger card-img-holder text-white">
+        <div class="card-body">
+          <img
+            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+            class="card-img-absolute"
+            alt="circle-image"
+          />
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Nervousness Score (NS)
+            <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            <span
+              >Video Analysis:
+              {{overall.overall_candidate_confidence['NS']|round(2)}}%</span
+            >
+            <span
+              >Text Analysis:
+              {{overall.overall_candidate_confidence_text['NS']|round(2)}}%</span
             >
           </p>
         </div>
