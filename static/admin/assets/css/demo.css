@@ -212,3 +212,11 @@
 footer.navigation {
   margin-top: 20px;
 }
+
+.modal#confidenceLevel .modal-dialog{
+max-width:40%;
+}
+
+.modal#nervousnessLevel .modal-dialog{
+max-width:40%;
+}

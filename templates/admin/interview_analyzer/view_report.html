@@ -69,32 +69,51 @@ Interview Assessment {% endblock %} {% block head_styles %}
       </div>
     </div> -->
     <div class="col-md-6 stretch-card grid-margin">
-      <div class="card bg-gradient-success card-img-holder text-white">
-        <div class="card-body">
-          <img
-            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
-            class="card-img-absolute"
-            alt="circle-image"
-          />
-          <p class="font-weight-normal mb-3 box-p-tag">
-            Confidence Level (CL)
-            <i class="mdi mdi-diamond mdi-24px float-right"></i>
-          </p>
-          <p class="percentage-font">
-            <span
-              >Video Analysis:
-              {{overall.overall_interviewer_confidence['CL']|round(2)}}%</span
-            >
-            <span
-              >Text Analysis:
-              {{overall.overall_interviewer_confidence_text['CL']|round(2)}}%</span
-            >
-          </p>
-        </div>
-      </div>
+  <div class="card bg-gradient-success card-img-holder text-white">
+     <i
+        class="fa fa-info-circle icon-css"
+        aria-hidden="true"
+        title="Check Graph"
+        data-bs-toggle="modal"
+        data-bs-target="#confidenceLevel"
+        style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"
+      ></i>
+    <div class="card-body">
+
+      <img
+        src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+        class="card-img-absolute"
+        alt="circle-image"
+      />
+
+      <p class="font-weight-normal mb-3 box-p-tag">
+        Confidence Level (CL)
+        <i class="mdi mdi-diamond mdi-24px float-right"></i>
+      </p>
+      <p class="percentage-font">
+        <span
+          >Video Analysis:
+          {{overall.overall_interviewer_confidence['CL']|round(2)}}%</span
+        >
+        <span
+          >Text Analysis:
+          {{overall.overall_interviewer_confidence_text['CL']|round(2)}}%</span
+        >
+      </p>
     </div>
+  </div>
+</div>
+
     <div class="col-md-6 stretch-card grid-margin">
       <div class="card bg-gradient-danger card-img-holder text-white">
+        <i
+        class="fa fa-info-circle icon-css"
+        aria-hidden="true"
+        title="Check Graph"
+        data-bs-toggle="modal"
+        data-bs-target="#nervousnessLevel"
+        style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"
+      ></i>
         <div class="card-body">
           <img
             src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
@@ -167,11 +186,11 @@ Interview Assessment {% endblock %} {% block head_styles %}
           <p class="percentage-font">
             <span
               >Video Analysis:
-              {{overall.overall_candidate_confidence['CS']|round(2)}}%</span
+              {{overall.overall_candidate_confidence['CL']|round(2)}}%</span
             >
             <span
               >Text Analysis:
-              {{overall.overall_candidate_confidence_text['CS']|round(2)}}%</span
+              {{overall.overall_candidate_confidence_text['CL']|round(2)}}%</span
             >
           </p>
         </div>
@@ -254,7 +273,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"
                     ></i>
-                    Interviewer's Score = {{video_report.frame_dur_report|emotion_scores }}
+                    Interviewer's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
                   </div>
                   {% elif ((next_video_process.start_duration|int - 3) <=
                   video_process.end_duration|int <=
@@ -272,7 +291,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"
                     ></i>
-                    Candidate's Score =  {{video_report.frame_dur_report|emotion_scores }}
+                    Candidate's Score(Video) =  {{video_report.frame_dur_report|emotion_scores }}
                   </div>
                 </div>
                 <div
@@ -368,6 +387,72 @@ Interview Assessment {% endblock %} {% block head_styles %}
           <canvas id="text_report_canvas"></canvas>
           <div id="chart-text">Text Analysis</div>
         </div>
+        <!-- <div class="chart-wrapper">
+            <canvas id="audio_report_canvas"></canvas>
+            <div id="chart-text">Center Text</div>
+          </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="confidenceLevel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          <h2>Logic Used to calculate Confidence Level</h2>
+          <p>weight_neutral = 0.7, weight_happy = 0.2, weight_surprise = 0.05, weight_angry = 0.6, weight_fear = 0.7, weight_sad = 1, weight_disgust = 1</p>
+
+          <p>We used the following to calculate weighted_sum</p>
+          weighted_sum = (neutral * weight_neutral) + (happy * weight_happy) + (surprise * weight_surprise)</p>
+
+          <p>
+          The Confidence Level represents the cumulative emotional intensity of the selected emotions. It is equal to the weighted sum of the selected emotions' percentages.
+          </p><p><b>Formula for Confidence Level: confidence_level = weighted_sum</b></p>
+        </div>
+
+        <!-- <div class="chart-wrapper">
+            <canvas id="audio_report_canvas"></canvas>
+            <div id="chart-text">Center Text</div>
+          </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="nervousnessLevel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          <h2>Logic Used to calculate Nervousness Level</h2>
+          <p>weight_neutral = 0.7, weight_happy = 0.2, weight_surprise = 0.05, weight_angry = 0.6, weight_fear = 0.7, weight_sad = 1, weight_disgust = 1</p>
+
+          <p>Formula for Sum of Remaining Emotions: other_emotions_sum = (angry * weight_angry) + (disgust * weight_disgust) + (fear * weight_fear) + (sad * weight_sad)</p>
+
+          <p>The Nervousness Level represents the cumulative emotional intensity of the remaining emotions. It is equal to the sum of the remaining emotions' weighted percentages.
+          </p><p><b>Formula for Nervousness Level: nervousness_level = other_emotions_sum</b></p>
+        </div>
+
         <!-- <div class="chart-wrapper">
             <canvas id="audio_report_canvas"></canvas>
             <div id="chart-text">Center Text</div>

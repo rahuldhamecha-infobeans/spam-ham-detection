@@ -21,8 +21,10 @@ import os
 import jinja2
 import glob
 
-from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt,save_frames_for_timestamps,save_audioclip_timestamps,analyze_timestamp_folder,analyze_audio_timestamps_clips
-from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report,generate_and_save_overall_video_report
+from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt, save_frames_for_timestamps, \
+    save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips
+from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report, \
+    generate_and_save_overall_video_report
 from jinja2 import Environment
 import shutil
 
@@ -217,17 +219,17 @@ def calculate_overall_confidence(facial_emotion_data):
 
     # Calculate the weighted sum of selected emotions
     weighted_sum = (
-         facial_emotion_data['neutral'] * weight_neutral +
-         facial_emotion_data['happy'] * weight_happy +
-         facial_emotion_data['surprise'] * weight_surprise
+            facial_emotion_data['neutral'] * weight_neutral +
+            facial_emotion_data['happy'] * weight_happy +
+            facial_emotion_data['surprise'] * weight_surprise
     )
 
     # Calculate the sum of remaining emotions (angry, disgust, fear, sad)
     other_emotions_sum = (
-         facial_emotion_data['angry'] * weight_angry +
-         facial_emotion_data['disgust'] * weight_disgust+
-         facial_emotion_data['fear'] * weight_fear +
-         facial_emotion_data['sad'] * weight_sad
+            facial_emotion_data['angry'] * weight_angry +
+            facial_emotion_data['disgust'] * weight_disgust +
+            facial_emotion_data['fear'] * weight_fear +
+            facial_emotion_data['sad'] * weight_sad
     )
 
     # Calculate the nervousness score (sum of remaining emotions)
@@ -240,9 +242,9 @@ def calculate_overall_confidence(facial_emotion_data):
     total_score = confidence_score + nervousness_score
     CL = (confidence_score / total_score) * 100
     NS = (nervousness_score / total_score) * 100
-    CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
+    # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
 
-    return 0, CS, NS, CL
+    return 0, 0, NS, CL
 
 
 def generate_report_pdf(candidate_id):
@@ -312,7 +314,8 @@ def create_overall_data_by_candidate_id(candidate_id):
     candidate_confidence_dict['CL'] = CL
 
     # Calculate and store the values for the candidate text
-    overall_candidate_confidence_text, CS, NS, CL = calculate_overall_confidence(candidate.overall_candidate_text_report)
+    overall_candidate_confidence_text, CS, NS, CL = calculate_overall_confidence(
+        candidate.overall_candidate_text_report)
     candidate_confidence_dict_text['overall_confidence'] = overall_candidate_confidence_text
     candidate_confidence_dict_text['CS'] = CS
     candidate_confidence_dict_text['NS'] = NS
@@ -669,36 +672,52 @@ def get_video_data(video_id):
         print(f"Error: {e}")
         return None
 
-def calculate_qna_confidence(facial_emotion_data):
 
+def calculate_qna_confidence(facial_emotion_data):
     facial_emotion_data = facial_emotion_data.replace("'", "\"")
     facial_emotion_data = json.loads(facial_emotion_data)
 
-    neutral_percentage = facial_emotion_data['neutral'] * 100
-    happy_percentage = facial_emotion_data['happy'] * 100
-    fear_percentage = facial_emotion_data['fear'] * 100
-    angry_percentage = facial_emotion_data['angry'] * 100
-    sad_percentage = facial_emotion_data['sad'] * 100
-    surprise_percentage = facial_emotion_data['surprise'] * 100
-    CS = (happy_percentage + neutral_percentage+surprise_percentage)
-    NS = fear_percentage + sad_percentage
-    CL = CS / (CS + NS)  
-    
-    if CS <0:
-        CS=0
-    if NS <0:
-        NS=0
-    if  CL<0:
-        CL=0 
+    weight_neutral = 0.7
+    weight_happy = 0.2
+    weight_surprise = 0.05
+    weight_angry = 0.6
+    weight_fear = 0.7
+    weight_sad = 1
+    weight_disgust = 1
 
-    CL=round(CL* 100, 2) 
-    # weighted_average= weighted_average+ facial_emotion_data['surprise']
-    # Subtract the percentages of 'angry' and 'fear' emotions
-    # Ensure that the overall confidence is within the range of 0% to 100%
-    return f"CS:{round(CS,2)}%, NS:{round(NS,2)}%, CL:{CL}%"
+    # Calculate the weighted sum of selected emotions
+    weighted_sum = (
+            facial_emotion_data['neutral'] * weight_neutral +
+            facial_emotion_data['happy'] * weight_happy +
+            facial_emotion_data['surprise'] * weight_surprise
+    )
+
+    # Calculate the sum of remaining emotions (angry, disgust, fear, sad)
+    other_emotions_sum = (
+            facial_emotion_data['angry'] * weight_angry +
+            facial_emotion_data['disgust'] * weight_disgust +
+            facial_emotion_data['fear'] * weight_fear +
+            facial_emotion_data['sad'] * weight_sad
+    )
+
+    # Calculate the nervousness score (sum of remaining emotions)
+    nervousness_score = other_emotions_sum
+
+    # Calculate the confidence score (weighted sum of selected emotions)
+    confidence_score = weighted_sum
+
+    # Normalize the scores to percentages
+    total_score = confidence_score + nervousness_score
+    CL = (confidence_score / total_score) * 100
+    NS = (nervousness_score / total_score) * 100
+    # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
+
+    return f"CS:{round(CL, 2)}%, NS:{round(NS, 2)}%"
+
 
 # Register the custom Jinja2 filter
 app.jinja_env.filters['emotion_scores'] = calculate_qna_confidence
+
 
 @app.route('/delete_route/<int:item_id>')
 def delete_route(item_id):
@@ -732,6 +751,7 @@ def delete_route(item_id):
         return f"Error: {str(e)}", 500
 
     return redirect(url_for('interview_analyzer.index'))
+
 
 app.register_blueprint(
     products_blueprint, url_prefix='/smart-interview-assessment')
