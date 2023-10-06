@@ -273,7 +273,13 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"
                     ></i>
-                    Interviewer's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
+                    <span>
+                      Interviewer's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
+                    <br/>
+                    Interviewer's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
+
+                    </span>
+
                   </div>
                   {% elif ((next_video_process.start_duration|int - 3) <=
                   video_process.end_duration|int <=
@@ -291,7 +297,12 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"
                     ></i>
-                    Candidate's Score(Video) =  {{video_report.frame_dur_report|emotion_scores }}
+                    <span>
+                       Candidate's Score(Video) =  {{video_report.frame_dur_report|emotion_scores }}
+                    <br/>
+                    Candidate's Score(Text) =  {{video_report.text_dur_report|emotion_scores }}
+                    </span>
+
                   </div>
                 </div>
                 <div
@@ -323,7 +334,12 @@ Interview Assessment {% endblock %} {% block head_styles %}
                     data-text-report="{{video_report.text_dur_report}}"
                     data-audio-report="{{video_report.audio_report}}"
                   ></i>
-                  Candidate's Score =  {{video_report.frame_dur_report|emotion_scores }}
+                  <span>
+                     Candidate's Score(Video)  =  {{video_report.frame_dur_report|emotion_scores }}
+                  <br/>
+                  Candidate's Score(Text) =  {{video_report.text_dur_report|emotion_scores }}
+                  </span>
+
                 </div>
               </div>
               <div
