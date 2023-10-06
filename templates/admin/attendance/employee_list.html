@@ -29,7 +29,7 @@
                   <td>
                       <a href="{{ url_for('attendance.employee_update',id=employee.id) }}" class="btn btn-theme-white">Edit</a>
                       <a href="{{ url_for('attendance.delete_employee',id=employee.id) }}" class="btn btn-theme-white">Delete</a>
-                      <a href="javascript:void(0)" class="btn btn-theme-white">View Attendance</a>
+                      <a href="{{ url_for('attendance.employee_view_attendance',id=employee.id) }}" class="btn btn-theme-white">View Attendance</a>
                   </td>
                 </tr>
                 {% endfor %} {% else %}

@@ -8,8 +8,12 @@
                 {% endif %}
                 {% endwith %}
             </td>
-            <td>{{ attendance.entry_time }}</td>
-            <td>{{ attendance.exit_time }}</td>
+            <td>{{ attendance.entry_time.strftime('%d-%m-%Y %H:%m:%S %p') }}</td>
+            <td>{{ attendance.exit_time.strftime('%d-%m-%Y %H:%m:%S %p') }}</td>
         </tr>
     {% endfor %}
+{% else %}
+    <tr>
+    <td colspan="3" class="text-center">No Attendance Found</td>
+    </tr>
 {% endif %}

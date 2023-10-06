@@ -1,0 +1,229 @@
+{% extends 'layouts/admin/dashboard/base.html' %}
+
+{% block page_title %} Smart Attendance Tracker {% endblock %}
+
+{% block page_body_title %} View Attendance {% endblock %}
+
+{% block body_block %}
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+     <div class="card-header d-flex justify-content-between border-bottom">
+         <h4>My Attendance {{  employee.name or None }}</h4>
+         <div>
+             <a href="{{ url_for('attendance.employee_list') }}" class="btn btn-outline-secondary">Back</a>
+         </div>
+     </div>
+     <div class="card-body pt-2 pb-2">
+         <div class="row">
+{#             <button class="btn btn-theme-white" onclick="generate_new_calender()">Rerender Calender</button>#}
+              <div id='calendar'></div>
+         </div>
+     </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="attendance_list_modal" style="display: none;" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCenterTitle">View Attendance List</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          onclick="modal_toggle()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <table class="table table-responsive table-bordered" id="attendance_list_table" style="width: 100%">
+              <thead>
+                <th>Employee Name</th>
+                <th>Entry Time</th>
+                <th>Exit Time</th>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+{#        <button type="button" class="btn btn-outline-secondary" onclick="modal_toggle()">#}
+{#          Close#}
+{#        </button>#}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader_wrapper d-none">
+  <div class="loader">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      style="margin: auto; display: block"
+      width="200px"
+      height="200px"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid"
+    >
+      <circle cx="30" cy="50" fill="#373450" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+      </circle>
+      <circle cx="70" cy="50" fill="#ea1b3d" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="0s"
+        ></animate>
+      </circle>
+      <circle cx="30" cy="50" fill="#373450" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+        <animate
+          attributeName="fill-opacity"
+          values="0;0;1;1"
+          calcMode="discrete"
+          keyTimes="0;0.499;0.5;1"
+          dur="1s"
+          repeatCount="indefinite"
+        ></animate>
+      </circle>
+    </svg>
+  </div>
+</div>
+{% endblock %}
+
+{% block head_styles %}
+<style>
+body {
+    margin: 40px 10px;
+    padding: 0;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
+  }
+
+  #calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .modal {
+    background: #00000050;
+}
+
+  .modal-dialog {
+    max-width: 45rem;
+    margin: 1.75rem auto;
+}
+
+</style>
+{% endblock %}
+
+{% block body_scripts %}
+    <script src="{{ url_for('static',filename='admin/assets/js/ui-modals.js') }}"></script>
+    <script src="{{ url_for('static',filename='assets/plugins/calender/calender.global.js') }}"></script>
+    <script>
+
+    function modal_toggle(){
+        $('#attendance_list_modal').toggle();
+        $('#attendance_list_modal').toggleClass('show');
+    }
+
+        function formatDate(date) {
+          var d = new Date(date),
+              month = '' + (d.getMonth() + 1),
+              day = '' + d.getDate(),
+              year = d.getFullYear();
+
+          if (month.length < 2)
+              month = '0' + month;
+          if (day.length < 2)
+              day = '0' + day;
+
+          return [year, month, day].join('-');
+      }
+
+        function init_calender(events = []){
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+              headerToolbar: {
+                left: 'prevYear,prev,next,nextYear today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek,dayGridDay'
+              },
+              initialDate: '2023-10-06',
+              navLinks: true, // can click day/week names to navigate views
+              editable: true,
+              dayMaxEvents: true, // allow "more" link when too many events
+              eventClick: function(arg) {
+                  event_date = formatDate(arg.event.start);
+                   $.ajax({
+                       url: '{{ url_for('attendance.employee_view_attendance_list',id=employee.id) }}?event_date='+event_date,
+                       type: 'GET',
+                       dataType: 'html',
+                       beforeSend:function(){
+                           $('.loader_wrapper').removeClass('d-none');
+                       },
+                       success:function(res){
+                           $('#attendance_list_table tbody').html(res);
+                           $('.loader_wrapper').addClass('d-none');
+                           modal_toggle();
+                       },
+                       error:function(e){
+                           console.log(e);
+                           $('.loader_wrapper').addClass('d-none');
+
+                       }
+                   });
+              },
+              events: events,
+
+            });
+            return calendar;
+        }
+        count = 1;
+
+        function fetch_calender_events(){
+            $.ajax({
+                url: '{{ url_for("attendance.employee_fetch_attendance",id=employee.id) }}',
+                type: 'POST',
+                dateType:'json',
+                beforeSend: function (){
+                    $('.loader_wrapper').removeClass('d-none')
+                },
+                success:function(res){
+                    events = res.list
+                    console.log(events);
+                    calender = init_calender(events)
+                    calender.render()
+                    count = count + 1;
+                    $('.loader_wrapper').addClass('d-none')
+                }
+            })
+        }
+
+        fetch_calender_events()
+        {#generate_new_calender()#}
+    </script>
+{% endblock %}

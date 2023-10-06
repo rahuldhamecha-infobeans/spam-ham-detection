@@ -30,6 +30,7 @@ class Camera:
                         if predictions:
                             for name,(top,right,bottom,left) in predictions:
                                 name = name.replace('_',' ')
+                                name = ''.join([i for i in name if not i.isdigit()])
                                 name = name.upper()
                                 cv2.putText(frame, name, (30, 60),
                                             cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1)

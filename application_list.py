@@ -144,4 +144,17 @@ application_list = [
     #     'project_model_code_link': '#',
     #     'created_by': 'Pragati Nande'
     # },
+    {
+        'route': 'attendance.index',
+        'image_path': 'pictures/spam.jpg',
+        'title': 'Attendance <br><span>Tracker</span>',
+        # New Data
+        'project_name': 'Smart Attendance Tracker',
+        'project_description': 'Smart Attendance Tracker uses technology to evaluate a candidate\'s face recognize to mark the attendance.',
+        'project_demo_link': 'http://aipocdemo.creatingwow.in/',
+        'project_demo_video': '#',
+        'project_demo_ppt': 'https://docs.google.com/presentation/d/1BeNfHygNHcxxkItbex8rgUUe5Xze3ln3/edit#slide=id.g25e105483f5_2_671',
+        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection',
+        'created_by': 'Rahul Dhamecha',
+    },
 ]

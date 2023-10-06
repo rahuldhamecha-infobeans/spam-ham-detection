@@ -14,6 +14,7 @@ from ib_aitool.admin.attendance_managment.camera import Camera
 import threading
 import cv2
 import pytz
+import sqlalchemy as sa
 
 attendance_blueprint = Blueprint('attendance', __name__)
 camera_instance = None
@@ -61,7 +62,7 @@ def employee_create():
 @has_permission('Attendance Admin')
 def employee_update(id):
     employee = Employee.query.get(id)
-    form = EmployeeForm(employee_id=id)
+    form = EmployeeForm(employee_id=id,name=employee.name,directory_name=employee.directory_name)
     if form.validate_on_submit():
         employee = Employee.query.get(form.employee_id.data)
         if employee:
@@ -82,7 +83,13 @@ def upload_images():
     employee_id = request.form.get('emp_id')
     employee = Employee.query.get(employee_id)
     if employee:
-        employee_name = employee.name.lower().replace(' ', '_')
+        if employee.directory_name != None:
+            employee_name = employee.directory_name
+        else:
+            employee_name = employee.name.lower().replace(' ', '_')+'_'+employee_id
+            employee.directory_name = employee_name
+            db.session.commit()
+
 
         if 'file' not in request.files:
             return Response('File Not Found.')
@@ -147,6 +154,10 @@ def delete_employee(id):
         if images:
             for image in images:
                 db.session.delete(image)
+        attendance = employee.attendance()
+        if attendance:
+            for att in attendance:
+                db.session.delete(att)
 
         db.session.delete(employee)
         db.session.commit()
@@ -240,8 +251,10 @@ def thread_start():
                         def store_attendance(predictions):
                             with app.app_context():
                                 for name, (top, right, bottom, left) in predictions:
-                                    employee_name = name.replace("_", " ")
-                                    employee = Employee.query.filter_by(name=employee_name).first()
+                                    if name == 'unknown':
+                                        return False
+                                    employee_name = name
+                                    employee = Employee.query.filter_by(directory_name=employee_name).first()
                                     if employee and employee.id:
                                         current_time = datetime.now(pytz.timezone('Asia/Kolkata'))
                                         existing_attendance = is_attendance_existing(employee.id)
@@ -253,10 +266,11 @@ def thread_start():
                                             attendance = EmployeeAttendance.query.get(existing_attendance.id)
                                             attendance.exit_time = current_time
                                             db.session.commit()
-                        store_attendance(predictions)
-                        ajax_load = True
-                        time.sleep(5)
-                        release_camera()
+                        att = store_attendance(predictions)
+                        if att != False:
+                            ajax_load = True
+                            time.sleep(3)
+                            release_camera()
 
 
 @attendance_blueprint.route('/fetch-attendance-list', methods=['POST'])
@@ -266,6 +280,22 @@ def fetch_attendance_list():
     attendance_list = db.session.query(EmployeeAttendance).filter(EmployeeAttendance.entry_time >= date.today()).order_by(EmployeeAttendance.entry_time.desc()).all()
     html = render_template('admin/attendance/attendance_list.html',attendance_list=attendance_list)
     return {'ajax_reload': ajax_load,'attendance_list' : html}
+
+@attendance_blueprint.route('/employee-view-attendance/<int:id>',methods=['GET','POST'])
+def employee_view_attendance(id):
+    employee = Employee.query.get(id)
+    return render_template('admin/attendance/view_attendance.html',employee=employee)
+@attendance_blueprint.route('/employee-fetch-attendance/<int:id>',methods=['GET','POST'])
+def employee_fetch_attendance(id):
+    employee = Employee.query.get(id)
+    event_list = employee.event_list()
+    return {'list' : event_list}
+
+@attendance_blueprint.route('/employee-view-attendance-list/<int:id>',methods=['GET'])
+def employee_view_attendance_list(id):
+    event_date = request.args.get('event_date')
+    employee_attendance = db.session.query(EmployeeAttendance).filter(EmployeeAttendance.employee_id == id).filter(sa.func.date(EmployeeAttendance.entry_time) == sa.func.date(event_date)).all()
+    return render_template('admin/attendance/attendance_list.html',attendance_list=employee_attendance);
 
 
 app.register_blueprint(attendance_blueprint, url_prefix='/admin/attendance')
