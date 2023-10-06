@@ -649,7 +649,11 @@ def remove_all_model_created_files(videopath):
 
     # List all files in the folder
     all_files = glob.glob(os.path.join(BASE_DIR, '*'))
-
+    video_name = os.path.basename(video_file_path)
+    # Remove the file extension if needed
+    video_name_without_extension, extension = os.path.splitext(video_name)
+    video_name_without_extension = f'uploads/{video_name_without_extension}'
+    shutil.rmtree(video_name_without_extension)
     # Iterate through the files and delete those with matching base names
     for file_path in all_files:
         print(file_path)
@@ -741,7 +745,8 @@ def delete_route(item_id):
             os.remove(video_url)
             os.remove(video_pdf)
             os.remove(video_audio)
-            shutil.rmtree(video_name_without_extension)
+            if os.path.exists(video_name_without_extension):
+                shutil.rmtree(video_name_without_extension)
 
         db.session.commit()
 
