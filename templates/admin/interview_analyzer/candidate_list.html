@@ -39,18 +39,19 @@
           >Check Report</a
         > -->
         <a
-          target="_blank"
+
           href="{{ url_for('interview_analyzer.view_report', id=candidate.id) }}"
           class="btn btn-theme-white btn-sm"
           >View Report</a
+
         >
          <a
-          target="_blank"
+
           href="#"
           class="btn btn-theme-white btn-sm"
           data-toggle="modal"
           data-target="#deleteModal{{candidate.id}}"
-      ><i class="fa fa-trash-o"></i> Delete</a>
+      > Delete</a>
 
         <!-- The Modal -->
 <div class="modal fade" id="deleteModal{{candidate.id}}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
