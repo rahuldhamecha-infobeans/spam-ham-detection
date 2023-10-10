@@ -15,6 +15,7 @@ from retrying import retry
 from transformers import pipeline
 import whisper
 import datetime
+import shutil
 
 audio_sentiment_pipe = pipeline("audio-classification", model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition")
 
@@ -41,6 +42,140 @@ def timestamp_to_seconds(timestamp):
 
     total_seconds = hours * 3600 + minutes * 60 + seconds
     return total_seconds
+
+# Function to transcribe video using Whisper
+def transcribe_video(video_file):
+    model = whisper.load_model('base.en')
+    options = whisper.DecodingOptions(language="en", fp16=False)
+    result = model.transcribe(video_file)
+    return result
+
+# Function to extract question timestamps from the Whisper output
+def extract_question_timestamps(transcription_result, max_questions=5):
+    question_timestamps = []
+    count = 0
+    for segment in transcription_result['segments']:
+        if '?' in segment['text'].strip():
+            question_timestamps.append({
+                'start': timestamp_to_seconds(str(datetime.timedelta(seconds=segment['start']))),
+                'end': timestamp_to_seconds(str(datetime.timedelta(seconds=segment['end']))),
+                'transcript': segment['text'].strip()
+            })
+            count += 1
+            if count == max_questions:
+                break
+    return question_timestamps
+
+# Function to save frames from a video based on timestamps
+def save_frames_from_video(video_file, timestamps, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
+    """cap = cv2.VideoCapture(video_file)
+    frame_count = 0
+    for timestamp in timestamps:
+        start_time = int(timestamp['start'])
+        end_time = int(timestamp['end'])
+        cap.set(cv2.CAP_PROP_POS_MSEC, start_time * 1000)
+        while True:
+            ret, frame = cap.read()
+            if not ret or frame_count >= end_time:
+                break
+            frame_filename = f"{output_folder}/frame_{frame_count}_{start_time}_{end_time}.jpg"
+            cv2.imwrite(frame_filename, frame)
+            frame_count += 1
+    cap.release() """
+    cap = cv2.VideoCapture(video_file)
+    frame_count = 0
+
+    if timestamps is not None:
+        for timestamp in timestamps:
+            start_time = int(timestamp['start'])
+            end_time = int(timestamp['end'])
+            cap.set(cv2.CAP_PROP_POS_MSEC, start_time*1000)
+            while True:
+                ret, frame = cap.read()
+                if not ret or frame_count >= end_time:
+                    break
+                frame_filename = f"{output_folder}/frame_{frame_count}_{start_time}_{end_time}.jpg"
+                cv2.imwrite(frame_filename, frame)
+                frame_count += 1
+    else:
+        cap.set(cv2.CAP_PROP_POS_MSEC, 0)
+        frame_interval_ms = 1000  # One frame per second (1000 milliseconds)
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            frame_filename = f"{output_folder}/frame_{frame_count}.jpg"
+            cv2.imwrite(frame_filename, frame)
+            frame_count += 1
+
+            # Skip frames to maintain one frame per second
+            cap.set(cv2.CAP_PROP_POS_MSEC, frame_count * frame_interval_ms)
+
+
+    cap.release()
+    return frame_count
+
+
+def save_highest_count_videoframe(image_dir, output_dir,saved_image_name):
+    # Initialize counters for Type A and Type B images
+    type_a_count = 0
+    type_b_count = 0
+
+    # Initialize variables to store the filename and count of the image with the highest count
+    highest_count_image_filename = ""
+    highest_count = 0
+
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Loop through the images in the directory
+    for filename in os.listdir(image_dir):
+        if filename.endswith('.jpg') or filename.endswith('.png'):
+            image_path = os.path.join(image_dir, filename)
+
+            # Load the image
+            image = cv2.imread(image_path)
+
+            # Perform some basic image processing or feature extraction to determine the type
+            # Here, we'll assume that Type A images have higher average pixel values than Type B
+            average_pixel_value = image.mean()
+
+            # You can adjust this threshold value based on your data
+            threshold = 150  # Example threshold
+
+            # Classify the image based on the threshold
+            if average_pixel_value > threshold:
+                type_a_count += 1
+            else:
+                type_b_count += 1
+
+                # Store the filename of the image with the highest count
+                highest_count_image_filename = filename
+
+    # Determine which type has the highest count
+    if type_a_count > type_b_count:
+        print("Type A has the highest count with", type_a_count, "images.")
+    else:
+        print("Type B has the highest count with", type_b_count, "images.")
+
+    # Print the filename of the image with the highest count
+    if highest_count_image_filename:
+        print("Image with the highest count:", highest_count_image_filename)
+        
+        # Define the custom name and path for the saved image
+        custom_image_name = f'{saved_image_name}.jpg'
+        custom_image_path = os.path.join(output_dir, custom_image_name)
+
+        # Copy the highest count image to the output directory with the custom name
+        source_path = os.path.join(image_dir, highest_count_image_filename)
+        shutil.copyfile(source_path, custom_image_path)
+
+        print(f"Highest count image copied to '{output_dir}' folder as '{custom_image_name}'.")
+        return True
+    else:
+        print("No images found.")
+        return False
 
 
 def generate_transcipt(videopath):

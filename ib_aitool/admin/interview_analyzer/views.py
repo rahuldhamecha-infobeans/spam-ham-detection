@@ -22,7 +22,7 @@ import jinja2
 import glob
 
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt, save_frames_for_timestamps, \
-    save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips
+    save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips,transcribe_video,extract_question_timestamps,save_frames_from_video,save_highest_count_videoframe
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report, \
     generate_and_save_overall_video_report
 from jinja2 import Environment
@@ -472,9 +472,24 @@ def analyze_video(queue, candidate_id):
             db.session.commit()
         if data is not None:
             videoPath = data.interview_video
-            transcriptJson = generate_transcipt(videoPath)
+            video_name = os.path.basename(videoPath)
+            # Remove the file extension if needed
+            video_name_without_extension, extension = os.path.splitext(video_name)
+            #transcriptJson = generate_transcipt(videoPath)
+            #allFrames = generate_per_second_frame(videoPath)
+            result = transcribe_video(videoPath)
+            question_timestamps = extract_question_timestamps(result, max_questions=5)
+            output_folder = f'uploads/{video_name_without_extension}/first-5qsn-videoframes/'
+            frame_count = save_frames_from_video(videoPath, question_timestamps, output_folder)
+            all_frame_count = save_frames_from_video(videoPath, None, f'uploads/{video_name_without_extension}/allframes')
+            image_directory_path=output_folder
+            output_directory_path=f'uploads/{video_name_without_extension}/video-interviewer/'
+            finalize_interviewer_saved=save_highest_count_videoframe(image_directory_path, output_directory_path,saved_image_name=video_name_without_extension)
+            if finalize_interviewer_saved: 
+                print(f"interviewer frame Saved  to {output_directory_path}")
+
             # Loop through the data and save it to the database
-            for entry in transcriptJson:
+            """    for entry in transcriptJson:
                 video_entry = VideoProcess(
                     vid=candidate_id,
                     start_duration=math.ceil(float(entry['start'])),
@@ -485,7 +500,7 @@ def analyze_video(queue, candidate_id):
                     speaker=entry['speaker'],
                 )
                 db.session.add(video_entry)
-                db.session.commit()
+                db.session.commit() """
             result = True
         else:
             result = False
@@ -579,6 +594,21 @@ def save_overall_report_to_candidate_table(queue, candidate_id):
         queue.put(result)
         time.sleep(1)  # Simulate some processing time
         print('Part 4 completed')  # Debugging statement
+        
+@products_blueprint.route('/run_tasks_modify', methods=['GET', 'POST'])
+def run_tasks_modify():
+    candidate_id = request.json.get('candidate_id')
+    task_queue = queue.Queue()
+
+    # Start the analyze_video thread
+    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id))
+    analyze_thread.start()
+    # Wait for analyze_video to complete and check the result
+    analyze_thread.join(timeout=7200)
+    confirmation = task_queue.get()
+    if confirmation:
+         final_result = task_queue.get()
+    return jsonify({'result': final_result})
 
 
 @products_blueprint.route('/run_tasks', methods=['GET', 'POST'])
