@@ -62,6 +62,19 @@ application_list = [
         'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection/blob/main/jupyter-notbook-code/image_classification.ipynb',
         'created_by': 'Sharad Kumar Gupta & Aman Goel'
     },
+    {
+        'route': 'maskdetection.mask_classification',
+        'image_path': 'pictures/spam.jpg',
+        'title': 'Face Mask <span>Classifiaction</span>',
+        # New Data
+        'project_name': 'Face Mask Classification using CNN',
+        'project_description': 'An face mask classification problem involves the task of categorizing images into predefined classes or categories. The goal is to develop a machine learning model that can accurately predict the class label of an image based on its visual content. In the field of biology and ecology, researchers often need to identify and classify various species of plants and animals for conservation efforts, ecosystem monitoring, and biodiversity studies.',
+        'project_demo_link': 'http://aipocdemo.creatingwow.in/',
+        'project_demo_video': 'https://www.loom.com/share/909f450b5af14661a4122fde93469d99',
+        'project_demo_ppt': 'https://docs.google.com/presentation/d/1K2Azc1XAhuWT9bwPFizBN1KorKSPZv7n/edit#slide=id.g2762425dcb9_0_76',
+        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection/blob/main/jupyter-notbook-code/face_mask_detect_final.ipynb',
+        'created_by': 'Sudam Wanve'
+    },
 
     # {
     #     'route': 'object_detection',
