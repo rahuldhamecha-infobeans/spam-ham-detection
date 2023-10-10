@@ -124,7 +124,7 @@
           var candidateId = $(this).data('candidate');
           // Perform your AJAX request here
           $.ajax({
-          url: '{{ url_for('interview_analyzer.run_tasks') }}', // Replace with your actual AJAX endpoint URL
+          url: '{{ url_for('interview_analyzer.run_tasks_modify') }}', // Replace with your actual AJAX endpoint URL
           type: 'POST', // or 'GET', depending on your requirements
           contentType: 'application/json', // Set the content type to JSON
           data: JSON.stringify({ candidate_id: candidateId }), // Convert data to JSON format
