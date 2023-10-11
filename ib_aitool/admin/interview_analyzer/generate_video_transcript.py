@@ -16,6 +16,8 @@ from transformers import pipeline
 import whisper
 import datetime
 import shutil
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+from moviepy.editor import VideoFileClip
 
 audio_sentiment_pipe = pipeline("audio-classification", model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition")
 
@@ -69,20 +71,6 @@ def extract_question_timestamps(transcription_result, max_questions=5):
 # Function to save frames from a video based on timestamps
 def save_frames_from_video(video_file, timestamps, output_folder):
     os.makedirs(output_folder, exist_ok=True)
-    """cap = cv2.VideoCapture(video_file)
-    frame_count = 0
-    for timestamp in timestamps:
-        start_time = int(timestamp['start'])
-        end_time = int(timestamp['end'])
-        cap.set(cv2.CAP_PROP_POS_MSEC, start_time * 1000)
-        while True:
-            ret, frame = cap.read()
-            if not ret or frame_count >= end_time:
-                break
-            frame_filename = f"{output_folder}/frame_{frame_count}_{start_time}_{end_time}.jpg"
-            cv2.imwrite(frame_filename, frame)
-            frame_count += 1
-    cap.release() """
     cap = cv2.VideoCapture(video_file)
     frame_count = 0
 
@@ -448,3 +436,114 @@ def analyze_audio_timestamps_clips(timestamp_folder):
                     updated_result_dict={}
                 final_result.append({parts[0]:updated_result_dict})
     return final_result
+
+
+
+def classify_images_and_generate_timestamp(image_dir, interviewer_image_path):
+    interviewer_image = cv2.imread(interviewer_image_path).mean()
+    interviewer_image_plus = interviewer_image + 15
+    interviewer_image_sub = interviewer_image - 15
+
+    type_a_count = 0
+    type_b_count = 0
+    type_a_filenames = []
+    type_b_filenames = []
+    type_a_array = []
+    type_b_array = []
+
+    for filename in os.listdir(image_dir):
+        if filename.endswith('.jpg') or filename.endswith('.png'):
+            image_path = os.path.join(image_dir, filename)
+            image = cv2.imread(image_path)
+            average_pixel_value = image.mean()
+
+            if (interviewer_image_plus <= average_pixel_value) or (interviewer_image_sub >= average_pixel_value):
+                type_a_count += 1
+                type_a_filenames.append(filename)
+                numbers = re.findall(r'\d+', filename)
+                if numbers:
+                    extracted_number = int(numbers[0])
+                    type_a_array.append(extracted_number)
+            else:
+                type_b_count += 1
+                type_b_filenames.append(filename)
+                numbers = re.findall(r'\d+', filename)
+                if numbers:
+                    extracted_number = int(numbers[0])
+                    type_b_array.append(extracted_number)
+
+    type_a_filenames = sorted(type_a_filenames)
+    type_b_filenames = sorted(type_b_filenames)
+    type_a_array = sorted(type_a_array)
+    type_b_array = sorted(type_b_array)
+
+    def group_consecutive_numbers(nums, label):
+        result_arrays = []
+        current_array = []
+
+        for num in sorted(nums):
+            if not current_array or num == current_array[-1] + 1:
+                current_array.append(num)
+            else:
+                result_arrays.append({label: current_array})
+                current_array = [num]
+
+        if current_array:
+            result_arrays.append({label: current_array})
+
+        return result_arrays
+
+    result_arrays1 = group_consecutive_numbers(type_a_array, 'candidate')
+    result_arrays2 = group_consecutive_numbers(type_b_array, 'interviewer')
+    merged_arrays = result_arrays1 + result_arrays2
+
+    output_data = []
+
+    for arr in merged_arrays:
+        label, numbers = list(arr.items())[0]
+        output_data.append({label: {'start': min(numbers), 'end': max(numbers)}})
+
+    output_data.sort(key=lambda x: list(x.values())[0]['start'])
+
+    return output_data
+
+
+
+def get_audioclip_timestamps(audio_path, start_time_seconds,end_time_seconds, dir_path):
+    os.makedirs(dir_path, exist_ok=True)
+    # Load the audio file
+    audio = AudioSegment.from_mp3(audio_path)
+
+    # Convert seconds to milliseconds
+    start_time_ms = start_time_seconds * 1000
+    end_time_ms = end_time_seconds * 1000
+
+    # Cut the audio
+    cut_audio = audio[start_time_ms:end_time_ms]
+
+    sub_dir_path = os.path.join(dir_path, 'audioclips')
+    os.makedirs(sub_dir_path, exist_ok=True)
+    # Export the cut audio to a new file
+    # Define the output audio file path (MP3 format)
+    output_audio_path = os.path.join(sub_dir_path, f'timestamp_{start_time_seconds}_{end_time_seconds}_audio.wav')
+    #print(output_audio_path)
+    cut_audio.export(output_audio_path, format='wav')
+    transcript= extract_audio_transcript(output_audio_path)
+    print(transcript)
+
+
+    return transcript
+
+
+
+def extract_audio_transcript(audio_path):
+    # Initialize the recognizer
+    model=whisper.load_model('base.en')
+    options = whisper.DecodingOptions(language="en", fp16=False)
+    result = model.transcribe(audio_path)
+    # Clean up temporary files
+    if os.path.exists(audio_path):
+        print(f"{audio_path} -exits")
+        os.remove(audio_path)
+
+    return result['text']

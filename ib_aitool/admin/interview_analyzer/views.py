@@ -22,7 +22,7 @@ import jinja2
 import glob
 
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt, save_frames_for_timestamps, \
-    save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips,transcribe_video,extract_question_timestamps,save_frames_from_video,save_highest_count_videoframe
+    save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips,transcribe_video,extract_question_timestamps,save_frames_from_video,save_highest_count_videoframe,classify_images_and_generate_timestamp,get_audioclip_timestamps
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report, \
     generate_and_save_overall_video_report
 from jinja2 import Environment
@@ -462,6 +462,8 @@ def view_report(id):
     return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data,
                            overall=overall)
 
+def is_directory_not_empty(directory_path):
+    return len(os.listdir(directory_path)) > 0
 
 def analyze_video(queue, candidate_id):
     with app.app_context():
@@ -472,6 +474,7 @@ def analyze_video(queue, candidate_id):
             db.session.commit()
         if data is not None:
             videoPath = data.interview_video
+            audioPath = data.interview_audio
             video_name = os.path.basename(videoPath)
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
@@ -487,26 +490,50 @@ def analyze_video(queue, candidate_id):
             finalize_interviewer_saved=save_highest_count_videoframe(image_directory_path, output_directory_path,saved_image_name=video_name_without_extension)
             if finalize_interviewer_saved: 
                 print(f"interviewer frame Saved  to {output_directory_path}")
-
+                
+            image_dir = f'uploads/{video_name_without_extension}/allframes' 
+            interviewer_image_path = f'uploads/{video_name_without_extension}/video-interviewer/{video_name_without_extension}.jpg'
+            # Check if both the image directory and interviewer image exist and are not empty
+            if os.path.exists(image_dir) and os.path.exists(interviewer_image_path) and is_directory_not_empty(image_dir):
+                result = classify_images_and_generate_timestamp(image_dir, interviewer_image_path)
+                temp_storage_dir_path=f'uploads/{video_name_without_extension}/'
+                final_transcript_data=process_video_and_transcript(result,audioPath,temp_storage_dir_path)
+                print(final_transcript_data)
             # Loop through the data and save it to the database
-            """    for entry in transcriptJson:
-                video_entry = VideoProcess(
-                    vid=candidate_id,
-                    start_duration=math.ceil(float(entry['start'])),
-                    end_duration=math.ceil(float(entry['end'])),
-                    interview_transcript=entry['transcript'],
-                    added_by=data.added_by,
-                    created_at=datetime.utcnow(),
-                    speaker=entry['speaker'],
-                )
-                db.session.add(video_entry)
-                db.session.commit() """
+                for entry in final_transcript_data:
+                    label = list(entry.keys())[0]
+                    video_entry = VideoProcess(
+                        vid=candidate_id,
+                        start_duration=math.ceil(float(entry[label]['start'])),
+                        end_duration=math.ceil(float(entry[label]['start'])),
+                        interview_transcript=entry[label]['transcript_data'],
+                        added_by=data.added_by,
+                        created_at=datetime.utcnow(),
+                        speaker=label,
+                    )
+                    db.session.add(video_entry)
+                    db.session.commit()
             result = True
         else:
             result = False
         queue.put(result)
         time.sleep(1)  # Simulate some processing time
         print('Part 1 completed')  # Debugging statement
+
+
+def process_video_and_transcript(result, audio_path,temp_storage_dir_path):
+    
+    for segment in result:
+        label = list(segment.keys())[0]
+        if label == 'candidate':
+            transcript_data = get_audioclip_timestamps(audio_path, segment[label]['start'], segment[label]['end'], temp_storage_dir_path)
+            segment[label]['transcript_data'] = transcript_data
+        elif label == 'interviewer':
+            transcript_data = get_audioclip_timestamps(audio_path, segment[label]['start'], segment[label]['end'], temp_storage_dir_path)
+            segment[label]['transcript_data'] = transcript_data
+    
+    return result
+
 
 
 def get_video_frames(queue, candidate_id):
