@@ -5,6 +5,7 @@ from poc.songsdetection.views import songs_blueprint
 from poc.spamham.views import spamham_blueprint
 from poc.objectdetection.views import object_detection_blueprint
 from poc.imageclassification.views import image_classification_blueprint
+from poc.maskdetection.views import mask_classification_blueprint
 from poc.emailvalidator.views import email_validator_blueprint
 from flask_login import login_required
 
@@ -23,6 +24,8 @@ app.register_blueprint(songs_blueprint,
                        url_prefix='/songs')
 app.register_blueprint(image_classification_blueprint,
                        url_prefix='/image-classification')
+app.register_blueprint(mask_classification_blueprint,
+                       url_prefix='/mask_classification')
 app.register_blueprint(email_validator_blueprint,
                        url_prefix='/email-validator')
 
