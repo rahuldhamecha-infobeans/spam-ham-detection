@@ -45,7 +45,9 @@ def migrate_permissions():
                    'Roles Update',
                    'Users',
                    'Users Create',
-                   'Users Update'
+                   'Users Update',
+                   'Attendance',
+                   'Attendance Admin',
                  ]
     for perm in permissions:
         permission = Permission(name=perm)
@@ -63,7 +65,7 @@ def migrate_role_map_permission():
         db.session.commit()
 
     # For Interviewer
-    inter_permissions= ['Dashboard','Interview Analyzer']
+    inter_permissions= ['Dashboard','Interview Analyzer','Attendance']
     role = Role.query.filter_by(name='Interviewer').first()
     if role:
         for perm in inter_permissions:
