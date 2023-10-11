@@ -112,3 +112,17 @@ class EmployeeAttendance(db.Model):
 
     def employee(self):
         return Employee.query.get(self.employee_id)
+
+    def calculate_hours(self):
+        hours = 0
+        hours_text = ''
+        if self.entry_time != None and self.exit_time != None:
+            t1 = self.entry_time
+            t2 = self.exit_time
+            diff = t2 - t1
+            minutes = diff.total_seconds() / 60
+            minutes = float('{0:.2f}'.format(minutes))
+            hours = minutes / 60
+            hours += float('{0:.2f}'.format(hours))
+            hours_text = str('{0:.2f}'.format(hours)) + ' Hours'
+        return {'hours': hours, 'hours_text': hours_text}

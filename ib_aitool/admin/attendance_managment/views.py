@@ -295,7 +295,13 @@ def employee_fetch_attendance(id):
 def employee_view_attendance_list(id):
     event_date = request.args.get('event_date')
     employee_attendance = db.session.query(EmployeeAttendance).filter(EmployeeAttendance.employee_id == id).filter(sa.func.date(EmployeeAttendance.entry_time) == sa.func.date(event_date)).all()
-    return render_template('admin/attendance/attendance_list.html',attendance_list=employee_attendance);
+    total_hours = 0
+    if employee_attendance:
+        for emp in employee_attendance:
+            emp_hours = emp.calculate_hours()
+            hours = emp_hours['hours'] or 0
+            total_hours = float(hours) + total_hours
+    return render_template('admin/attendance/view_attendance_list.html',attendance_list=employee_attendance,total_hours=float('{0:.2f}'.format(total_hours)));
 
 
 app.register_blueprint(attendance_blueprint, url_prefix='/admin/attendance')

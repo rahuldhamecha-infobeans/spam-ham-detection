@@ -23,8 +23,19 @@
                         {{ attendance.exit_time }}
                     {% endif %}
                 </td>
+                <td>
+                        {{ attendance.calculate_hours()['hours_text'] }}
+                </td>
             </tr>
         {% endfor %}
+        <tr>
+            <td colspan="3" class="text-right" style="text-align: right;">
+                Total Duration
+            </td>
+            <td colspan="3">
+                {{ total_hours }} Hours
+            </td>
+        </tr>
 {% else %}
     <tr>
     <td colspan="3" class="text-center">No Attendance Found</td>
