@@ -20,6 +20,7 @@ import pdfkit
 import os
 import jinja2
 import glob
+import cv2
 
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt, save_frames_for_timestamps, \
     save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips,transcribe_video,extract_question_timestamps,save_frames_from_video,save_highest_count_videoframe
@@ -459,11 +460,10 @@ def view_report(id):
     candidate = Candidate.query.get(id)
     data, overall = create_overall_data_by_candidate_id(id)
 
-    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data,
-                           overall=overall)
+    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data, overall=overall)
 
 
-def analyze_video(queue, candidate_id):
+def analyze_video(queue, candidate_id,selected_image):
     with app.app_context():
         data = Candidate.get_video_data(candidate_id)
         candidate_data = Candidate.query.filter_by(id=candidate_id).first()
@@ -478,15 +478,19 @@ def analyze_video(queue, candidate_id):
             #transcriptJson = generate_transcipt(videoPath)
             #allFrames = generate_per_second_frame(videoPath)
             result = transcribe_video(videoPath)
-            question_timestamps = extract_question_timestamps(result, max_questions=5)
-            output_folder = f'uploads/{video_name_without_extension}/first-5qsn-videoframes/'
-            frame_count = save_frames_from_video(videoPath, question_timestamps, output_folder)
+            # question_timestamps = extract_question_timestamps(result, max_questions=5)
+            # output_folder = f'uploads/{video_name_without_extension}/first-5qsn-videoframes/'
+            # frame_count = save_frames_from_video(videoPath, question_timestamps, output_folder)
             all_frame_count = save_frames_from_video(videoPath, None, f'uploads/{video_name_without_extension}/allframes')
-            image_directory_path=output_folder
-            output_directory_path=f'uploads/{video_name_without_extension}/video-interviewer/'
-            finalize_interviewer_saved=save_highest_count_videoframe(image_directory_path, output_directory_path,saved_image_name=video_name_without_extension)
-            if finalize_interviewer_saved: 
-                print(f"interviewer frame Saved  to {output_directory_path}")
+            # image_directory_path=output_folder
+
+            output_directory_path=os.path.join(BASE_DIR,'uploads/'+video_name_without_extension+'/video-interviewer/')
+            selected_image = os.path.join(BASE_DIR+selected_image)
+            os.makedirs(output_directory_path, exist_ok=True)
+            shutil.copy(selected_image,output_directory_path)            
+            # finalize_interviewer_saved=save_highest_count_videoframe(image_directory_path, output_directory_path)
+            # if finalize_interviewer_saved: 
+                # print(f"interviewer frame Saved  to {output_directory_path}")
 
             # Loop through the data and save it to the database
             """    for entry in transcriptJson:
@@ -508,6 +512,48 @@ def analyze_video(queue, candidate_id):
         time.sleep(1)  # Simulate some processing time
         print('Part 1 completed')  # Debugging statement
 
+@products_blueprint.route('/confirm_interviewer', methods=['POST'])
+def confirm_interviewer():    
+    data = Candidate.get_video_data(request.json.get('candidate_id'))
+    if data is not None:
+        videoPath = data.interview_video
+        video_name = os.path.basename(videoPath)
+        video_name_without_extension, extension = os.path.splitext(video_name)
+        output_folder = f'uploads/{video_name_without_extension}/two-minutes-videoframes/'
+        output_directory_path=f'uploads/{video_name_without_extension}/final-frames/'
+
+        if(request.json.get('sendCandidate')):
+            return json.dumps({'success': 1,'image':output_directory_path+'candidate.jpg'})
+        else:            
+            timestamp = []
+            timestamp.append({'start': 30, 'end': 150})            
+            save_two_minutes_frame(videoPath, timestamp, output_folder)#save two minutes frames
+            finalize_interviewer_saved=save_highest_count_videoframe(output_folder, output_directory_path)
+            if finalize_interviewer_saved: 
+                return json.dumps({'success': 1,'image':output_directory_path+'interviewer.jpg'})
+            else:
+                return json.dumps({'success':0})
+
+def save_two_minutes_frame(videoPath, timestamp, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
+    cap = cv2.VideoCapture(videoPath)
+    frame_count = 0
+    start_time = int(timestamp[0]['start'])
+    end_time = int(timestamp[0]['end'])
+    cap.set(cv2.CAP_PROP_POS_MSEC, (start_time * 1000))
+    frame_interval_ms = 1000  # One frame per second (1000 milliseconds)
+    while True:
+        ret, frame = cap.read()
+        if not ret or cap.get(cv2.CAP_PROP_POS_MSEC) > (end_time * 1000):
+            break
+        frame_filename = f"{output_folder}/frame_{frame_count}.jpg"
+        cv2.imwrite(frame_filename, frame)
+        frame_count += 1
+
+        # Skip frames to maintain one frame per second
+        cap.set(cv2.CAP_PROP_POS_MSEC, frame_count * frame_interval_ms)
+
+    cap.release()
 
 def get_video_frames(queue, candidate_id):
     with app.app_context():
@@ -598,10 +644,11 @@ def save_overall_report_to_candidate_table(queue, candidate_id):
 @products_blueprint.route('/run_tasks_modify', methods=['GET', 'POST'])
 def run_tasks_modify():
     candidate_id = request.json.get('candidate_id')
+    selected_image = request.json.get('selected_image')
     task_queue = queue.Queue()
 
     # Start the analyze_video thread
-    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id))
+    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id,selected_image))
     analyze_thread.start()
     # Wait for analyze_video to complete and check the result
     analyze_thread.join(timeout=7200)
