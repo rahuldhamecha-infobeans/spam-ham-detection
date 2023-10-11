@@ -26,7 +26,6 @@ ajax_load = False
 
 @attendance_blueprint.route('/')
 @login_required
-@has_permission('Attendance')
 def index():
     global camera_instance, is_camera_on, opened_camera
     return render_template('admin/attendance/index.html', is_camera_on=is_camera_on,
@@ -35,7 +34,6 @@ def index():
 
 @attendance_blueprint.route('/list')
 @login_required
-@has_permission('Attendance Admin')
 def employee_list():
     employee_list = Employee.query.all()
     return render_template('admin/attendance/employee_list.html', employees=employee_list)
@@ -43,7 +41,6 @@ def employee_list():
 
 @attendance_blueprint.route('/employee-create', methods=['GET', 'POST'])
 @login_required
-@has_permission('Attendance Admin')
 def employee_create():
     form = EmployeeForm()
     if form.validate_on_submit():
@@ -59,7 +56,6 @@ def employee_create():
 
 @attendance_blueprint.route('/employee-update/<int:id>', methods=['GET', 'POST'])
 @login_required
-@has_permission('Attendance Admin')
 def employee_update(id):
     employee = Employee.query.get(id)
     form = EmployeeForm(employee_id=id,name=employee.name,directory_name=employee.directory_name)
@@ -76,7 +72,6 @@ def employee_update(id):
 
 @attendance_blueprint.route('/employee/upload-images', methods=['GET', 'POST'])
 @login_required
-@has_permission('Attendance Admin')
 def upload_images():
     current_date = datetime.now()
     current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
@@ -121,7 +116,6 @@ def upload_images():
 
 @attendance_blueprint.route('/employee/image-list')
 @login_required
-@has_permission('Attendance Admin')
 def images_list():
     emp_id = request.args.get('emp_id')
     employee = Employee.query.get(emp_id)
@@ -134,7 +128,6 @@ def images_list():
 
 @attendance_blueprint.route('/employee/image/delete/<int:id>')
 @login_required
-@has_permission('Attendance Admin')
 def delete_image(id):
     image = EmployeeImage.query.get(id)
     if image:
@@ -146,7 +139,6 @@ def delete_image(id):
 
 @attendance_blueprint.route('/list/delete/<int:id>')
 @login_required
-@has_permission('Attendance Admin')
 def delete_employee(id):
     employee = Employee.query.get(id)
     if employee:
@@ -168,7 +160,6 @@ def delete_employee(id):
 
 @attendance_blueprint.route('/list/train-model', methods=['POST'])
 @login_required
-@has_permission('Attendance Admin')
 def employee_train_model():
     dir_path = os.path.join(app.config['UPLOAD_FOLDER'], 'models')
     isExist = os.path.exists(path=dir_path)
