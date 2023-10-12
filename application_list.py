@@ -62,6 +62,19 @@ application_list = [
         'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection/blob/main/jupyter-notbook-code/image_classification.ipynb',
         'created_by': 'Sharad Kumar Gupta & Aman Goel'
     },
+    {
+        'route': 'maskdetection.mask_classification',
+        'image_path': 'pictures/spam.jpg',
+        'title': 'Face Mask <span>Classifiaction</span>',
+        # New Data
+        'project_name': 'Face Mask Classification using CNN',
+        'project_description': 'An face mask classification problem involves the task of categorizing images into predefined classes or categories. The goal is to develop a machine learning model that can accurately predict the class label of an image based on its visual content. In the field of biology and ecology, researchers often need to identify and classify various species of plants and animals for conservation efforts, ecosystem monitoring, and biodiversity studies.',
+        'project_demo_link': 'http://aipocdemo.creatingwow.in/',
+        'project_demo_video': 'https://www.loom.com/share/909f450b5af14661a4122fde93469d99',
+        'project_demo_ppt': 'https://docs.google.com/presentation/d/1K2Azc1XAhuWT9bwPFizBN1KorKSPZv7n/edit#slide=id.g2762425dcb9_0_76',
+        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection/blob/main/jupyter-notbook-code/face_mask_detect_final.ipynb',
+        'created_by': 'Sudam Wanve'
+    },
 
     # {
     #     'route': 'object_detection',
@@ -144,7 +157,7 @@ application_list = [
     #     'project_model_code_link': '#',
     #     'created_by': 'Pragati Nande'
     # },
-    {
+       {
         'route': 'textclassification.investor',
         'image_path': 'pictures/spam.jpg',
         'title': 'Text Classification by Category',
@@ -154,6 +167,18 @@ application_list = [
         'project_demo_video': 'https://drive.google.com/file/d/1vCfj2aeFqd-GU3dZcIgTvuof7lfdfPki/view?usp=drive_link',
         'project_demo_ppt': 'https://docs.google.com/presentation/d/17jo0duV4iyPs-ZZQlKz1VmG0SVi73GJKnBPG1C3q1xU/edit',
         'project_model_code_link': '',
-        'created_by': 'Amit Gupta'
+        'created_by': 'Amit Gupta'},
+      {
+        'route': 'attendance.index',
+        'image_path': 'pictures/spam.jpg',
+        'title': 'Attendance <br><span>Tracker</span>',
+        # New Data
+        'project_name': 'Smart Attendance Tracker',
+        'project_description': 'Smart Attendance Tracker uses technology to evaluate a candidate\'s face recognize to mark the attendance.',
+        'project_demo_link': 'http://aipocdemo.creatingwow.in/',
+        'project_demo_video': '#',
+        'project_demo_ppt': 'https://docs.google.com/presentation/d/1BeNfHygNHcxxkItbex8rgUUe5Xze3ln3/edit#slide=id.g25e105483f5_2_671',
+        'project_model_code_link': 'https://github.com/rahuldhamecha-infobeans/spam-ham-detection',
+        'created_by': 'Rahul Dhamecha',
     },
 ]

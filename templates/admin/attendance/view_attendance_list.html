@@ -1,0 +1,43 @@
+{% if attendance_list %}
+        {% for attendance in attendance_list %}
+            <tr>
+                <td>
+                    {% with employee = attendance.employee() %}
+                    {% if employee %}
+                        {{ employee.name }}
+                    {% endif %}
+                    {% endwith %}
+                </td>
+
+                <td>
+                    {% if attendance.entry_time != None %}
+                        {{ attendance.entry_time.strftime('%d-%m-%Y %H:%M:%S %p') }}
+                    {% else %}
+                        {{ attendance.entry_time }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if attendance.exit_time != None %}
+                        {{ attendance.exit_time.strftime('%d-%m-%Y %H:%M:%S %p') }}
+                    {% else %}
+                        {{ attendance.exit_time }}
+                    {% endif %}
+                </td>
+                <td>
+                        {{ attendance.calculate_hours()['hours_text'] }}
+                </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3" class="text-right" style="text-align: right;">
+                Total Duration
+            </td>
+            <td colspan="3">
+                {{ total_hours }} Hours
+            </td>
+        </tr>
+{% else %}
+    <tr>
+    <td colspan="3" class="text-center">No Attendance Found</td>
+    </tr>
+{% endif %}

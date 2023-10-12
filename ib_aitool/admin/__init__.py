@@ -4,3 +4,4 @@ import ib_aitool.admin.roles.views
 import ib_aitool.admin.users.views
 import ib_aitool.admin.interview_analyzer.views
 import ib_aitool.admin.interview_analyzer.generate_report_command
+import ib_aitool.admin.attendance_managment.views
