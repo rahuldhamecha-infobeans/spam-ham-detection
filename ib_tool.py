@@ -36,9 +36,13 @@ def get_file_url(dir,name):
     path = os.path.join(app.config['UPLOAD_FOLDER'],dir)
     return send_from_directory(path, name)
 
-app.add_url_rule(
-    "/uploads/<dir>/<name>", endpoint="get_file_url", build_only=True
-)
+@app.route('/uploads/<dir>/final-frames/<name>')
+def get_final_frame(dir,name):
+    path = os.path.join(app.config['UPLOAD_FOLDER'],dir,'final-frames')
+    return send_from_directory(path, name)
+
+app.add_url_rule("/uploads/<dir>/<name>", endpoint="get_file_url", build_only=True)
+app.add_url_rule("/uploads/<dir>/final-frames/<name>", endpoint="get_final_frame", build_only=True)
 
 import ib_aitool.register_application
 import ib_aitool.context_processor

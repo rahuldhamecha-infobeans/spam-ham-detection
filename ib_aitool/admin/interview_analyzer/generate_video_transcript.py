@@ -104,67 +104,80 @@ def save_frames_from_video(video_file, timestamps, output_folder):
     cap.release()
     return frame_count
 
+def save_highest_count_videoframe(image_dir, output_dir):
+    """Save Highest and Lowest count frame"""
 
-def save_highest_count_videoframe(image_dir, output_dir,saved_image_name):
-    # Initialize counters for Type A and Type B images
     type_a_count = 0
     type_b_count = 0
+    highest_count_image_type_a = None
+    lowest_count_image_type_a = None
+    highest_count_image_type_b = None
+    lowest_count_image_type_b = None
 
-    # Initialize variables to store the filename and count of the image with the highest count
-    highest_count_image_filename = ""
-    highest_count = 0
-
-    # Create the output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Loop through the images in the directory
     for filename in os.listdir(image_dir):
         if filename.endswith('.jpg') or filename.endswith('.png'):
             image_path = os.path.join(image_dir, filename)
 
-            # Load the image
             image = cv2.imread(image_path)
-
-            # Perform some basic image processing or feature extraction to determine the type
-            # Here, we'll assume that Type A images have higher average pixel values than Type B
             average_pixel_value = image.mean()
 
-            # You can adjust this threshold value based on your data
             threshold = 150  # Example threshold
 
-            # Classify the image based on the threshold
             if average_pixel_value > threshold:
                 type_a_count += 1
+                if highest_count_image_type_a is None or type_a_count > highest_count_image_type_a[1]:
+                    highest_count_image_type_a = (filename, type_a_count)
+                if lowest_count_image_type_a is None or type_a_count < lowest_count_image_type_a[1]:
+                    lowest_count_image_type_a = (filename, type_a_count)
             else:
                 type_b_count += 1
-
-                # Store the filename of the image with the highest count
-                highest_count_image_filename = filename
+                if highest_count_image_type_b is None or type_b_count > highest_count_image_type_b[1]:
+                    highest_count_image_type_b = (filename, type_b_count)
+                if lowest_count_image_type_b is None or type_b_count < lowest_count_image_type_b[1]:
+                    lowest_count_image_type_b = (filename, type_b_count)
 
     # Determine which type has the highest count
     if type_a_count > type_b_count:
-        print("Type A has the highest count with", type_a_count, "images.")
-    else:
-        print("Type B has the highest count with", type_b_count, "images.")
+            #interviewer image
+            interviewer = f'interviewer.jpg'
+            interviewer_image_path = os.path.join(output_dir, interviewer)
 
-    # Print the filename of the image with the highest count
-    if highest_count_image_filename:
-        print("Image with the highest count:", highest_count_image_filename)
-        
-        # Define the custom name and path for the saved image
-        custom_image_name = f'{saved_image_name}.jpg'
-        custom_image_path = os.path.join(output_dir, custom_image_name)
+            # Copy the highest count image to the output directory with the custom name
+            source_path = os.path.join(image_dir, highest_count_image_type_a[0])
+            shutil.copyfile(source_path, interviewer_image_path)
 
-        # Copy the highest count image to the output directory with the custom name
-        source_path = os.path.join(image_dir, highest_count_image_filename)
-        shutil.copyfile(source_path, custom_image_path)
+            #candidate image
+            candidate = f'candidate.jpg'
+            candidate_image_path = os.path.join(output_dir, candidate)
 
-        print(f"Highest count image copied to '{output_dir}' folder as '{custom_image_name}'.")
-        return True
-    else:
-        print("No images found.")
-        return False
+            # Copy the highest count image to the output directory with the custom name
+            source_path = os.path.join(image_dir, lowest_count_image_type_b[0])
+            shutil.copyfile(source_path, candidate_image_path)
+            
+            return True
 
+    elif type_b_count > type_a_count:
+        #interviewer image
+            interviewer = f'interviewer.jpg'
+            interviewer_image_path = os.path.join(output_dir, interviewer)
+
+            # Copy the highest count image to the output directory with the custom name
+            source_path = os.path.join(image_dir, highest_count_image_type_b[0])
+            shutil.copyfile(source_path, interviewer_image_path)
+
+            #candidate image
+            candidate = f'candidate.jpg'
+            candidate_image_path = os.path.join(output_dir, candidate)
+
+            # Copy the highest count image to the output directory with the custom name
+            source_path = os.path.join(image_dir, lowest_count_image_type_a[0])
+            shutil.copyfile(source_path, candidate_image_path)
+            
+            return True
+
+    return False
 
 def generate_transcipt(videopath):
     # Run the Whisper command and capture its output
