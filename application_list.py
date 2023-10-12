@@ -157,7 +157,18 @@ application_list = [
     #     'project_model_code_link': '#',
     #     'created_by': 'Pragati Nande'
     # },
-    {
+       {
+        'route': 'textclassification.investor',
+        'image_path': 'pictures/spam.jpg',
+        'title': 'Text Classification by Category',
+        'project_name': ' Automatic Text Recognization ',
+        'project_description': 'Automatic category filtering is a technology that employs algorithms to analyze incoming text, messages, or content and identify that in which category the text belong.',
+        'project_demo_link':  'http://aipocdemo.creatingwow.in/',
+        'project_demo_video': 'https://drive.google.com/file/d/1vCfj2aeFqd-GU3dZcIgTvuof7lfdfPki/view?usp=drive_link',
+        'project_demo_ppt': 'https://docs.google.com/presentation/d/17jo0duV4iyPs-ZZQlKz1VmG0SVi73GJKnBPG1C3q1xU/edit',
+        'project_model_code_link': '',
+        'created_by': 'Amit Gupta'},
+      {
         'route': 'attendance.index',
         'image_path': 'pictures/spam.jpg',
         'title': 'Attendance <br><span>Tracker</span>',
