@@ -264,7 +264,7 @@
     $('.modal-header').html("")
 
     $.ajax({
-      url: '{{ url_for('interview_analyzer.run_tasks_modify') }}',
+      url: '{{ url_for('interview_analyzer.run_tasks') }}',
       type: "POST",
       contentType: "application/json",
       data: JSON.stringify({ candidate_id: candidateId, selected_image }),

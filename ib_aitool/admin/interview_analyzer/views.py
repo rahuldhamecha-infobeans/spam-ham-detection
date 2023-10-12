@@ -479,11 +479,6 @@ def analyze_video(queue, candidate_id,selected_image):
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
             #transcriptJson = generate_transcipt(videoPath)
-            #allFrames = generate_per_second_frame(videoPath)
-            #result = transcribe_video(videoPath)
-            # question_timestamps = extract_question_timestamps(result, max_questions=5)
-            # output_folder = f'uploads/{video_name_without_extension}/first-5qsn-videoframes/'
-            # frame_count = save_frames_from_video(videoPath, question_timestamps, output_folder)
             all_frame_count = save_frames_from_video(videoPath, None, f'uploads/{video_name_without_extension}/allframes')
             # image_directory_path=output_folder
 
@@ -494,11 +489,7 @@ def analyze_video(queue, candidate_id,selected_image):
             custom_image_name = f'{video_name_without_extension}.jpg'
             custom_image_path = os.path.join(output_directory_path, custom_image_name)
 
-            shutil.copy(selected_image,custom_image_path)            
-            # finalize_interviewer_saved=save_highest_count_videoframe(image_directory_path, output_directory_path)
-            # if finalize_interviewer_saved: 
-                # print(f"interviewer frame Saved  to {output_directory_path}")
-                
+            shutil.copy(selected_image,custom_image_path)             
             image_dir = f'uploads/{video_name_without_extension}/allframes' 
             interviewer_image_path = f'uploads/{video_name_without_extension}/video-interviewer/{video_name_without_extension}.jpg'
             # Check if both the image directory and interviewer image exist and are not empty
@@ -513,7 +504,7 @@ def analyze_video(queue, candidate_id,selected_image):
                     video_entry = VideoProcess(
                         vid=candidate_id,
                         start_duration=math.ceil(float(entry[label]['start'])),
-                        end_duration=math.ceil(float(entry[label]['start'])),
+                        end_duration=math.ceil(float(entry[label]['end'])),
                         interview_transcript=entry[label]['transcript_data'],
                         added_by=data.added_by,
                         created_at=datetime.utcnow(),
@@ -524,6 +515,7 @@ def analyze_video(queue, candidate_id,selected_image):
             result = True
         else:
             result = False
+        print(f'result: {result}')
         queue.put(result)
         time.sleep(1)  # Simulate some processing time
         print('Part 1 completed')  # Debugging statement
@@ -692,16 +684,18 @@ def run_tasks_modify():
 @products_blueprint.route('/run_tasks', methods=['GET', 'POST'])
 def run_tasks():
     candidate_id = request.json.get('candidate_id')
+    selected_image = request.json.get('selected_image')
     task_queue = queue.Queue()
 
     # Start the analyze_video thread
-    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id))
+    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id,selected_image))
     analyze_thread.start()
 
     # Wait for analyze_video to complete and check the result
     analyze_thread.join(timeout=7200)
     confirmation = task_queue.get()
     if confirmation:
+        print("part-1 confirmation")
         # If confirmation is True, start the get_video_frames thread
         get_frames_thread = threading.Thread(target=get_video_frames, args=(task_queue, candidate_id))
         get_frames_thread.start()

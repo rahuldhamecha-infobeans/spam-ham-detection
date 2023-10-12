@@ -358,6 +358,7 @@ def analyze_timestamp_folder(timestamp_folder):
             # Create JSON objects for emotion totals
             timestamp_string = timestamp_dir
             parts = timestamp_string.split("__")
+            json_result={}
             emotion_totals_1_all_zero = all(value == 0.0 for value in emotion_totals_1.values())
             if emotion_totals_1_all_zero:
                 result_1={}
@@ -368,7 +369,7 @@ def analyze_timestamp_folder(timestamp_folder):
                 result_2={}
             else:
                 result_2 = {key: round(value / count, 2) for key, value in emotion_totals_2.items()}
-
+            
             if  result_1 and result_2:
                 if result_1["neutral"] > result_2["neutral"] and result_1["happy"] > result_2["happy"]:
                     selected_json = result_1
@@ -377,9 +378,11 @@ def analyze_timestamp_folder(timestamp_folder):
                 json_result = {parts[0]: selected_json}
             elif result_1 and not result_2:
                 json_result = {parts[0]: result_1}
+            elif result_2 and not result_1:
+                json_result = {parts[0]: result_2}
                
-
-            final_json_result.append(json_result) 
+            if json_result:
+                final_json_result.append(json_result) 
         
     return final_json_result
 
