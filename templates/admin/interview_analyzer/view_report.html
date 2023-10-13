@@ -20,9 +20,9 @@ Interview Assessment {% endblock %} {% block head_styles %}
       <h2 class="m-4 text-center">
         <u>Interview Report of {{ candidate.name }}</u>
       </h2>
-      <a class="download_report" href="#"><button class="file-upload-button css-1ikvom0">
+      <!-- <a class="download_report" href="#"><button class="file-upload-button css-1ikvom0">
           <i class="fa fa-download"></i> Download Report
-        </button></a>
+        </button></a> -->
     </div>
     <div class="col-md-6 stretch-card grid-margin">
       <div class="report-container">
@@ -222,11 +222,11 @@ Interview Assessment {% endblock %} {% block head_styles %}
       </div>
 
       <div class="modal-body">
-        <div class="chart-wrapper">
+        <div class="chart-wrapper video_report_wrapper">
           <canvas id="video_report_canvas"></canvas>
           <div id="chart-text">Video Analysis</div>
         </div>
-        <div class="chart-wrapper">
+        <div class="chart-wrapper text_report_wrapper">
           <canvas id="text_report_canvas"></canvas>
           <div id="chart-text">Text Analysis</div>
         </div>

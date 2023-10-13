@@ -161,11 +161,12 @@ h5 {
   font-size: 15px;
 }
 
-.percentage-wrapper > div{
-display:flex;}
+.percentage-wrapper > div {
+  display: flex;
+}
 
-.percentage-wrapper > div span{
-margin: -3px 0px 0px 10px;
+.percentage-wrapper > div span {
+  margin: -3px 0px 0px 10px;
 }
 
 .modal-dialog {
@@ -209,12 +210,17 @@ div#chart-text {
   top: 27px;
 }
 
-.modal#confidenceLevel .modal-dialog{
-max-width:40%;
+.modal#confidenceLevel .modal-dialog {
+  max-width: 40%;
 }
 
-.modal#nervousnessLevel .modal-dialog{
-max-width:40%;
+.modal#nervousnessLevel .modal-dialog {
+  max-width: 40%;
+}
+
+.video_report_wrapper,
+.text_report_wrapper {
+  display: none;
 }
 
 @media only screen and (max-width: 1024px) {

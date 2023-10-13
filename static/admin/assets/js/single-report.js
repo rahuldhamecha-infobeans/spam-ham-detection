@@ -15,18 +15,23 @@ $(function () {
 function createDoughnutChart(target, targetClass) {
   const reportData = JSON.parse(target.data(targetClass).replaceAll("'", '"'));
   const chartData = getChartData(reportData);
+  const isEmpty = Object.values(reportData).every((x) => x === 0 || x === "0");
 
-  if (targetClass == "video-report") {
-    chartTarget = "video_report_canvas";
-  } else if (targetClass == "text-report") {
-    chartTarget = "text_report_canvas";
+  if (!isEmpty) {
+    if (targetClass == "video-report") {
+      chartTarget = "video_report_canvas";
+      $(".video_report_wrapper").show();
+    } else if (targetClass == "text-report") {
+      chartTarget = "text_report_canvas";
+      $(".text_report_wrapper").show();
+    }
+
+    generated_chart = new Chart(chartTarget, {
+      type: "doughnut",
+      data: chartData,
+      options: getChartOptions(),
+    });
   }
-
-  generated_chart = new Chart(chartTarget, {
-    type: "doughnut",
-    data: chartData,
-    options: getChartOptions(),
-  });
 }
 
 function getChartData(chartData) {
