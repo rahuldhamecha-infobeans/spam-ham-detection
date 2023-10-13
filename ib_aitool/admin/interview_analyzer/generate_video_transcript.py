@@ -380,9 +380,12 @@ def analyze_timestamp_folder(timestamp_folder):
                 json_result = {parts[0]: result_1}
             elif result_2 and not result_1:
                 json_result = {parts[0]: result_2}
-               
+            else:
+                default_entry={'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.0, 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+                json_result={parts[0]:default_entry}
             if json_result:
-                final_json_result.append(json_result) 
+                final_json_result.append(json_result)
+             
         
     return final_json_result
 

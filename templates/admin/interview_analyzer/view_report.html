@@ -95,7 +95,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
     <div class="col-xl-12">
       <div class="card">
         <div class="card-header">
-          <h4>Question Analysis</h4>
+          <h4> Conversation Analysis</h4>
         </div>
         <div class="card-body">
           <div class="col-md mb-4 mb-md-0">
@@ -112,8 +112,12 @@ Interview Assessment {% endblock %} {% block head_styles %}
                 <h2 class="accordion-header" id="heading_{{ index }}">
                   <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
                     data-bs-target="#accordion_{{ index }}" aria-expanded="false" aria-controls="accordion_{{ index }}">
-                    <i class="fa fa-commenting" aria-hidden="true" style="color: #aa142d"></i>&nbsp;{{
-                    video_process.interview_transcript }}
+                    <i class="fa fa-commenting" aria-hidden="true" style="color: #aa142d"></i>&nbsp;
+                    {% if video_process.interview_transcript=='NA' %}
+                        Transcript Not Found
+                    {% else %}
+                    {{video_process.interview_transcript }}
+                    {% endif %}
                   </button>
                 </h2>
 
@@ -150,8 +154,13 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <div id="accordion_{{ index - 1 }}" class="accordion-collapse collapse"
               data-bs-parent="#question_answer_accordion" aria-labelledby="heading_{{ index }}">
               <div class="accordion-body">
-                <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;{{
-                video_process.interview_transcript }}
+                <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;
+                  {% if video_process.interview_transcript=='NA' %}
+                  Transcript Not Found
+                {% else %}
+                {{video_process.interview_transcript }}
+                {% endif %}
+
               </div>
             </div>
 
@@ -173,16 +182,24 @@ Interview Assessment {% endblock %} {% block head_styles %}
           <div id="accordion_{{ index - 1 }}" class="accordion-collapse collapse"
             data-bs-parent="#question_answer_accordion">
             <div class="accordion-body">
-              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;{{
-              video_process.interview_transcript }}
+              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;      
+                {% if video_process.interview_transcript=='NA' %}
+                  Transcript Not Found
+                {% else %}
+                {{video_process.interview_transcript }}
+                {% endif %}
             </div>
           </div>
           {%elif video_process.speaker == 'interviewer'%}
           <div id="accordion_{{ index - 1 }}" class="accordion-collapse collapse"
             data-bs-parent="#question_answer_accordion">
             <div class="accordion-body">
-              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;{{
-              video_process.interview_transcript }}
+              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;
+              {% if video_process.interview_transcript=='NA' %}
+              Transcript Not Found
+            {% else %}
+            {{video_process.interview_transcript }}
+            {% endif %}
             </div>
           </div>
 

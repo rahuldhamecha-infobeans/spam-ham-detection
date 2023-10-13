@@ -127,6 +127,7 @@
         >
         {% endif %} {% if candidate.video_analysis_status == "inprogress" %}
         Analyzing Please wait... for 15 -30 minutes {% endif %}
+        
       </td>
     </tr>
     {% endfor %} {% else %}
@@ -262,7 +263,10 @@
     $(".img_wrapper").hide()
     $('.button_wrapper').hide()
     $('.modal-header').html("")
-
+    // Delay the page reload by 10 seconds (10000 milliseconds)
+    setTimeout(function() {
+        location.reload();
+    }, 10000);
     $.ajax({
       url: '{{ url_for('interview_analyzer.run_tasks') }}',
       type: "POST",

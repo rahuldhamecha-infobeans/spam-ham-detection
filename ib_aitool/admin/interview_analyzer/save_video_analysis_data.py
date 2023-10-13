@@ -89,21 +89,29 @@ def save_videots_report(data_by_timestamps,audio_emotions):
                 emotion_dict_data=''    
             transcript_emotions=get_text_sentiments(interview_transcript)
             #print(transcript_emotions)
-            if item[key] and transcript_emotions:
-                video_report = VideoReport(
-                    video_process_id=key,
-                    frame_dur_report=item[key],
-                    text_dur_report=transcript_emotions,
-                    audio_report=emotion_dict_data,
-                    speaker=speaker,
-                    added_by=added_by,
-                    video_id=vid,
-                    created_at=datetime.utcnow(),
-                )
-                db.session.add(video_report)
-                db.session.commit()
+            if item[key]:
+                frame_report=item[key]
             else:
-                print('unable to save entry')
+                frame_report={'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.0, 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+
+            if transcript_emotions:
+                transcript_emotions_data=transcript_emotions
+            else:
+                transcript_emotions_data={'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.0, 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+                
+            video_report = VideoReport(
+                video_process_id=key,
+                frame_dur_report=frame_report,
+                text_dur_report=transcript_emotions_data,
+                audio_report=emotion_dict_data,
+                speaker=speaker,
+                added_by=added_by,
+                video_id=vid,
+                created_at=datetime.utcnow(),
+            )
+            db.session.add(video_report)
+            db.session.commit()
+
         return True
     else:
         return False

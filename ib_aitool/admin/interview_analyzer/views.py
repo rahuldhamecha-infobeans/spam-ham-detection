@@ -635,11 +635,10 @@ def get_timestamp_emotion(queue, candidate_id):
                 f'uploads/{video_name_without_extension}/interviewer/videoframes/')
             overall_timestamp_candidate = analyze_timestamp_folder(
                 f'uploads/{video_name_without_extension}/candidate/videoframes/')
-            save_timestamp_video_report_inteviewer = save_videots_report(overall_timestamp_interviewer,
-                                                                         audio_emotions_interviewer)
-            save_timestamp_video_report_candidate = save_videots_report(overall_timestamp_candidate,
-                                                                        audio_emotions_candidate)
-
+            print(f'{overall_timestamp_interviewer}')
+            print(f'{overall_timestamp_candidate}')
+            save_timestamp_video_report_inteviewer = save_videots_report(overall_timestamp_interviewer,audio_emotions_interviewer)
+            save_timestamp_video_report_candidate = save_videots_report(overall_timestamp_candidate, audio_emotions_candidate)
             if save_timestamp_video_report_inteviewer and save_timestamp_video_report_candidate:
                 result = True
             else:
@@ -818,11 +817,14 @@ def calculate_qna_confidence(facial_emotion_data):
 
     # Normalize the scores to percentages
     total_score = confidence_score + nervousness_score
-    CL = (confidence_score / total_score) * 100
-    NS = (nervousness_score / total_score) * 100
+    CL='NA'
+    NS='NA'
+    if total_score!=0.0:
+        CL = (confidence_score / total_score) * 100
+        NS = (nervousness_score / total_score) * 100
     # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
-
-    return f"CS:{round(CL, 2)}%, NS:{round(NS, 2)}%"
+        return f"CS:{round(CL, 2)}%, NS:{round(NS, 2)}%"
+    return f"CS:{CL}, NS:{NS}"
 
 
 # Register the custom Jinja2 filter
