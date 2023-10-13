@@ -635,8 +635,6 @@ def get_timestamp_emotion(queue, candidate_id):
                 f'uploads/{video_name_without_extension}/interviewer/videoframes/')
             overall_timestamp_candidate = analyze_timestamp_folder(
                 f'uploads/{video_name_without_extension}/candidate/videoframes/')
-            print(f'{overall_timestamp_interviewer}')
-            print(f'{overall_timestamp_candidate}')
             save_timestamp_video_report_inteviewer = save_videots_report(overall_timestamp_interviewer,audio_emotions_interviewer)
             save_timestamp_video_report_candidate = save_videots_report(overall_timestamp_candidate, audio_emotions_candidate)
             if save_timestamp_video_report_inteviewer and save_timestamp_video_report_candidate:
