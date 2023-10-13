@@ -213,3 +213,62 @@ footer.navigation {
   margin-top: 20px;
 }
 
+#confirmation_modal .modal-dialog {
+  max-width: 60%;
+  padding: 20px;
+}
+
+#confirmation_modal .modal-body {
+  padding-top: 0;
+}
+
+#confirmation_modal .modal-dialog .img_wrapper {
+  display: block;
+  overflow: hidden;
+}
+
+#confirmation_modal .modal-dialog .img_wrapper img {
+  object-fit: contain;
+  float: left;
+  width: 100%;
+}
+
+#confirmation_modal {
+  float: left;
+  margin: 30px 0;
+  text-align: center;
+  width: 100%;
+}
+
+#confirmation_modal .button_wrapper {
+  float: left;
+  width: 100%;
+  margin: 30px 0 10px 0;
+}
+
+#confirmation_modal .btn-success,
+#confirmation_modal .btn-failed {
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #fff;
+}
+
+#confirmation_modal .btn-failed {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+#confirmation_modal .btn-close:hover,
+#confirmation_modal .btn-close:focus,
+#confirmation_modal .btn-close:active {
+  opacity: 1;
+  outline: none;
+  transform: none;
+}
+
+#confirmation_modal .modal-header .btn-close {
+  margin-top: -1.25rem;
+  margin: -81px -40px 0 0;
+  transform: none;
+}
