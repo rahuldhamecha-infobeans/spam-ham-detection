@@ -272,7 +272,7 @@
         if (response) {
           var res = JSON.parse(response);
           if (res.success) {
-            location.reload()
+            location.reload(true)
             $(".loader_wrapper").addClass("d-none");
             reload_candidate_list();
             

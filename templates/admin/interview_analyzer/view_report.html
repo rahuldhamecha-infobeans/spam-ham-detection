@@ -2,22 +2,11 @@
 Interview Assessment {% endblock %} {% block page_body_title %} Report | Smart
 Interview Assessment {% endblock %} {% block head_styles %}
 
-<link
-  rel="stylesheet"
-  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-/>
-<link
-  href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
-  rel="stylesheet"
-/>
-<link
-  href="{{ url_for('static', filename='assets/css/details_report.css') }}"
-  rel="stylesheet"
-/>
-<link
-  rel="stylesheet"
-  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-/>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='assets/css/details_report.css') }}" rel="stylesheet" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -31,86 +20,56 @@ Interview Assessment {% endblock %} {% block head_styles %}
       <h2 class="m-4 text-center">
         <u>Interview Report of {{ candidate.name }}</u>
       </h2>
-      <a class="download_report" href="#"
-        ><button class="file-upload-button css-1ikvom0">
+      <a class="download_report" href="#"><button class="file-upload-button css-1ikvom0">
           <i class="fa fa-download"></i> Download Report
-        </button></a
-      >
+        </button></a>
     </div>
     <div class="col-md-6 stretch-card grid-margin">
-        <div class="report-container">
-          <h3 class="report-title">Interviewer's Score</h3>
-          <i
-            class="fa fa-info-circle icon-css"
-            aria-hidden="true"
-            title="Check Graph"
-            data-bs-toggle="modal"
-            data-bs-target="#graphmodal"
-            data-video-report="{{candidate.overall_interviewer_video_report}}"
-            data-text-report="{{candidate.overall_interviewer_text_report}}"
-            data-audio-report="{{candidate.overall_interviewer_audio_report}}"
-          ></i>
+      <div class="report-container">
+        <h3 class="report-title">Interviewer's Score</h3>
+        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+          data-bs-target="#graphmodal" data-video-report="{{candidate.overall_interviewer_video_report}}"
+          data-text-report="{{candidate.overall_interviewer_text_report}}"
+          data-audio-report="{{candidate.overall_interviewer_audio_report}}"></i>
+      </div>
+      <div class="card bg-gradient-success card-img-holder text-white">
+        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+          data-bs-target="#confidenceLevel" style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"></i>
+        <div class="card-body">
+
+          <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute"
+            alt="circle-image" />
+
+          <!-- Overall Interviewer Video Confidence -->
+          {% set OIVC = overall.overall_interviewer_confidence['CL'] %}
+          <!-- Overall Interviewer Text Confidence -->
+          {% set OITC = overall.overall_interviewer_confidence_text['CL'] %}
+
+          <p class="font-weight-normal mb-3 box-p-tag">
+            Confidence Level (CL) - <small>{{ ((OIVC + OITC) / 2) | round(2) }}%</small>
+            <i class="mdi mdi-diamond mdi-24px float-right"></i>
+          </p>
+          <p class="percentage-font">
+            <span>Video Analysis:
+              {{OIVC|round(2)}}%</span>
+            <span>Text Analysis:
+              {{OITC|round(2)}}%</span>
+          </p>
         </div>
-        <div class="card bg-gradient-success card-img-holder text-white">
-          <i
-              class="fa fa-info-circle icon-css"
-              aria-hidden="true"
-              title="Check Graph"
-              data-bs-toggle="modal"
-              data-bs-target="#confidenceLevel"
-              style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"
-            ></i>
-          <div class="card-body">
-
-            <img
-              src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
-              class="card-img-absolute"
-              alt="circle-image"
-            />
-
-            <!-- Overall Interviewer Video Confidence -->
-            {% set OIVC = overall.overall_interviewer_confidence['CL'] %}
-            <!-- Overall Interviewer Text Confidence -->
-            {% set OITC = overall.overall_interviewer_confidence_text['CL'] %}
-
-            <p class="font-weight-normal mb-3 box-p-tag">
-              Confidence Level (CL) - <small>{{ ((OIVC + OITC) / 2) | round(2) }}%</small>
-              <i class="mdi mdi-diamond mdi-24px float-right"></i>
-            </p>
-            <p class="percentage-font">
-              <span
-                >Video Analysis:
-                {{OIVC|round(2)}}%</span
-              >
-              <span
-                >Text Analysis:
-                {{OITC|round(2)}}%</span
-              >
-            </p>
-          </div>
-        </div>
+      </div>
     </div>
     <div class="col-md-6 stretch-card grid-margin">
       <div class="report-container">
         <h3 class="report-title">Candidate's Score</h3>
-        <i
-          class="fa fa-info-circle icon-css"
-          aria-hidden="true"
-          title="Check Graph"
-          data-bs-toggle="modal"
-          data-bs-target="#graphmodal"
-          data-video-report="{{candidate.overall_candidate_video_report}}"
+        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+          data-bs-target="#graphmodal" data-video-report="{{candidate.overall_candidate_video_report}}"
           data-text-report="{{candidate.overall_candidate_text_report}}"
-          data-audio-report="{{candidate.overall_candidate_audio_report}}"
-        ></i>
+          data-audio-report="{{candidate.overall_candidate_audio_report}}"></i>
       </div>
       <div class="card bg-gradient-success card-img-holder text-white">
         <div class="card-body">
-          <img
-            src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
-            class="card-img-absolute"
-            alt="circle-image"
-          />
+          <img src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}" class="card-img-absolute"
+            alt="circle-image" />
 
           <!-- Overall Candidate Video Confidence -->
           {% set OCVC = overall.overall_candidate_confidence['CL'] %}
@@ -122,14 +81,10 @@ Interview Assessment {% endblock %} {% block head_styles %}
             <i class="mdi mdi-diamond mdi-24px float-right"></i>
           </p>
           <p class="percentage-font">
-            <span
-              >Video Analysis:
-              {{OCVC|round(2)}}%</span
-            >
-            <span
-              >Text Analysis:
-              {{OCTC|round(2)}}%</span
-            >
+            <span>Video Analysis:
+              {{OCVC|round(2)}}%</span>
+            <span>Text Analysis:
+              {{OCTC|round(2)}}%</span>
           </p>
         </div>
       </div>
@@ -145,154 +100,100 @@ Interview Assessment {% endblock %} {% block head_styles %}
         <div class="card-body">
           <div class="col-md mb-4 mb-md-0">
             <div class="accordion mt-3" id="question_answer_accordion">
-              {% set list_length = report_data|length %} {% for video_report,
-              video_process in report_data %} {% set index = loop.index %} {% if
-              index <= list_length %} {% if index == list_length %} {% set
-              next_video_process = report_data[index-1][1] %} {% else %} {% set
-              next_video_process = report_data[index][1] %} {% endif %} {% if
-              (next_video_process.start_duration|int - 3) <=
-              video_process.end_duration|int <=
-              (next_video_process.start_duration|int + 3) and
-              video_process.speaker == 'Interviewer' %}
-
-              <div class="card accordion-item">
+              {% set list_length = report_data|length %}
+              {% for video_report,
+              video_process in report_data %}
+              {% set index = loop.index %}
+              {% if index <= list_length %} {% if index==list_length %} {% set
+                next_video_process=report_data[index-1][1] %} {% else %} {% set next_video_process=report_data[index][1]
+                %} {% endif %} {% if (next_video_process.start_duration|int - 3) <=video_process.end_duration|int
+                <=(next_video_process.start_duration|int + 3) and video_process.speaker=='interviewer' %} <div
+                class="card accordion-item">
                 <h2 class="accordion-header" id="heading_{{ index }}">
-                  <button
-                    type="button"
-                    class="accordion-button collapsed"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#accordion_{{ index }}"
-                    aria-expanded="false"
-                    aria-controls="accordion_{{ index }}"
-                  >
-                    <i
-                      class="fa fa-question-circle"
-                      aria-hidden="true"
-                      style="color: #aa142d"
-                    ></i
-                    >&nbsp;{{ video_process.interview_transcript }}
+                  <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                    data-bs-target="#accordion_{{ index }}" aria-expanded="false" aria-controls="accordion_{{ index }}">
+                    <i class="fa fa-commenting" aria-hidden="true" style="color: #aa142d"></i>&nbsp;{{
+                    video_process.interview_transcript }}
                   </button>
                 </h2>
 
                 <div class="percentage-wrapper">
                   <div class="interviewer">
-                    <i
-                      class="fa fa-info-circle icon-css"
-                      aria-hidden="true"
-                      title="Check Graph"
-                      data-bs-toggle="modal"
-                      data-bs-target="#graphmodal"
-                      data-video-report="{{video_report.frame_dur_report}}"
+                    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+                      data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                       data-text-report="{{video_report.text_dur_report}}"
-                      data-audio-report="{{video_report.audio_report}}"
-                    ></i>
+                      data-audio-report="{{video_report.audio_report}}"></i>
                     <span>
                       Interviewer's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
-                    <br/>
-                    Interviewer's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
+                      <br />
+                      Interviewer's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
 
                     </span>
 
                   </div>
-                  {% elif ((next_video_process.start_duration|int - 3) <=
-                  video_process.end_duration|int <=
-                  ((next_video_process.start_duration|int) + 3) and
-                  video_process.speaker == 'candidate' and
-                  video_process.start_duration != '0' ) %}
-                  <div class="candidate">
-                    <i
-                      class="fa fa-info-circle icon-css"
-                      aria-hidden="true"
-                      title="Check Graph"
-                      data-bs-toggle="modal"
-                      data-bs-target="#graphmodal"
-                      data-video-report="{{video_report.frame_dur_report}}"
+                  {% elif ((next_video_process.start_duration|int - 3) <= video_process.end_duration|int
+                    <=((next_video_process.start_duration|int) + 3) and video_process.speaker=='candidate' and
+                    video_process.start_duration !='0' ) %} <div class="candidate">
+                    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+                      data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                       data-text-report="{{video_report.text_dur_report}}"
-                      data-audio-report="{{video_report.audio_report}}"
-                    ></i>
+                      data-audio-report="{{video_report.audio_report}}"></i>
                     <span>
-                       Candidate's Score(Video) =  {{video_report.frame_dur_report|emotion_scores }}
-                    <br/>
-                    Candidate's Score(Text) =  {{video_report.text_dur_report|emotion_scores }}
+                      Candidate's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
+                      <br />
+                      Candidate's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
                     </span>
 
-                  </div>
                 </div>
-                <div
-                  id="accordion_{{ index - 1 }}"
-                  class="accordion-collapse collapse"
-                  data-bs-parent="#question_answer_accordion"
-                  aria-labelledby="heading_{{ index }}"
-                >
-                  <div class="accordion-body">
-                    <i
-                      class="fa fa-check-circle"
-                      aria-hidden="true"
-                      style="color: #228b22"
-                    ></i
-                    >&nbsp;{{ video_process.interview_transcript }}
-                  </div>
-                </div>
-
-                {% elif index == list_length and video_process.speaker ==
-                'candidate' %}
-                <div class="candidate">
-                  <i
-                    class="fa fa-info-circle icon-css"
-                    aria-hidden="true"
-                    title="Check Graph"
-                    data-bs-toggle="modal"
-                    data-bs-target="#graphmodal"
-                    data-video-report="{{video_report.frame_dur_report}}"
-                    data-text-report="{{video_report.text_dur_report}}"
-                    data-audio-report="{{video_report.audio_report}}"
-                  ></i>
-                  <span>
-                     Candidate's Score(Video)  =  {{video_report.frame_dur_report|emotion_scores }}
-                  <br/>
-                  Candidate's Score(Text) =  {{video_report.text_dur_report|emotion_scores }}
-                  </span>
-
-                </div>
-              </div>
-              <div
-                id="accordion_{{ index - 1 }}"
-                class="accordion-collapse collapse"
-                data-bs-parent="#question_answer_accordion"
-              >
-                <div class="accordion-body">
-                  <i
-                    class="fa fa-check-circle"
-                    aria-hidden="true"
-                    style="color: #228b22"
-                  ></i
-                  >&nbsp;{{ video_process.interview_transcript }}
-                </div>
-              </div>
-              {%elif video_process.speaker == 'Interviewer'%}
-              <div
-                id="accordion_{{ index - 1 }}"
-                class="accordion-collapse collapse"
-                data-bs-parent="#question_answer_accordion"
-              >
-                <div class="accordion-body">
-                  <i
-                    class="fa fa-check-circle"
-                    aria-hidden="true"
-                    style="color: #228b22"
-                  ></i
-                  >&nbsp;{{ video_process.interview_transcript }}
-                </div>
-              </div>
-
-              {% endif %} {% if video_process.speaker == 'candidate' %}
             </div>
-            {% endif %} {% endif %} {% endfor %}
+
+            <div id="accordion_{{ index - 1 }}" class="accordion-collapse collapse"
+              data-bs-parent="#question_answer_accordion" aria-labelledby="heading_{{ index }}">
+              <div class="accordion-body">
+                <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;{{
+                video_process.interview_transcript }}
+              </div>
+            </div>
+
+            {% elif index == list_length and video_process.speaker ==
+            'candidate' %}
+            <div class="candidate">
+              <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+                data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
+                data-text-report="{{video_report.text_dur_report}}"
+                data-audio-report="{{video_report.audio_report}}"></i>
+              <span>
+                Candidate's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
+                <br />
+                Candidate's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
+              </span>
+
+            </div>
           </div>
+          <div id="accordion_{{ index - 1 }}" class="accordion-collapse collapse"
+            data-bs-parent="#question_answer_accordion">
+            <div class="accordion-body">
+              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;{{
+              video_process.interview_transcript }}
+            </div>
+          </div>
+          {%elif video_process.speaker == 'interviewer'%}
+          <div id="accordion_{{ index - 1 }}" class="accordion-collapse collapse"
+            data-bs-parent="#question_answer_accordion">
+            <div class="accordion-body">
+              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;{{
+              video_process.interview_transcript }}
+            </div>
+          </div>
+
+          {% endif %} {% if video_process.speaker == 'candidate' %}
         </div>
+        {% endif %} {% endif %} {% endfor %}
       </div>
     </div>
   </div>
+</div>
+</div>
 </div>
 
 <!-- The Modal -->
@@ -300,11 +201,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
@@ -330,24 +227,23 @@ Interview Assessment {% endblock %} {% block head_styles %}
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
         <div>
           <h2>Logic Used to calculate Confidence Level</h2>
-          <p>weight_neutral = 0.7, weight_happy = 0.2, weight_surprise = 0.05, weight_angry = 0.6, weight_fear = 0.7, weight_sad = 1, weight_disgust = 1</p>
+          <p>weight_neutral = 0.7, weight_happy = 0.2, weight_surprise = 0.05, weight_angry = 0.6, weight_fear = 0.7,
+            weight_sad = 1, weight_disgust = 1</p>
 
           <p>We used the following to calculate weighted_sum</p>
           weighted_sum = (neutral * weight_neutral) + (happy * weight_happy) + (surprise * weight_surprise)</p>
 
           <p>
-          The Confidence Level represents the cumulative emotional intensity of the selected emotions. It is equal to the weighted sum of the selected emotions' percentages.
-          </p><p><b>Formula for Confidence Level: confidence_level = weighted_sum</b></p>
+            The Confidence Level represents the cumulative emotional intensity of the selected emotions. It is equal to
+            the weighted sum of the selected emotions' percentages.
+          </p>
+          <p><b>Formula for Confidence Level: confidence_level = weighted_sum</b></p>
         </div>
 
         <!-- <div class="chart-wrapper">
@@ -364,22 +260,22 @@ Interview Assessment {% endblock %} {% block head_styles %}
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
         <div>
           <h2>Logic Used to calculate Nervousness Level</h2>
-          <p>weight_neutral = 0.7, weight_happy = 0.2, weight_surprise = 0.05, weight_angry = 0.6, weight_fear = 0.7, weight_sad = 1, weight_disgust = 1</p>
+          <p>weight_neutral = 0.7, weight_happy = 0.2, weight_surprise = 0.05, weight_angry = 0.6, weight_fear = 0.7,
+            weight_sad = 1, weight_disgust = 1</p>
 
-          <p>Formula for Sum of Remaining Emotions: other_emotions_sum = (angry * weight_angry) + (disgust * weight_disgust) + (fear * weight_fear) + (sad * weight_sad)</p>
+          <p>Formula for Sum of Remaining Emotions: other_emotions_sum = (angry * weight_angry) + (disgust *
+            weight_disgust) + (fear * weight_fear) + (sad * weight_sad)</p>
 
-          <p>The Nervousness Level represents the cumulative emotional intensity of the remaining emotions. It is equal to the sum of the remaining emotions' weighted percentages.
-          </p><p><b>Formula for Nervousness Level: nervousness_level = other_emotions_sum</b></p>
+          <p>The Nervousness Level represents the cumulative emotional intensity of the remaining emotions. It is equal
+            to the sum of the remaining emotions' weighted percentages.
+          </p>
+          <p><b>Formula for Nervousness Level: nervousness_level = other_emotions_sum</b></p>
         </div>
 
         <!-- <div class="chart-wrapper">

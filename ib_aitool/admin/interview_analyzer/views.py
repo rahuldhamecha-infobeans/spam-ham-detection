@@ -501,11 +501,15 @@ def analyze_video(queue, candidate_id,selected_image):
             # Loop through the data and save it to the database
                 for entry in final_transcript_data:
                     label = list(entry.keys())[0]
+                    if entry[label]['transcript_data']:
+                        transcript_data=entry[label]['transcript_data']
+                    else:
+                        transcript_data='NA'  
                     video_entry = VideoProcess(
                         vid=candidate_id,
                         start_duration=math.ceil(float(entry[label]['start'])),
                         end_duration=math.ceil(float(entry[label]['end'])),
-                        interview_transcript=entry[label]['transcript_data'],
+                        interview_transcript=transcript_data,
                         added_by=data.added_by,
                         created_at=datetime.utcnow(),
                         speaker=label,
