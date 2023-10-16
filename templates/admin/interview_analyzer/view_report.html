@@ -1,6 +1,422 @@
-{% extends 'layouts/admin/dashboard/base.html' %} {% block page_title %} Smart
-Interview Assessment {% endblock %} {% block page_body_title %} Report | Smart
-Interview Assessment {% endblock %} {% block head_styles %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.js"></script>
+<style>
+.accordion {
+
+    background-color: #fff;
+    border-radius: 5px;
+
+    background: rgba(0,0,255,0.2);
+    color:white;
+
+}
+.css-vnbyu8 {
+margin-top:-6%!important;
+    display: inline-flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    outline: 0px;
+    border: 0px;
+    margin: 0px;
+    cursor: pointer;
+    user-select: none;
+    vertical-align: middle;
+    appearance: none;
+    text-decoration: none;
+    text-align: center;
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    overflow: visible;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    color: rgb(82, 79, 252);
+    background-color: rgb(255, 255, 255);
+    position: absolute;
+    height: 40px;
+    width: 40px;
+    top: 77px;
+    left: 20px;
+    padding: 12px;
+    box-shadow: rgba(33, 37, 41, 0.15) 1px 2px 7px;
+}
+.css-11pse9l {
+    margin: 0px;
+    font-family: Inter, sans-serif, "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    line-height: 1.5;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.accordion .accordion-title {
+
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.accordion .content-container .question {
+
+    padding: 20px 0px;
+    font-size: 20px;
+    cursor: pointer;
+    border-bottom: 2px solid black;
+    color:#000;
+    position: relative;
+}
+
+.accordion .content-container .question::after {
+
+    content: '+';
+    position: absolute;
+    right: -4px;
+}
+
+.accordion .content-container .answer {
+
+    padding-top: 20px;
+    line-height: 1.4;
+    font-size: 20px;
+    color:#000;
+    height: 0px;
+    overflow: hidden;
+    transition: .5s;
+
+
+}
+
+.accordion .content-container.active .answer {
+
+    height: 100px;
+}
+
+.accordion .content-container.active .question {
+
+    font-size: 18px;
+    transition: .5s;
+}
+
+.accordion .content-container.active .question::after {
+
+    content: '-';
+    font-size: 35px;
+    transform: translateY(-20%);
+    transition: .5s;
+
+}
+#wrapper {
+  padding-right: 0;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+  padding-right: 250px;
+}
+
+#sidebar-wrapper {
+  margin-top:-5%;
+  z-index: 1000;
+  position: fixed;
+  right: 250px;
+  width: 0;
+  height: 100%;
+  margin-right: -250px;
+  overflow-y: auto;
+
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  width: 250px;
+}
+
+#page-content-wrapper {
+  width: 100%;
+  position: absolute;
+  padding: 15px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+  position: absolute;
+  margin-left: -250px;
+}
+
+/* Sidebar Styles */
+
+.sidebar-nav {
+  position: absolute;
+  top: 0;
+  width: 250px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-nav li {
+  text-indent: 20px;
+  line-height: 40px;
+}
+
+.sidebar-nav li a {
+  display: block;
+  text-decoration: none;
+  color: #999999;
+}
+
+.sidebar-nav li a:hover {
+  text-decoration: none;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+  text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+  height: 65px;
+  font-size: 18px;
+  line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+  color: #999999;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+  color: #fff;
+  background: none;
+}
+
+@media (min-width: 768px) {
+  #wrapper {
+    padding-right: 0;
+  }
+  #wrapper.toggled {
+    padding-right: 250px;
+  }
+  #sidebar-wrapper {
+    width: 0;
+  }
+  #wrapper.toggled #sidebar-wrapper {
+    width: 40%;
+  }
+  #page-content-wrapper {
+    padding: 20px;
+    position: relative;
+  }
+  #wrapper.toggled #page-content-wrapper {
+    position: relative;
+    margin-left: 0;
+  }
+}
+
+* New styles to align the button to the right */
+.title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #333; /* You can adjust the background color */
+  color: #fff; /* Text color */
+
+}
+.css-5277k6 {
+    display: flex;
+    flex-direction: row;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    background: linear-gradient(71.49deg, rgb(219, 243, 253) -9.87%, rgb(222, 221, 255) 79.01%);
+    color: rgb(4, 3, 72);
+}
+.header{
+ padding-top:80px;
+}
+.title-container h2 {
+  margin: 0;
+}
+
+.btn-secondary {
+  background: #007BFF; /* Button background color */
+  color: #fff; /* Button text color */
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #0056b3; /* Button background color on hover */
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn.btn-secondary {
+  margin-left: 10px; /* Adjust the margin as needed for spacing */
+}
+.css-w0pj6f {
+    overflow: hidden;
+    pointer-events: none;
+    position: absolute;
+    z-index: 0;
+    inset: 0px;
+    border-radius: inherit;
+}
+</style>
+
+{% extends 'layouts/admin/dashboard/base.html' %}
+{% block page_title %} Smart Interview Assessment {% endblock %}
+{% block page_body_title %}
+  <!-- Create a container for the button and title -->
+<div class="title-container">
+  <div class="header">
+    <h4>Report | Smart Interview Assessment</h4>
+    <a href="#menu-toggle" class="added-css added-css1 btn btn-secondary float-right" id="menu-toggle"><i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights</a>
+  </div>
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+
+      <button class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-vnbyu8" id="menu-toggle-out" tabindex="0" type="button" aria-label="Toggle Insights"><svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 4L10 7L-3.93402e-07 7L-3.0598e-07 9L10 9L10 12L14 8L10 4ZM16 16L18 16L18 -7.86805e-07L16 -6.99382e-07L16 16Z" fill="currentColor"></path></svg><span class="MuiTouchRipple-root css-w0pj6f"></span></button>
+      <script>
+
+    $("#menu-toggle-out").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+
+      if ($("#wrapper").hasClass("toggled")) {
+        $(".container").css("margin-left", "10px");
+        $(".container").css("width", "60%");
+        $(".added-css").css("margin-right", "39.6%");
+         $(".added-css").css("transition", "margin-right 0.5s ease-in-out, transform 0.5s ease-in-out");
+          $(".added-css1").css("display", "none");
+        $(".icon").addClass("fa-arrow-circle-right");
+
+        var element = document.querySelector('.added-css');
+
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-right icon fa-lg" aria-hidden="true"></i> Outsights';
+}
+      } else {
+        $(".container").css("margin-left", "");
+        $(".added-css").css("margin-right", "");
+        $(".container").css("width", "");
+        $(".added-css1").css("display", "");
+        $(".icon").removeClass("fa-arrow-circle-right");
+        var element = document.querySelector('.added-css');
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights';
+}
+      }
+    });
+
+    </script>
+      <div class="accordion">
+        <div class="css-5277k6"><p class="MuiTypography-root MuiTypography-body1 css-11pse9l">SANDEEP KUMAR GUPTA's Speaking Insights</p></div>
+
+
+        <div class="content-container">
+            <div class="question">How to pay?</div>
+            <div class="answer">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Assumenda, neque provident nam odit ex,
+                veritatis sit itaque quam ducimus suscipit illo
+
+            </div>
+        </div>
+
+
+        <div class="content-container">
+            <div class="question">How to complain?</div>
+            <div class="answer">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Assumenda, neque provident nam odit ex,
+                veritatis sit itaque quam ducimus suscipit illo
+
+            </div>
+        </div>
+
+
+        <div class="content-container">
+            <div class="question">How to refund?</div>
+            <div class="answer">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Assumenda, neque provident nam odit ex,
+                veritatis sit itaque quam ducimus suscipit illo
+                error quis ratione vero debitis
+            </div>
+        </div>
+
+      </div>
+    <!-- /#sidebar-wrapper -->
+
+  </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+
+      if ($("#wrapper").hasClass("toggled")) {
+        $(".container").css("margin-left", "10px");
+        $(".container").css("width", "60%");
+        $(".added-css").css("margin-right", "39.6%");
+        $(".added-css1").css("display", "none");
+         $(".added-css").css("transition", "margin-right 0.5s ease-in-out, transform 0.5s ease-in-out");
+        $(".icon").addClass("fa-arrow-circle-right");
+        var element = document.querySelector('.added-css');
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-right icon fa-lg" aria-hidden="true"></i> Outsights';
+}
+      } else {
+        $(".container").css("margin-left", "");
+        $(".added-css").css("margin-right", "");
+        $(".container").css("width", "");
+        $(".icon").removeClass("fa-arrow-circle-right");
+        var element = document.querySelector('.added-css');
+        $(".added-css1").css("display", "");
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights';
+}
+      }
+    });
+  });
+
+  const accordion = document.getElementsByClassName("content-container");
+
+for (let i = 0; i < accordion.length; i++) {
+  accordion[i].addEventListener("click", function () {
+    this.classList.toggle("active");
+    console.log(this);
+  });
+}
+
+</script>
+  </div>
+{% endblock %}
+{% block head_styles %}
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
@@ -182,7 +598,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
           <div id="accordion_{{ index - 1 }}" class="accordion-collapse collapse"
             data-bs-parent="#question_answer_accordion">
             <div class="accordion-body">
-              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;      
+              <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;
                 {% if video_process.interview_transcript=='NA' %}
                   Transcript Not Found
                 {% else %}
