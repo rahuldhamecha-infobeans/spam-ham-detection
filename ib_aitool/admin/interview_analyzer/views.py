@@ -134,7 +134,7 @@ def interview_video_upload():
     if request.method == 'POST':
         name = request.form.get('candidate_name')
         video_url = upload_video()
-        print(video_url)
+        #print(video_url)
         if video_url.startswith('/'):
             video_url = video_url[1:]
         else:
@@ -217,7 +217,22 @@ def calculate_overall_confidence(facial_emotion_data):
     weight_fear = 0.7
     weight_sad = 1
     weight_disgust = 1
+    # Calculate the weighted sum of selected emotions
+    if 'neutral' not in facial_emotion_data:
+        facial_emotion_data['neutral']=0
+    if 'happy' not in facial_emotion_data:
+        facial_emotion_data['happy']=0
+    if 'surprise' not in facial_emotion_data:
+        facial_emotion_data['surprise']=0
 
+    if 'angry' not in facial_emotion_data:
+        facial_emotion_data['angry']=0
+    if 'disgust' not in facial_emotion_data:
+        facial_emotion_data['disgust']=0
+    if 'fear' not in facial_emotion_data:
+        facial_emotion_data['fear']=0   
+    if 'sad' not in facial_emotion_data:
+        facial_emotion_data['sad']=0 
     # Calculate the weighted sum of selected emotions
     weighted_sum = (
             facial_emotion_data['neutral'] * weight_neutral +
@@ -244,6 +259,61 @@ def calculate_overall_confidence(facial_emotion_data):
     CL = (confidence_score / total_score) * 100
     NS = (nervousness_score / total_score) * 100
     # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
+
+    return 0, 0, NS, CL
+
+def calculate_overall_audio_confidence(facial_emotion_data):
+    facial_emotion_data = facial_emotion_data.replace("'", "\"")
+    facial_emotion_data = json.loads(facial_emotion_data)
+
+    # Define weights for selected emotions (neutral, happy, and surprise)
+    weight_neutral = 1
+    weight_happy = 1
+    weight_surprise = 1
+    weight_angry = 0.6
+    weight_fear = 0.9
+    weight_sad = 0.7
+    weight_disgust = 1
+    # Calculate the weighted sum of selected emotions
+    if 'neutral' not in facial_emotion_data:
+        facial_emotion_data['neutral']=0
+    if 'happy' not in facial_emotion_data:
+        facial_emotion_data['happy']=0
+    if 'surprise' not in facial_emotion_data:
+        facial_emotion_data['surprise']=0
+
+    if 'angry' not in facial_emotion_data:
+        facial_emotion_data['angry']=0
+    if 'disgust' not in facial_emotion_data:
+        facial_emotion_data['disgust']=0
+    if 'fear' not in facial_emotion_data:
+        facial_emotion_data['fear']=0   
+    if 'sad' not in facial_emotion_data:
+        facial_emotion_data['sad']=0 
+    # Calculate the weighted sum of selected emotions
+    weighted_sum = (
+            facial_emotion_data['neutral'] * weight_neutral +
+            facial_emotion_data['happy'] * weight_happy +
+            facial_emotion_data['surprise'] * weight_surprise
+    )
+
+    # Calculate the sum of remaining emotions (angry, disgust, fear, sad)
+    other_emotions_sum = (
+            facial_emotion_data['angry'] * weight_angry +
+            facial_emotion_data['fear'] * weight_fear +
+            facial_emotion_data['sad'] * weight_sad
+    )
+
+    # Calculate the nervousness score (sum of remaining emotions)
+    nervousness_score = other_emotions_sum
+
+    # Calculate the confidence score (weighted sum of selected emotions)
+    confidence_score = weighted_sum
+
+    # Normalize the scores to percentages
+    total_score = confidence_score + nervousness_score
+    CL = (confidence_score / total_score) * 100
+    NS = (nervousness_score / total_score) * 100
 
     return 0, 0, NS, CL
 
@@ -290,6 +360,8 @@ def create_overall_data_by_candidate_id(candidate_id):
     interviewer_confidence_dict_text = {}
     candidate_confidence_dict = {}
     candidate_confidence_dict_text = {}
+    interviewer_confidence_audio = {}
+    candidate_confidence_audio = {}
 
     # Calculate and store the values for the interviewer video
     overall_interviewer_confidence, CS, NS, CL = calculate_overall_confidence(
@@ -322,6 +394,21 @@ def create_overall_data_by_candidate_id(candidate_id):
     candidate_confidence_dict_text['NS'] = NS
     candidate_confidence_dict_text['CL'] = CL
 
+    #Calculate the audio emotion for interviewer and candidate
+    overall_interviewer_confidence_audio, CS, NS, CL = calculate_overall_audio_confidence(
+        candidate.overall_interviewer_audio_report)
+    interviewer_confidence_audio['overall_confidence'] = overall_interviewer_confidence_audio
+    interviewer_confidence_audio['CS'] = CS
+    interviewer_confidence_audio['NS'] = NS
+    interviewer_confidence_audio['CL'] = CL
+
+    overall_candidate_confidence_audio, CS, NS, CL = calculate_overall_audio_confidence(
+        candidate.overall_candidate_audio_report)
+    candidate_confidence_audio['overall_confidence'] = overall_candidate_confidence_audio
+    candidate_confidence_audio['CS'] = CS
+    candidate_confidence_audio['NS'] = NS
+    candidate_confidence_audio['CL'] = CL
+
     overall = {"candidate_id": str(candidate_id),
                "interviewer_video_report": ib_format_json(data=candidate.overall_interviewer_video_report),
                "candidate_video_report": ib_format_json(data=candidate.overall_candidate_video_report),
@@ -333,6 +420,9 @@ def create_overall_data_by_candidate_id(candidate_id):
                "overall_candidate_confidence": candidate_confidence_dict,
                "overall_interviewer_confidence_text": interviewer_confidence_dict_text,
                "overall_candidate_confidence_text": candidate_confidence_dict_text,
+               "overall_interviewer_confidence_audio": interviewer_confidence_audio,
+               "overall_candidate_confidence_audio": candidate_confidence_audio,
+
                }
 
     data = get_video_data(candidate_id)
@@ -497,7 +587,7 @@ def analyze_video(queue, candidate_id,selected_image):
                 result = classify_images_and_generate_timestamp(image_dir, interviewer_image_path)
                 temp_storage_dir_path=f'uploads/{video_name_without_extension}/'
                 final_transcript_data=process_video_and_transcript(result,audioPath,temp_storage_dir_path)
-                print(final_transcript_data)
+                #print(final_transcript_data)
             # Loop through the data and save it to the database
                 for entry in final_transcript_data:
                     label = list(entry.keys())[0]
@@ -584,7 +674,6 @@ def process_video_and_transcript(result, audio_path,temp_storage_dir_path):
 
 def get_video_frames(queue, candidate_id):
     with app.app_context():
-        print("part2  confirmation")
         data = Candidate.get_video_data(candidate_id)
         interviewer_data = VideoProcess.get_transcripts('Interviewer', candidate_id)
         candidate_data = VideoProcess.get_transcripts('candidate', candidate_id)
@@ -629,8 +718,10 @@ def get_timestamp_emotion(queue, candidate_id):
             video_name = os.path.basename(videoPath)
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
-            audio_emotions_interviewer = {}
-            audio_emotions_candidate = {}
+            #audio_emotions_interviewer = {}
+            #audio_emotions_candidate = {}
+            audio_emotions_interviewer = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/interviewer/audioclips/')
+            audio_emotions_candidate = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/candidate/audioclips/')
             overall_timestamp_interviewer = analyze_timestamp_folder(
                 f'uploads/{video_name_without_extension}/interviewer/videoframes/')
             overall_timestamp_candidate = analyze_timestamp_folder(
@@ -793,6 +884,22 @@ def calculate_qna_confidence(facial_emotion_data):
     weight_disgust = 1
 
     # Calculate the weighted sum of selected emotions
+    if 'neutral' not in facial_emotion_data:
+        facial_emotion_data['neutral']=0
+    if 'happy' not in facial_emotion_data:
+        facial_emotion_data['happy']=0
+    if 'surprise' not in facial_emotion_data:
+        facial_emotion_data['surprise']=0
+
+    if 'angry' not in facial_emotion_data:
+        facial_emotion_data['angry']=0
+    if 'disgust' not in facial_emotion_data:
+        facial_emotion_data['disgust']=0
+    if 'fear' not in facial_emotion_data:
+        facial_emotion_data['fear']=0   
+    if 'sad' not in facial_emotion_data:
+        facial_emotion_data['sad']=0  
+
     weighted_sum = (
             facial_emotion_data['neutral'] * weight_neutral +
             facial_emotion_data['happy'] * weight_happy +
@@ -821,12 +928,70 @@ def calculate_qna_confidence(facial_emotion_data):
         CL = (confidence_score / total_score) * 100
         NS = (nervousness_score / total_score) * 100
     # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
-        return f"CS:{round(CL, 2)}%, NS:{round(NS, 2)}%"
-    return f"CS:{CL}, NS:{NS}"
+        return f"CS:{round(CL, 2)}%"
+    return f"CS:{CL}"
 
+def calculate_qna_audio_confidence(facial_emotion_data):
+    facial_emotion_data = facial_emotion_data.replace("'", "\"")
+    facial_emotion_data = json.loads(facial_emotion_data)
 
+    weight_neutral = 1
+    weight_happy = 1
+    weight_surprise = 1
+    weight_angry = 0.6
+    weight_fear = 0.9
+    weight_sad = 0.7
+    weight_disgust = 1
+
+    # Calculate the weighted sum of selected emotions
+    if 'neutral' not in facial_emotion_data:
+        facial_emotion_data['neutral']=0
+    if 'happy' not in facial_emotion_data:
+        facial_emotion_data['happy']=0
+    if 'surprise' not in facial_emotion_data:
+        facial_emotion_data['surprise']=0
+
+    if 'angry' not in facial_emotion_data:
+        facial_emotion_data['angry']=0
+    if 'disgust' not in facial_emotion_data:
+        facial_emotion_data['disgust']=0
+    if 'fear' not in facial_emotion_data:
+        facial_emotion_data['fear']=0   
+    if 'sad' not in facial_emotion_data:
+        facial_emotion_data['sad']=0  
+
+    weighted_sum = (
+            facial_emotion_data['neutral'] * weight_neutral +
+            facial_emotion_data['happy'] * weight_happy +
+            facial_emotion_data['surprise'] * weight_surprise
+    )
+
+    # Calculate the sum of remaining emotions (angry, disgust, fear, sad)
+    other_emotions_sum = (
+            facial_emotion_data['angry'] * weight_angry +
+            facial_emotion_data['disgust'] * weight_disgust +
+            facial_emotion_data['fear'] * weight_fear +
+            facial_emotion_data['sad'] * weight_sad
+    )
+
+    # Calculate the nervousness score (sum of remaining emotions)
+    nervousness_score = other_emotions_sum
+
+    # Calculate the confidence score (weighted sum of selected emotions)
+    confidence_score = weighted_sum
+
+    # Normalize the scores to percentages
+    total_score = confidence_score + nervousness_score
+    CL='NA'
+    NS='NA'
+    if total_score!=0.0:
+        CL = (confidence_score / total_score) * 100
+        NS = (nervousness_score / total_score) * 100
+        return f"CS:{round(CL, 2)}%"
+    return f"CS:{CL}"
 # Register the custom Jinja2 filter
 app.jinja_env.filters['emotion_scores'] = calculate_qna_confidence
+app.jinja_env.filters['emotion_scores_audio'] = calculate_qna_audio_confidence
 
 
 @app.route('/delete_route/<int:item_id>')

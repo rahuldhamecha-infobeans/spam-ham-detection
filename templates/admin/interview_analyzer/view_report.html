@@ -44,6 +44,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
           {% set OIVC = overall.overall_interviewer_confidence['CL'] %}
           <!-- Overall Interviewer Text Confidence -->
           {% set OITC = overall.overall_interviewer_confidence_text['CL'] %}
+          <!-- Overall Interviewer Audio Confidence -->
+          {% set OIAC = overall.overall_interviewer_confidence_audio['CL'] %}
 
           <p class="font-weight-normal mb-3 box-p-tag">
             Confidence Level (CL) - <small>{{ ((OIVC + OITC) / 2) | round(2) }}%</small>
@@ -54,6 +56,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
               {{OIVC|round(2)}}%</span>
             <span>Text Analysis:
               {{OITC|round(2)}}%</span>
+            <span>Audio Analysis:
+                {{OIAC|round(2)}}%</span>
           </p>
         </div>
       </div>
@@ -75,7 +79,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
           {% set OCVC = overall.overall_candidate_confidence['CL'] %}
           <!-- Overall Candidate Text Confidence -->
           {% set OCTC = overall.overall_candidate_confidence_text['CL'] %}
-
+          
+          {% set OCAC = overall.overall_candidate_confidence_audio['CL'] %}
           <p class="font-weight-normal mb-3 box-p-tag">
             Confidence Level (CL) - <small>{{ ((OCVC + OCTC) / 2) | round(2) }}%</small>
             <i class="mdi mdi-diamond mdi-24px float-right"></i>
@@ -85,6 +90,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
               {{OCVC|round(2)}}%</span>
             <span>Text Analysis:
               {{OCTC|round(2)}}%</span>
+            <span>Audio Analysis:
+                {{OCAC|round(2)}}%</span>
           </p>
         </div>
       </div>
@@ -131,7 +138,9 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       Interviewer's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
                       <br />
                       Interviewer's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
-
+                    <br/>
+                    
+                      Interviewer's Score(Audio) = {{video_report.audio_report|emotion_scores_audio }}
                     </span>
 
                   </div>
@@ -146,6 +155,8 @@ Interview Assessment {% endblock %} {% block head_styles %}
                       Candidate's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
                       <br />
                       Candidate's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
+                      <br />
+                      Candidate's Score(Audio) = {{video_report.audio_report|emotion_scores_audio }}
                     </span>
 
                 </div>
@@ -160,7 +171,7 @@ Interview Assessment {% endblock %} {% block head_styles %}
                 {% else %}
                 {{video_process.interview_transcript }}
                 {% endif %}
-
+            
               </div>
             </div>
 
@@ -175,6 +186,9 @@ Interview Assessment {% endblock %} {% block head_styles %}
                 Candidate's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
                 <br />
                 Candidate's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
+                <br />
+
+                Candidate's Score(Audio) = {{video_report.audio_report|emotion_scores_audio }}
               </span>
 
             </div>

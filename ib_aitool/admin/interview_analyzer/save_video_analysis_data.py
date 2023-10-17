@@ -67,6 +67,19 @@ def get_text_sentiments(input_text):
         updated_result_dict={}
         return updated_result_dict
 
+def convert_dict(input_dict):
+    order = [
+        'angry',
+        'disgust',
+        'fear',
+        'happy',
+        'neutral',
+        'sad',
+        'surprise'
+    ]
+
+    output_dict = {key: input_dict[key] for key in order if key in input_dict}
+    return output_dict
 
 def save_videots_report(data_by_timestamps,audio_emotions):
     if data_by_timestamps:
@@ -80,13 +93,14 @@ def save_videots_report(data_by_timestamps,audio_emotions):
             added_by=trans_data.added_by
             speaker=trans_data.speaker
             #print(interview_transcript)
-            emotion_dict_data=''
             if audio_emotions:
                 filtered_dicts = [item for item in audio_emotions if key in item]
                 if filtered_dicts:
-                    emotion_dict_data = filtered_dicts[0][key]
+                    emotion_dict_data = convert_dict(filtered_dicts[0][key])
+                else:
+                    emotion_dict_data={'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.0, 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
             else:
-                emotion_dict_data=''    
+                emotion_dict_data={'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.0, 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}   
             transcript_emotions=get_text_sentiments(interview_transcript)
             #print(transcript_emotions)
             if item[key]:
