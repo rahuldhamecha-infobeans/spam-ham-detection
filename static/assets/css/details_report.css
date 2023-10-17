@@ -69,6 +69,11 @@
   box-shadow: none;
 }
 
+.card.accordion-item-sidebar {
+  padding: 10px 23pxpx;
+  box-shadow: none;
+}
+
 .accordion-body {
   color: #373450;
   background: #fff;
@@ -384,7 +389,7 @@ padding: 10px 0px 10px 10px;
 }
 
 #sidebar-wrapper {
-  margin-top:-5%;
+  margin-top:-4.6%;
   z-index: 1000;
   position: fixed;
   right: 250px;
@@ -558,7 +563,6 @@ padding: 10px 0px 10px 10px;
     outline: 0px;
     border: 0px;
     margin: 0px;
-    cursor: pointer;
     user-select: none;
     vertical-align: middle;
     appearance: none;
