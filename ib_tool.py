@@ -1,6 +1,7 @@
 from flask import Flask, render_template,send_from_directory
 from flask_mail import Mail,Message
 from app_config import mail_config
+import logging
 import os
 
 BASE_DIR = os.path.dirname(__file__)
@@ -11,6 +12,7 @@ def create_ecommerce_app():
     app = Flask(__name__)
     return app
 
+logging.basicConfig(filename='debug.log', level=logging.INFO)
 app = create_ecommerce_app()
 app.config['SECRET_KEY'] = 'infobeans_app_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -43,6 +45,12 @@ def get_final_frame(dir,name):
 
 app.add_url_rule("/uploads/<dir>/<name>", endpoint="get_file_url", build_only=True)
 app.add_url_rule("/uploads/<dir>/final-frames/<name>", endpoint="get_final_frame", build_only=True)
+
+@app.route('/uploads/<dir>/<dir_2>/<name>')
+def get_multi_dir_url(dir,dir_2,name):
+    path = os.path.join(app.config['UPLOAD_FOLDER'],dir,dir_2)
+    return send_from_directory(path, name)
+
 
 import ib_aitool.register_application
 import ib_aitool.context_processor

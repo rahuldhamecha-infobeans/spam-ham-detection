@@ -1,0 +1,155 @@
+{% extends 'layouts/admin/dashboard/base.html' %}
+
+{% block page_title %} Smart Attendance Tracker {% endblock %}
+
+{% block page_body_title %} Smart Attendance Tracker {% endblock %}
+
+{% block body_block %}
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+     <div class="card-header d-flex justify-content-between border-bottom">
+         <h4>My Attendance</h4>
+         <div>
+{#             <a href="javascript:start_entry_camera()" class="btn btn-theme-white">Start Entry Camera</a>#}
+             {% if not is_camera_on or opened_camera == 'exit_camera' %}
+                 <a href="{{ url_for('attendance.start_camera',camera_type='entry_camera') }}" class="btn btn-theme-white">Start Entry Camera</a>
+             {% endif %}
+
+            {% if is_camera_on and opened_camera == 'entry_camera' %}
+                 <a href="{{ url_for('attendance.stop_camera',camera_type='entry_camera') }}" class="btn btn-theme-white">Stop Entry Camera</a>
+             {% endif %}
+
+
+            {% if not is_camera_on or opened_camera == 'entry_camera' %}
+                 <a href="{{ url_for('attendance.start_camera',camera_type='exit_camera') }}" class="btn btn-theme-white">Start Exit Camera</a>
+             {% endif %}
+
+            {% if is_camera_on and opened_camera == 'exit_camera' %}
+                 <a href="{{ url_for('attendance.stop_camera',camera_type='exit_camera') }}" class="btn btn-theme-white">Stop Exit Camera</a>
+             {% endif %}
+
+         </div>
+     </div>
+     <div class="card-body pt-2 pb-2">
+         <div class="row">
+             {% if is_camera_on %}
+             <div class="col-md-4">
+                 <img src="{{ url_for('attendance.video_feed_for_object') }}" style="width: 100%;" alt="">
+             </div>
+             {% endif %}
+
+             {% if is_camera_on %}
+            <div class="col-md-8">
+             {% else %}
+                 <div class="col-md-12">
+             {% endif %}
+                <table class="table table-responsive table-bordered" id="attendance_list" style="width: 100%">
+                  <thead>
+                    <th>Employee Name</th>
+                    <th>Entry Time</th>
+                    <th>Exit Time</th>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+             </div>
+         </div>
+     </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="loader_wrapper d-none">
+  <div class="loader">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      style="margin: auto; display: block"
+      width="200px"
+      height="200px"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid"
+    >
+      <circle cx="30" cy="50" fill="#373450" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+      </circle>
+      <circle cx="70" cy="50" fill="#ea1b3d" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="0s"
+        ></animate>
+      </circle>
+      <circle cx="30" cy="50" fill="#373450" r="20">
+        <animate
+          attributeName="cx"
+          repeatCount="indefinite"
+          dur="1s"
+          keyTimes="0;0.5;1"
+          values="30;70;30"
+          begin="-0.5s"
+        ></animate>
+        <animate
+          attributeName="fill-opacity"
+          values="0;0;1;1"
+          calcMode="discrete"
+          keyTimes="0;0.499;0.5;1"
+          dur="1s"
+          repeatCount="indefinite"
+        ></animate>
+      </circle>
+    </svg>
+  </div>
+</div>
+{% endblock %}
+
+{% block head_styles %}
+<style>
+  .table thead th {
+    background-color: #373450;
+    color: #ffffff !important;
+  }
+</style>
+{% endblock %}
+
+{% block body_scripts %}
+    <script>
+        count =0;
+        function load_attendance_list(){
+            $.ajax({
+                url: '{{ url_for("attendance.fetch_attendance_list") }}',
+                type: 'POST',
+                dataType: 'json',
+                beforeSend:function(){
+                    $('.loader_wrapper').removeClass('d-none');
+                },
+                success:function(res){
+                    console.log(res);
+                    $('.loader_wrapper').addClass('d-none');
+                    $('#attendance_list tbody').html(res?.attendance_list)
+                    if(res?.ajax_reload == true && count > 1){
+                      location.reload()
+                    }
+                    count = count + 1;
+                }
+            });
+        }
+
+        {% if is_camera_on %}
+            setInterval(load_attendance_list,3000);
+        {% endif %}
+    load_attendance_list();
+    </script>
+{% endblock %}

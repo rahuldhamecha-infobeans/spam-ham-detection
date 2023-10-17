@@ -61,7 +61,7 @@
 - ##### Step 4 :
   Now install all required dependencies using below command
   ```shell
-  pip install -r requirement.txt
+  pip install -r requirements.txt
   ```
 - ##### Step 5 :
 

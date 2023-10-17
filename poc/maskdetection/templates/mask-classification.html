@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %} {% block page_title %} Multiclass
+Classification {% endblock %} {% block body_block %}
+
+<div class="cover-container w-50 h-100 p-3 mx-auto">
+  <header class="mb-auto"><h2>Image Classification</h2></header>
+
+  <main class="py-5">
+    <form method="post" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="formFile" class="form-label">Upload Image</label>
+        <input
+          class="form-control"
+          type="file"
+          required
+          accept="image/png, image/jpeg,image/jpg"
+          id="formFile"
+          name="imgfile"
+        />
+        <small
+          >The model was trained with the images(approx 10,000 each) of With Mask and
+          Without MAsk and the accuracy was approx: 0.8290
+        </small>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <p class="mt-5 d-flex flex-column align-items-start">
+      {% if label %} Uploaded File:
+      <img
+        src="data:image/jpeg;base64,{{ base64_image }}"
+        alt="Uploaded Image"
+        height="100%"
+        width="20%"
+      />
+    </p>
+   <h3><b>Predicted Label: </b>  {{label}} {% endif %}</h3>
+  </main>
+
+
+</div>
+  <footer class="mt-auto text-white-50"></footer>
+{% endblock %}
