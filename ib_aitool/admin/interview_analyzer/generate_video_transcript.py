@@ -403,7 +403,8 @@ def save_audioclip_timestamps(audio_path, timestamps, dir_path):
                 start_time_sec = math.ceil(float(timestamp.start_duration))
             end_time_sec = math.ceil(float(timestamp.end_duration))
             # Define the start and end times in seconds
-
+            if end_time_sec-start_time_sec > 160:
+                end_time_sec=start_time_sec+160
             # Convert seconds to milliseconds
             start_time_ms = start_time_sec * 1000
             end_time_ms = end_time_sec * 1000
