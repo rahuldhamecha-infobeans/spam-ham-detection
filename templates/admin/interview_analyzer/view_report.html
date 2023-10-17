@@ -1,289 +1,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.js"></script>
-<style>
-.accordion {
-
-    background-color: #fff;
-    border-radius: 5px;
-
-    background: rgba(0,0,255,0.2);
-    color:white;
-
-}
-.css-vnbyu8 {
-margin-top:-6%!important;
-    display: inline-flex;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    outline: 0px;
-    border: 0px;
-    margin: 0px;
-    cursor: pointer;
-    user-select: none;
-    vertical-align: middle;
-    appearance: none;
-    text-decoration: none;
-    text-align: center;
-    flex: 0 0 auto;
-    font-size: 1.5rem;
-    border-radius: 50%;
-    overflow: visible;
-    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    color: rgb(82, 79, 252);
-    background-color: rgb(255, 255, 255);
-    position: absolute;
-    height: 40px;
-    width: 40px;
-    top: 77px;
-    left: 20px;
-    padding: 12px;
-    box-shadow: rgba(33, 37, 41, 0.15) 1px 2px 7px;
-}
-.css-11pse9l {
-    margin: 0px;
-    font-family: Inter, sans-serif, "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    line-height: 1.5;
-    color: inherit;
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-.accordion .accordion-title {
-
-    margin-bottom: 28px;
-    text-align: center;
-}
-
-.accordion .content-container .question {
-
-    padding: 20px 0px;
-    font-size: 20px;
-    cursor: pointer;
-    border-bottom: 2px solid black;
-    color:#000;
-    position: relative;
-}
-
-.accordion .content-container .question::after {
-
-    content: '+';
-    position: absolute;
-    right: -4px;
-}
-
-.accordion .content-container .answer {
-
-    padding-top: 20px;
-    line-height: 1.4;
-    font-size: 20px;
-    color:#000;
-    height: 0px;
-    overflow: hidden;
-    transition: .5s;
-
-
-}
-
-.accordion .content-container.active .answer {
-
-    height: 100px;
-}
-
-.accordion .content-container.active .question {
-
-    font-size: 18px;
-    transition: .5s;
-}
-
-.accordion .content-container.active .question::after {
-
-    content: '-';
-    font-size: 35px;
-    transform: translateY(-20%);
-    transition: .5s;
-
-}
-#wrapper {
-  padding-right: 0;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-}
-
-#wrapper.toggled {
-  padding-right: 250px;
-}
-
-#sidebar-wrapper {
-  margin-top:-5%;
-  z-index: 1000;
-  position: fixed;
-  right: 250px;
-  width: 0;
-  height: 100%;
-  margin-right: -250px;
-  overflow-y: auto;
-
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  transition: all 0.5s ease;
-  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
-}
-
-#wrapper.toggled #sidebar-wrapper {
-  width: 250px;
-}
-
-#page-content-wrapper {
-  width: 100%;
-  position: absolute;
-  padding: 15px;
-}
-
-#wrapper.toggled #page-content-wrapper {
-  position: absolute;
-  margin-left: -250px;
-}
-
-/* Sidebar Styles */
-
-.sidebar-nav {
-  position: absolute;
-  top: 0;
-  width: 250px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.sidebar-nav li {
-  text-indent: 20px;
-  line-height: 40px;
-}
-
-.sidebar-nav li a {
-  display: block;
-  text-decoration: none;
-  color: #999999;
-}
-
-.sidebar-nav li a:hover {
-  text-decoration: none;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.sidebar-nav li a:active,
-.sidebar-nav li a:focus {
-  text-decoration: none;
-}
-
-.sidebar-nav > .sidebar-brand {
-  height: 65px;
-  font-size: 18px;
-  line-height: 60px;
-}
-
-.sidebar-nav > .sidebar-brand a {
-  color: #999999;
-}
-
-.sidebar-nav > .sidebar-brand a:hover {
-  color: #fff;
-  background: none;
-}
-
-@media (min-width: 768px) {
-  #wrapper {
-    padding-right: 0;
-  }
-  #wrapper.toggled {
-    padding-right: 250px;
-  }
-  #sidebar-wrapper {
-    width: 0;
-  }
-  #wrapper.toggled #sidebar-wrapper {
-    width: 40%;
-  }
-  #page-content-wrapper {
-    padding: 20px;
-    position: relative;
-  }
-  #wrapper.toggled #page-content-wrapper {
-    position: relative;
-    margin-left: 0;
-  }
-}
-
-* New styles to align the button to the right */
-.title-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: #333; /* You can adjust the background color */
-  color: #fff; /* Text color */
-
-}
-.css-5277k6 {
-    display: flex;
-    flex-direction: row;
-    -webkit-box-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    justify-content: center;
-    padding-top: 16px;
-    padding-bottom: 16px;
-    background: linear-gradient(71.49deg, rgb(219, 243, 253) -9.87%, rgb(222, 221, 255) 79.01%);
-    color: rgb(4, 3, 72);
-}
-.header{
- padding-top:80px;
-}
-.title-container h2 {
-  margin: 0;
-}
-
-.btn-secondary {
-  background: #007BFF; /* Button background color */
-  color: #fff; /* Button text color */
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.btn-secondary:hover {
-  background: #0056b3; /* Button background color on hover */
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.btn.btn-secondary {
-  margin-left: 10px; /* Adjust the margin as needed for spacing */
-}
-.css-w0pj6f {
-    overflow: hidden;
-    pointer-events: none;
-    position: absolute;
-    z-index: 0;
-    inset: 0px;
-    border-radius: inherit;
-}
-</style>
-
 {% extends 'layouts/admin/dashboard/base.html' %}
 {% block page_title %} Smart Interview Assessment {% endblock %}
 {% block page_body_title %}
@@ -291,7 +7,7 @@ margin-top:-6%!important;
 <div class="title-container">
   <div class="header">
     <h4>Report | Smart Interview Assessment</h4>
-    <a href="#menu-toggle" class="added-css added-css1 btn btn-secondary float-right" id="menu-toggle"><i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights</a>
+    <a href="#menu-toggle" class="added-css added-css1 btn btn-secondary float-right" id="menu-toggle" style="background: #373742"><i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights</a>
   </div>
   <div id="wrapper">
 
@@ -333,10 +49,11 @@ margin-top:-6%!important;
 
     </script>
       <div class="accordion">
-        <div class="css-5277k6"><p class="MuiTypography-root MuiTypography-body1 css-11pse9l">SANDEEP KUMAR GUPTA's Speaking Insights</p></div>
-
-
-        <div class="content-container">
+        <div class="css-5277k6 "><p class="MuiTypography-root MuiTypography-body1 css-11pse9l">SANDEEP KUMAR GUPTA's Speaking Insights</p></div>
+    <div class="css-1gc0uv4 parent-container">
+      <div class="css-9qrd19">
+        <button class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-disableElevation css-1q1t9mv" tabindex="0" type="button"><span class="MuiButton-startIcon MuiButton-iconSizeMedium css-1l6c7y9"><div class="MuiBox-root css-1o4lo4k"><svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;"><path d="M1.2 3.6H1.37143C2.03143 3.6 2.57143 4.14 2.57143 4.8V10.8C2.57143 11.46 2.03143 12 1.37143 12H1.2C0.54 12 0 11.46 0 10.8V4.8C0 4.14 0.54 3.6 1.2 3.6ZM6 0C6.66 0 7.2 0.54 7.2 1.2V10.8C7.2 11.46 6.66 12 6 12C5.34 12 4.8 11.46 4.8 10.8V1.2C4.8 0.54 5.34 0 6 0ZM10.8 6.85714C11.46 6.85714 12 7.39714 12 8.05714V10.8C12 11.46 11.46 12 10.8 12C10.14 12 9.6 11.46 9.6 10.8V8.05714C9.6 7.39714 10.14 6.85714 10.8 6.85714Z" fill="#EA1B3D"></path></svg></div></span>Analytics<span class="MuiTouchRipple-root css-w0pj6f"></span></button></div></div>
+        <div class="content-container added-accordion-css">
             <div class="question">How to pay?</div>
             <div class="answer">Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Assumenda, neque provident nam odit ex,
@@ -346,7 +63,7 @@ margin-top:-6%!important;
         </div>
 
 
-        <div class="content-container">
+        <div class="content-container added-accordion-css">
             <div class="question">How to complain?</div>
             <div class="answer">Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Assumenda, neque provident nam odit ex,
@@ -356,7 +73,7 @@ margin-top:-6%!important;
         </div>
 
 
-        <div class="content-container">
+        <div class="content-container added-accordion-css">
             <div class="question">How to refund?</div>
             <div class="answer">Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Assumenda, neque provident nam odit ex,
