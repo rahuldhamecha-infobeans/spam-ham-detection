@@ -47,7 +47,6 @@ import plotly.io as pio
 @has_permission('Interview Analyzer')
 def index():
     return render_template('admin/interview_analyzer/index.html')
-    return render_template('admin/interview_analyzer/index.html')
 
 
 @products_blueprint.route('/fetch-candidate-list')
@@ -453,14 +452,58 @@ def remove_files(template_data):
             os.remove(BASE_DIR + question['question_url'])
 
 
+def text_analysis(paragraph):
+    weak_words = [
+        'Absolutely', 'Definitely', 'Totally', 'Actually', 'Personally', 'Technically',
+        'Virtually', 'Simply', 'Possibly', 'Somehow', 'Just', 'Very', 'Pretty', 'Some', 'Honestly',
+        'That', 'Extremely', 'Really', 'Much', 'Exactly', 'Ultimate', 'Complete', 'World-class',
+        'Amazing'
+    ]
+
+    filler_words = [
+        'Well', 'um', 'uh', 'umm', 'hmm', 'hmmm', 'Like', 'Basically', 'seriously',
+        'literally', 'totally', 'Clearly', 'you see', 'you know', 'I mean', 'You know what I mean',
+        'At the end of the day', 'Believe me', 'Okay'
+    ]
+
+    founded_weak_words = []
+    founded_filler_words = []
+    paragraph_lower = paragraph.lower()
+
+    for word in weak_words:
+        lower_word = word.lower()
+        count = paragraph_lower.count(lower_word)
+        if int(count) > 0:
+            data = {'word': word, 'count': count}
+            founded_weak_words.append(data)
+
+    for word in filler_words:
+        lower_word = word.lower()
+        count = paragraph_lower.count(lower_word)
+        if int(count) > 0:
+            data = {'word': word, 'count': count}
+            founded_filler_words.append(data)
+
+    return {'weak_words': founded_weak_words, 'filler_words': founded_filler_words}
+
 @products_blueprint.route('/view-reports/<id>')
 @login_required
 @has_permission('Interview Analyzer')
 def view_report(id):
     candidate = Candidate.query.get(id)
     data, overall = create_overall_data_by_candidate_id(id)
+    analysis = get_text_analysis_data(data)
+    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data, overall=overall, analysis_data=analysis)
 
-    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data, overall=overall)
+def get_text_analysis_data(data):
+    all_text = []
+    final_text = ''
+    for video_report, video_process in data:
+        all_text.append(video_process.interview_transcript)
+    if len(all_text) > 0:
+        final_text = " ".join(all_text)
+    words_list = text_analysis(final_text)
+    return words_list
 
 def is_directory_not_empty(directory_path):
     return len(os.listdir(directory_path)) > 0
