@@ -19,7 +19,8 @@ import shutil
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 from moviepy.editor import VideoFileClip
 
-audio_sentiment_pipe = pipeline("audio-classification", model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition")
+audio_sentiment_pipe = pipeline("audio-classification", model="classla/wav2vec2-large-slavic-voxpopuli-v2_hr_SER")
+
 
 
 def count_images_in_directory(directory_path, extensions=("*.jpg", "*.jpeg", "*.png", "*.gif")):
@@ -307,7 +308,7 @@ def analyze_timestamp_folder(timestamp_folder):
                 "surprise": 0,
                 "neutral": 0
             }
-            print(timestamp_dir_path)
+            #print(timestamp_dir_path)
             count = count_images_in_directory(f'{timestamp_dir_path}/')
 
             # Iterate over all image files in the current timestamp folder
@@ -395,25 +396,27 @@ def save_audioclip_timestamps(audio_path, timestamps, dir_path):
     # Load the audio file
     audio = AudioSegment.from_mp3(audio_path)
     for i, timestamp in enumerate(timestamps):
-        if timestamp.start_duration ==0:
-            start_time_sec = math.ceil(float(timestamp.start_duration))+1
-        else:
-            start_time_sec = math.ceil(float(timestamp.start_duration))
-        end_time_sec = math.ceil(float(timestamp.end_duration))
-        # Define the start and end times in seconds
+        if timestamp.start_duration !=timestamp.end_duration:
+            if timestamp.start_duration ==0:
+                start_time_sec = math.ceil(float(timestamp.start_duration))+1
+            else:
+                start_time_sec = math.ceil(float(timestamp.start_duration))
+            end_time_sec = math.ceil(float(timestamp.end_duration))
+            # Define the start and end times in seconds
+            if end_time_sec-start_time_sec > 160:
+                end_time_sec=start_time_sec+160
+            # Convert seconds to milliseconds
+            start_time_ms = start_time_sec * 1000
+            end_time_ms = end_time_sec * 1000
 
-        # Convert seconds to milliseconds
-        start_time_ms = start_time_sec * 1000
-        end_time_ms = end_time_sec * 1000
-
-        # Cut the audio
-        cut_audio = audio[start_time_ms:end_time_ms]
-        sub_dir_path = os.path.join(dir_path, 'audioclips')
-        os.makedirs(sub_dir_path, exist_ok=True)
-        # Export the cut audio to a new file
-               # Define the output audio file path (MP3 format)
-        output_audio_path = os.path.join(sub_dir_path, f'{timestamp.id}__timestamp_{start_time_sec}_{end_time_sec}_audio.mp3')
-        cut_audio.export(output_audio_path, format='mp3')
+            # Cut the audio
+            cut_audio = audio[start_time_ms:end_time_ms]
+            sub_dir_path = os.path.join(dir_path, 'audioclips')
+            os.makedirs(sub_dir_path, exist_ok=True)
+            # Export the cut audio to a new file
+                # Define the output audio file path (MP3 format)
+            output_audio_path = os.path.join(sub_dir_path, f'{timestamp.id}__timestamp_{start_time_sec}_{end_time_sec}_audio.mp3')
+            cut_audio.export(output_audio_path, format='mp3')
 
     return True
 
@@ -447,7 +450,11 @@ def analyze_audio_timestamps_clips(timestamp_folder):
                     # Replace specific keys
                     replacement_mapping = {
                         'surprised':'surprise',
-                        'fearful':'fear'
+                        'fearful':'fear',
+                        'anger':'angry',
+                        'sadness':'sad',
+                        'happiness':'happy'
+
                     }
                     # Create the updated dictionary with replaced keys
                     updated_result_dict = {replacement_mapping.get(key, key): value for key, value in result_dict.items()}
@@ -548,7 +555,7 @@ def get_audioclip_timestamps(audio_path, start_time_seconds,end_time_seconds, di
     #print(output_audio_path)
     cut_audio.export(output_audio_path, format='wav')
     transcript= extract_audio_transcript(output_audio_path)
-    print(transcript)
+    #print(transcript)
 
 
     return transcript
