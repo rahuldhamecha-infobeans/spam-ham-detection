@@ -492,18 +492,25 @@ def text_analysis(paragraph):
 def view_report(id):
     candidate = Candidate.query.get(id)
     data, overall = create_overall_data_by_candidate_id(id)
-    analysis = get_text_analysis_data(data)
-    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data, overall=overall, analysis_data=analysis)
+    intrvwr_analysis,candidate_analysis = get_text_analysis_data(data)
+    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data, overall=overall,analysis_idata=intrvwr_analysis, analysis_cdata=candidate_analysis)
 
 def get_text_analysis_data(data):
-    all_text = []
-    final_text = ''
+    all_text_candidate = []
+    all_text_interviwer = []
+    final_itext = ''
+    final_ctext = ''
     for video_report, video_process in data:
-        all_text.append(video_process.interview_transcript)
-    if len(all_text) > 0:
-        final_text = " ".join(all_text)
-    words_list = text_analysis(final_text)
-    return words_list
+        if video_process.speaker == 'candidate':
+            all_text_candidate.append(video_process.interview_transcript)
+        else:
+            all_text_interviwer.append(video_process.interview_transcript)
+    if len(all_text_candidate) > 0 and len(all_text_interviwer) > 0:
+        final_itext = " ".join(all_text_interviwer)
+        final_ctext = " ".join(all_text_candidate)
+    words_ilist = text_analysis(final_itext)
+    words_clist = text_analysis(final_ctext)
+    return words_ilist,words_clist
 
 def is_directory_not_empty(directory_path):
     return len(os.listdir(directory_path)) > 0
