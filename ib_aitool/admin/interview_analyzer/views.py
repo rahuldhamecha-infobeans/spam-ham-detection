@@ -23,7 +23,9 @@ import glob
 import cv2
 
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt, save_frames_for_timestamps, \
-    save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips,transcribe_video,extract_question_timestamps,save_frames_from_video,save_highest_count_videoframe,classify_images_and_generate_timestamp,get_audioclip_timestamps
+    save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips, transcribe_video, \
+    extract_question_timestamps, save_frames_from_video, save_highest_count_videoframe, \
+    classify_images_and_generate_timestamp, get_audioclip_timestamps
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report, \
     generate_and_save_overall_video_report
 from jinja2 import Environment
@@ -486,6 +488,7 @@ def text_analysis(paragraph):
 
     return {'weak_words': founded_weak_words, 'filler_words': founded_filler_words}
 
+
 @products_blueprint.route('/view-reports/<id>')
 @login_required
 @has_permission('Interview Analyzer')
@@ -493,22 +496,38 @@ def view_report(id):
     candidate = Candidate.query.get(id)
     data, overall = create_overall_data_by_candidate_id(id)
     analysis = get_text_analysis_data(data)
-    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data, overall=overall, analysis_data=analysis)
+    return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data,
+                           overall=overall, analysis_data=analysis)
+
 
 def get_text_analysis_data(data):
     all_text = []
+    candidate_text = []
     final_text = ''
+    candidate_text_string = ''
     for video_report, video_process in data:
-        all_text.append(video_process.interview_transcript)
+        if video_process.speaker == 'interviewer':
+            all_text.append(video_process.interview_transcript)
+
+        if video_process.speaker == 'candidate':
+            candidate_text.append(video_process.interview_transcript)
+
     if len(all_text) > 0:
         final_text = " ".join(all_text)
-    words_list = text_analysis(final_text)
-    return words_list
+
+    if len(candidate_text) > 0:
+        candidate_text_string = " ".join(candidate_text)
+
+    data = [('Candidate Analysis', text_analysis(candidate_text_string)),
+            ('Interviewer Analysis', text_analysis(final_text))]
+    return data
+
 
 def is_directory_not_empty(directory_path):
     return len(os.listdir(directory_path)) > 0
 
-def analyze_video(queue, candidate_id,selected_image):
+
+def analyze_video(queue, candidate_id, selected_image):
     with app.app_context():
         data = Candidate.get_video_data(candidate_id)
         candidate_data = Candidate.query.filter_by(id=candidate_id).first()
@@ -521,33 +540,36 @@ def analyze_video(queue, candidate_id,selected_image):
             video_name = os.path.basename(videoPath)
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
-            #transcriptJson = generate_transcipt(videoPath)
-            all_frame_count = save_frames_from_video(videoPath, None, f'uploads/{video_name_without_extension}/allframes')
+            # transcriptJson = generate_transcipt(videoPath)
+            all_frame_count = save_frames_from_video(videoPath, None,
+                                                     f'uploads/{video_name_without_extension}/allframes')
             # image_directory_path=output_folder
 
-            output_directory_path=os.path.join(BASE_DIR,'uploads/'+video_name_without_extension+'/video-interviewer/')
-            selected_image = os.path.join(BASE_DIR+selected_image)
+            output_directory_path = os.path.join(BASE_DIR,
+                                                 'uploads/' + video_name_without_extension + '/video-interviewer/')
+            selected_image = os.path.join(BASE_DIR + selected_image)
             os.makedirs(output_directory_path, exist_ok=True)
-                    # Define the custom name and path for the saved image
+            # Define the custom name and path for the saved image
             custom_image_name = f'{video_name_without_extension}.jpg'
             custom_image_path = os.path.join(output_directory_path, custom_image_name)
 
-            shutil.copy(selected_image,custom_image_path)             
-            image_dir = f'uploads/{video_name_without_extension}/allframes' 
+            shutil.copy(selected_image, custom_image_path)
+            image_dir = f'uploads/{video_name_without_extension}/allframes'
             interviewer_image_path = f'uploads/{video_name_without_extension}/video-interviewer/{video_name_without_extension}.jpg'
             # Check if both the image directory and interviewer image exist and are not empty
-            if os.path.exists(image_dir) and os.path.exists(interviewer_image_path) and is_directory_not_empty(image_dir):
+            if os.path.exists(image_dir) and os.path.exists(interviewer_image_path) and is_directory_not_empty(
+                    image_dir):
                 result = classify_images_and_generate_timestamp(image_dir, interviewer_image_path)
-                temp_storage_dir_path=f'uploads/{video_name_without_extension}/'
-                final_transcript_data=process_video_and_transcript(result,audioPath,temp_storage_dir_path)
+                temp_storage_dir_path = f'uploads/{video_name_without_extension}/'
+                final_transcript_data = process_video_and_transcript(result, audioPath, temp_storage_dir_path)
                 print(final_transcript_data)
-            # Loop through the data and save it to the database
+                # Loop through the data and save it to the database
                 for entry in final_transcript_data:
                     label = list(entry.keys())[0]
                     if entry[label]['transcript_data']:
-                        transcript_data=entry[label]['transcript_data']
+                        transcript_data = entry[label]['transcript_data']
                     else:
-                        transcript_data='NA'  
+                        transcript_data = 'NA'
                     video_entry = VideoProcess(
                         vid=candidate_id,
                         start_duration=math.ceil(float(entry[label]['start'])),
@@ -567,27 +589,29 @@ def analyze_video(queue, candidate_id,selected_image):
         time.sleep(1)  # Simulate some processing time
         print('Part 1 completed')  # Debugging statement
 
+
 @products_blueprint.route('/confirm_interviewer', methods=['POST'])
-def confirm_interviewer():    
+def confirm_interviewer():
     data = Candidate.get_video_data(request.json.get('candidate_id'))
     if data is not None:
         videoPath = data.interview_video
         video_name = os.path.basename(videoPath)
         video_name_without_extension, extension = os.path.splitext(video_name)
         output_folder = f'uploads/{video_name_without_extension}/two-minutes-videoframes/'
-        output_directory_path=f'uploads/{video_name_without_extension}/final-frames/'
+        output_directory_path = f'uploads/{video_name_without_extension}/final-frames/'
 
-        if(request.json.get('sendCandidate')):
-            return json.dumps({'success': 1,'image':output_directory_path+'candidate.jpg'})
-        else:            
+        if (request.json.get('sendCandidate')):
+            return json.dumps({'success': 1, 'image': output_directory_path + 'candidate.jpg'})
+        else:
             timestamp = []
-            timestamp.append({'start': 30, 'end': 150})            
-            save_two_minutes_frame(videoPath, timestamp, output_folder)#save two minutes frames
-            finalize_interviewer_saved=save_highest_count_videoframe(output_folder, output_directory_path)
-            if finalize_interviewer_saved: 
-                return json.dumps({'success': 1,'image':output_directory_path+'interviewer.jpg'})
+            timestamp.append({'start': 30, 'end': 150})
+            save_two_minutes_frame(videoPath, timestamp, output_folder)  # save two minutes frames
+            finalize_interviewer_saved = save_highest_count_videoframe(output_folder, output_directory_path)
+            if finalize_interviewer_saved:
+                return json.dumps({'success': 1, 'image': output_directory_path + 'interviewer.jpg'})
             else:
-                return json.dumps({'success':0})
+                return json.dumps({'success': 0})
+
 
 def save_two_minutes_frame(videoPath, timestamp, output_folder):
     os.makedirs(output_folder, exist_ok=True)
@@ -610,19 +634,20 @@ def save_two_minutes_frame(videoPath, timestamp, output_folder):
 
     cap.release()
 
-def process_video_and_transcript(result, audio_path,temp_storage_dir_path):
-    
+
+def process_video_and_transcript(result, audio_path, temp_storage_dir_path):
     for segment in result:
         label = list(segment.keys())[0]
         if label == 'candidate':
-            transcript_data = get_audioclip_timestamps(audio_path, segment[label]['start'], segment[label]['end'], temp_storage_dir_path)
+            transcript_data = get_audioclip_timestamps(audio_path, segment[label]['start'], segment[label]['end'],
+                                                       temp_storage_dir_path)
             segment[label]['transcript_data'] = transcript_data
         elif label == 'interviewer':
-            transcript_data = get_audioclip_timestamps(audio_path, segment[label]['start'], segment[label]['end'], temp_storage_dir_path)
+            transcript_data = get_audioclip_timestamps(audio_path, segment[label]['start'], segment[label]['end'],
+                                                       temp_storage_dir_path)
             segment[label]['transcript_data'] = transcript_data
-    
-    return result
 
+    return result
 
 
 def get_video_frames(queue, candidate_id):
@@ -678,8 +703,10 @@ def get_timestamp_emotion(queue, candidate_id):
                 f'uploads/{video_name_without_extension}/interviewer/videoframes/')
             overall_timestamp_candidate = analyze_timestamp_folder(
                 f'uploads/{video_name_without_extension}/candidate/videoframes/')
-            save_timestamp_video_report_inteviewer = save_videots_report(overall_timestamp_interviewer,audio_emotions_interviewer)
-            save_timestamp_video_report_candidate = save_videots_report(overall_timestamp_candidate, audio_emotions_candidate)
+            save_timestamp_video_report_inteviewer = save_videots_report(overall_timestamp_interviewer,
+                                                                         audio_emotions_interviewer)
+            save_timestamp_video_report_candidate = save_videots_report(overall_timestamp_candidate,
+                                                                        audio_emotions_candidate)
             if save_timestamp_video_report_inteviewer and save_timestamp_video_report_candidate:
                 result = True
             else:
@@ -707,7 +734,8 @@ def save_overall_report_to_candidate_table(queue, candidate_id):
         queue.put(result)
         time.sleep(1)  # Simulate some processing time
         print('Part 4 completed')  # Debugging statement
-        
+
+
 @products_blueprint.route('/run_tasks_modify', methods=['GET', 'POST'])
 def run_tasks_modify():
     candidate_id = request.json.get('candidate_id')
@@ -715,13 +743,13 @@ def run_tasks_modify():
     task_queue = queue.Queue()
 
     # Start the analyze_video thread
-    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id,selected_image))
+    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id, selected_image))
     analyze_thread.start()
     # Wait for analyze_video to complete and check the result
     analyze_thread.join(timeout=7200)
     confirmation = task_queue.get()
     if confirmation:
-         final_result = task_queue.get()
+        final_result = task_queue.get()
     return jsonify({'result': final_result})
 
 
@@ -732,7 +760,7 @@ def run_tasks():
     task_queue = queue.Queue()
 
     # Start the analyze_video thread
-    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id,selected_image))
+    analyze_thread = threading.Thread(target=analyze_video, args=(task_queue, candidate_id, selected_image))
     analyze_thread.start()
 
     # Wait for analyze_video to complete and check the result
@@ -858,12 +886,12 @@ def calculate_qna_confidence(facial_emotion_data):
 
     # Normalize the scores to percentages
     total_score = confidence_score + nervousness_score
-    CL='NA'
-    NS='NA'
-    if total_score!=0.0:
+    CL = 'NA'
+    NS = 'NA'
+    if total_score != 0.0:
         CL = (confidence_score / total_score) * 100
         NS = (nervousness_score / total_score) * 100
-    # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
+        # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
         return f"CS:{round(CL, 2)}%, NS:{round(NS, 2)}%"
     return f"CS:{CL}, NS:{NS}"
 
