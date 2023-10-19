@@ -25,7 +25,7 @@ import cv2
 from ib_aitool.admin.interview_analyzer.generate_video_transcript import generate_transcipt, save_frames_for_timestamps, \
     save_audioclip_timestamps, analyze_timestamp_folder, analyze_audio_timestamps_clips, transcribe_video, \
     extract_question_timestamps, save_frames_from_video, save_highest_count_videoframe, \
-    classify_images_and_generate_timestamp, get_audioclip_timestamps
+    classify_images_and_generate_timestamp, get_audioclip_timestamps,crop_and_save_video_timestamps
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report, \
     generate_and_save_overall_video_report
 from jinja2 import Environment
@@ -764,7 +764,10 @@ def get_video_frames(queue, candidate_id):
                                                                       f'uploads/{video_name_without_extension}/interviewer/')
             saving_audioclips_candidate = save_audioclip_timestamps(f'{audioPath}', candidate_data,
                                                                     f'uploads/{video_name_without_extension}/candidate/')
-
+            saving_videoclips_interviewer = crop_and_save_video_timestamps(f'{videoPath}', interviewer_data,
+                                                                   f'uploads/{video_name_without_extension}/interviewer/videoclips/')
+            saving_videoclips_candidate = crop_and_save_video_timestamps(f'{videoPath}', candidate_data,
+                                                                   f'uploads/{video_name_without_extension}/candidate/videoclips/')
             if saving_frames_interviewer and saving_frames_candidate:
                 result = True
             else:
@@ -888,7 +891,7 @@ def run_tasks():
                         candidate_data.video_analysis_status = 'completed'
                         db.session.commit()
                     c_data = Candidate.get_video_data(candidate_id)
-                    remove_all_model_created_files(c_data.interview_video)
+                    #remove_all_model_created_files(c_data.interview_video)
             else:
                 final_result = False
     else:
@@ -1059,9 +1062,44 @@ def calculate_qna_audio_confidence(facial_emotion_data):
         NS = (nervousness_score / total_score) * 100
         return f"CS:{round(CL, 2)}%"
     return f"CS:{CL}"
+
+def get_timestamp_video_clip(video_process_id):
+    vprocess=VideoProcess.query.get(video_process_id)
+    vp_id   =   vprocess.id
+    vid=   vprocess.vid
+    start_duration=   vprocess.start_duration
+    end_duration=   vprocess.end_duration
+    speaker=   vprocess.speaker
+    candidate = Candidate.query.get(vid)
+    video_url = candidate.interview_video
+    video_name = os.path.basename(video_url)
+    # Remove the file extension if needed
+    video_name_without_extension, extension = os.path.splitext(video_name)
+    #video_name_without_extension = f'uploads/{video_name_without_extension}'
+    if speaker=='interviewer':
+        path= f'uploads/{video_name_without_extension}/interviewer/videoclips/'
+        matching_file = None
+
+        for filename in os.listdir(path):
+            if filename.startswith(str(vp_id) + "__"):
+                matching_file = os.path.join(path, filename)
+                break
+    else:
+        path= f'uploads/{video_name_without_extension}/candidate/videoclips/'
+        matching_file = None
+
+        for filename in os.listdir(path):
+            if filename.startswith(str(vp_id) + "__"):
+                matching_file = os.path.join(path, filename)
+                break 
+    return f'/{matching_file}'
+    
+
+
 # Register the custom Jinja2 filter
 app.jinja_env.filters['emotion_scores'] = calculate_qna_confidence
 app.jinja_env.filters['emotion_scores_audio'] = calculate_qna_audio_confidence
+app.jinja_env.filters['get_timestamp_vclip_url'] = get_timestamp_video_clip
 
 
 @app.route('/delete_route/<int:item_id>')

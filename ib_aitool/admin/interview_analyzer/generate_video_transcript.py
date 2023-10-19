@@ -277,6 +277,30 @@ def save_frames_for_timestamps(video_path, timestamps, dir_path, basename, ext='
 # Usage
 #save_frames_for_timestamps('interview2.mp4', timestamps, f'videoframes/{current_datetime}', 'interview_frame')
 
+def crop_and_save_video_timestamps(input_video_path,timestamps,output_video_path):
+    os.makedirs(output_video_path, exist_ok=True)
+    video = VideoFileClip(input_video_path)
+    for i, timestamp in enumerate(timestamps):
+        strtt=      int(timestamp.start_duration)
+        endtt=   int(timestamp.end_duration)
+        if strtt != endtt:
+            if timestamp.start_duration ==0:
+                start_time_sec = math.ceil(float(timestamp.start_duration))+1
+            else:
+                start_time_sec = math.ceil(float(timestamp.start_duration))
+            end_time_sec = math.ceil(float(timestamp.end_duration))
+            print(f"start:{start_time_sec},end{end_time_sec}")
+            cropped_video = video.subclip(start_time_sec, end_time_sec)
+            # Define the output video file name based on the timestamp
+            output_filename = f"{timestamp.id}__timestamp_{start_time_sec}_{end_time_sec}_vclip.mp4"
+
+            # Create the output video file path by joining the output folder and filename
+            output_path = os.path.join(output_video_path, output_filename)
+
+            # Write the cropped video to the output file
+            cropped_video.write_videofile(output_path)
+
+    return True
 
 def analyze_timestamp_folder(timestamp_folder):
     # Initialize counters for each emotion for emotion_1 and emotion_2

@@ -43,8 +43,20 @@ def get_final_frame(dir,name):
     path = os.path.join(app.config['UPLOAD_FOLDER'],dir,'final-frames')
     return send_from_directory(path, name)
 
+@app.route('/uploads/<dir>/interviewer/videoclips/<name>')
+def interviwer_clip(dir,name):
+    path = os.path.join(app.config['UPLOAD_FOLDER'],dir,'interviewer/videoclips')
+    return send_from_directory(path, name)
+
+@app.route('/uploads/<dir>/candidate/videoclips/<name>')
+def candidate_clip(dir,name):
+    path = os.path.join(app.config['UPLOAD_FOLDER'],dir,'candidate/videoclips')
+    return send_from_directory(path, name)
+
 app.add_url_rule("/uploads/<dir>/<name>", endpoint="get_file_url", build_only=True)
 app.add_url_rule("/uploads/<dir>/final-frames/<name>", endpoint="get_final_frame", build_only=True)
+app.add_url_rule("/uploads/<dir>/interviewer/videoclips/<name>", endpoint="interviwer_clip", build_only=True)
+app.add_url_rule("/uploads/<dir>/candidate/videoclips/<name>", endpoint="candidate_clip", build_only=True)
 
 @app.route('/uploads/<dir>/<dir_2>/<name>')
 def get_multi_dir_url(dir,dir_2,name):
