@@ -373,9 +373,20 @@ for (let i = 0; i < accordion.length; i++) {
                     </span>
 
                   </div>
+                  
+                  <div>
+                    <span><i class="fa fa-video-camera show-video-clip-interviewer" style="
+                    color: #b90015;font-size: 15px;" aria-hidden="true" title="Interviewer Timestamp clip" data-bs-toggle="modal"
+                    data-bs-target="#vclipmodel-int" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span>
+                    <br>
+
                   {% elif ((next_video_process.start_duration|int - 3) <= video_process.end_duration|int
                     <=((next_video_process.start_duration|int) + 3) and video_process.speaker=='candidate' and
-                    video_process.start_duration !='0' ) %} <div class="candidate">
+                    video_process.start_duration !='0' ) %}
+                    <span><i class="fa fa-video-camera show-video-clip-candidate" style="
+                      color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip" data-bs-toggle="modal"
+                    data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span></div>
+                    <div class="candidate">
                     <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
                       data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                       data-text-report="{{video_report.text_dur_report}}"
@@ -403,9 +414,12 @@ for (let i = 0; i < accordion.length; i++) {
             
               </div>
             </div>
-
+            
             {% elif index == list_length and video_process.speaker ==
             'candidate' %}
+            <span><i class="fa fa-video-camera show-video-clip-candidate" style="
+              color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip" data-bs-toggle="modal"
+            data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span></div>
             <div class="candidate">
               <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
                 data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
@@ -482,6 +496,34 @@ for (let i = 0; i < accordion.length; i++) {
   </div>
 </div>
 
+<div class="modal" id="vclipmodel-int">
+  <div class="modal-dialog">
+    <div class="modal-content" style="width: 73%;margin: 0 auto;">
+      <div class="modal-header">
+        <button type="button" class="btn-close" id="closeModalButton-interviewer" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="videoContainer-interviewer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="vclipmodel-cand">
+  <div class="modal-dialog">
+    <div class="modal-content"style="width: 73%;margin: 0 auto;">
+      <div class="modal-header">
+        <button type="button" class="btn-close" id="closeModalButton-candidate" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="videoContainer-candidate"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
 <!-- The Modal -->
 <div class="modal" id="confidenceLevel">
   <div class="modal-dialog">
@@ -546,5 +588,6 @@ for (let i = 0; i < accordion.length; i++) {
     </div>
   </div>
 </div>
+
 
 {% endblock %}

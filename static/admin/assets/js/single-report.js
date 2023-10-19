@@ -10,7 +10,64 @@ $(function () {
     createDoughnutChart($(this), "video-report");
     createDoughnutChart($(this), "text-report");
   });
+
+  $(document).on("click", ".show-video-clip-interviewer", function () {
+    console.log("dsadsad")
+    var videoClipURL = $(this).data("video-clip");
+    console.log(videoClipURL)
+   // Create a video element
+   var videoElement = $("<video controls>");
+   videoElement.attr("height", "500px");
+   var sourceElement = $("<source>");
+
+   sourceElement.attr("src", videoClipURL);
+   videoElement.append(sourceElement);
+
+   // Append the video element to the video container div
+   if(videoClipURL!='/None'){
+   $("#videoContainer-interviewer").empty().append(videoElement);
+    }else{
+      $("#videoContainer-interviewer").empty().append("<h3>No Video Found</h3>");
+    }
+   // Show the video player
+   $("#vclipmodal-int").modal("show");
+    // Pause the video when the modal is closed
+    $("#closeModalButton-interviewer").on("click", function () {
+      videoElement[0].pause();
+  });
+    });
+
+  $(document).on("click", ".show-video-clip-candidate", function () {
+    console.log("dsadsad")
+    var videoClipURL = $(this).data("video-clip");
+    console.log(videoClipURL)
+   // Create a video element
+   var videoElement = $("<video controls>");
+   videoElement.attr("height", "500px"); // Set the height here
+
+   var sourceElement = $("<source>");
+  if(videoClipURL!='/None'){
+   sourceElement.attr("src", videoClipURL);
+   videoElement.append(sourceElement);
+  }
+   
+  if(videoClipURL!='/None'){
+   // Append the video element to the video container div
+   $("#videoContainer-candidate").empty().append(videoElement);
+  }else{
+    $("#videoContainer-candidate").empty().append("<h3>No Video Found</h3>");
+  }
+   // Show the video player
+   $("#vclipmodal-cand").modal("show");
+    // Add an event listener to the close button
+    $("#closeModalButton-candidate").on("click", function () {
+      videoElement[0].pause();
+  });
+  });
+
 });
+
+
 
 function createDoughnutChart(target, targetClass) {
   const reportData = JSON.parse(target.data(targetClass).replaceAll("'", '"'));
