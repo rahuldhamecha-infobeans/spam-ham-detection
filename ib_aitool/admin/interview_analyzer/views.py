@@ -5,7 +5,7 @@ from ib_aitool.database.models.VideoProcessModel import VideoReport
 import subprocess
 from ib_aitool import app
 from ib_tool import BASE_DIR, mail
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Markup
 from flask_login import login_required, current_user
 from ib_aitool.admin.decorators import has_permission
 from ib_aitool.database.models.CandidateModel import Candidate
@@ -42,6 +42,7 @@ import plotly
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 import plotly.io as pio
+import re
 
 
 @products_blueprint.route('/')
@@ -135,7 +136,7 @@ def interview_video_upload():
     if request.method == 'POST':
         name = request.form.get('candidate_name')
         video_url = upload_video()
-        #print(video_url)
+        # print(video_url)
         if video_url.startswith('/'):
             video_url = video_url[1:]
         else:
@@ -220,21 +221,21 @@ def calculate_overall_confidence(facial_emotion_data):
     weight_disgust = 1
     # Calculate the weighted sum of selected emotions
     if 'neutral' not in facial_emotion_data:
-        facial_emotion_data['neutral']=0
+        facial_emotion_data['neutral'] = 0
     if 'happy' not in facial_emotion_data:
-        facial_emotion_data['happy']=0
+        facial_emotion_data['happy'] = 0
     if 'surprise' not in facial_emotion_data:
-        facial_emotion_data['surprise']=0
+        facial_emotion_data['surprise'] = 0
 
     if 'angry' not in facial_emotion_data:
-        facial_emotion_data['angry']=0
+        facial_emotion_data['angry'] = 0
     if 'disgust' not in facial_emotion_data:
-        facial_emotion_data['disgust']=0
+        facial_emotion_data['disgust'] = 0
     if 'fear' not in facial_emotion_data:
-        facial_emotion_data['fear']=0   
+        facial_emotion_data['fear'] = 0
     if 'sad' not in facial_emotion_data:
-        facial_emotion_data['sad']=0 
-    # Calculate the weighted sum of selected emotions
+        facial_emotion_data['sad'] = 0
+        # Calculate the weighted sum of selected emotions
     weighted_sum = (
             facial_emotion_data['neutral'] * weight_neutral +
             facial_emotion_data['happy'] * weight_happy +
@@ -263,6 +264,7 @@ def calculate_overall_confidence(facial_emotion_data):
 
     return 0, 0, NS, CL
 
+
 def calculate_overall_audio_confidence(facial_emotion_data):
     facial_emotion_data = facial_emotion_data.replace("'", "\"")
     facial_emotion_data = json.loads(facial_emotion_data)
@@ -277,21 +279,21 @@ def calculate_overall_audio_confidence(facial_emotion_data):
     weight_disgust = 1
     # Calculate the weighted sum of selected emotions
     if 'neutral' not in facial_emotion_data:
-        facial_emotion_data['neutral']=0
+        facial_emotion_data['neutral'] = 0
     if 'happy' not in facial_emotion_data:
-        facial_emotion_data['happy']=0
+        facial_emotion_data['happy'] = 0
     if 'surprise' not in facial_emotion_data:
-        facial_emotion_data['surprise']=0
+        facial_emotion_data['surprise'] = 0
 
     if 'angry' not in facial_emotion_data:
-        facial_emotion_data['angry']=0
+        facial_emotion_data['angry'] = 0
     if 'disgust' not in facial_emotion_data:
-        facial_emotion_data['disgust']=0
+        facial_emotion_data['disgust'] = 0
     if 'fear' not in facial_emotion_data:
-        facial_emotion_data['fear']=0   
+        facial_emotion_data['fear'] = 0
     if 'sad' not in facial_emotion_data:
-        facial_emotion_data['sad']=0 
-    # Calculate the weighted sum of selected emotions
+        facial_emotion_data['sad'] = 0
+        # Calculate the weighted sum of selected emotions
     weighted_sum = (
             facial_emotion_data['neutral'] * weight_neutral +
             facial_emotion_data['happy'] * weight_happy +
@@ -395,7 +397,7 @@ def create_overall_data_by_candidate_id(candidate_id):
     candidate_confidence_dict_text['NS'] = NS
     candidate_confidence_dict_text['CL'] = CL
 
-    #Calculate the audio emotion for interviewer and candidate
+    # Calculate the audio emotion for interviewer and candidate
     overall_interviewer_confidence_audio, CS, NS, CL = calculate_overall_audio_confidence(
         candidate.overall_interviewer_audio_report)
     interviewer_confidence_audio['overall_confidence'] = overall_interviewer_confidence_audio
@@ -549,7 +551,7 @@ def text_analysis(paragraph):
         'Absolutely', 'Definitely', 'Totally', 'Actually', 'Personally', 'Technically',
         'Virtually', 'Simply', 'Possibly', 'Somehow', 'Just', 'Very', 'Pretty', 'Some', 'Honestly',
         'That', 'Extremely', 'Really', 'Much', 'Exactly', 'Ultimate', 'Complete', 'World-class',
-        'Amazing'
+        'Amazing', 'So',
     ]
 
     filler_words = [
@@ -563,20 +565,25 @@ def text_analysis(paragraph):
     paragraph_lower = paragraph.lower()
 
     for word in weak_words:
-        lower_word = word.lower()
-        count = paragraph_lower.count(lower_word)
-        if int(count) > 0:
+        # Use word boundaries to match whole words
+        pattern = r'\b' + re.escape(word.lower()) + r'\b'
+        count = len(re.findall(pattern, paragraph_lower))
+
+        if count > 0:
             data = {'word': word, 'count': count}
             founded_weak_words.append(data)
 
     for word in filler_words:
-        lower_word = word.lower()
-        count = paragraph_lower.count(lower_word)
-        if int(count) > 0:
+        # Use word boundaries to match whole words
+        pattern = r'\b' + re.escape(word.lower()) + r'\b'
+        count = len(re.findall(pattern, paragraph_lower))
+
+        if count > 0:
             data = {'word': word, 'count': count}
             founded_filler_words.append(data)
 
     return {'weak_words': founded_weak_words, 'filler_words': founded_filler_words}
+
 
 
 @products_blueprint.route('/view-reports/<id>')
@@ -650,10 +657,10 @@ def analyze_video(queue, candidate_id, selected_image):
             if os.path.exists(image_dir) and os.path.exists(interviewer_image_path) and is_directory_not_empty(
                     image_dir):
                 result = classify_images_and_generate_timestamp(image_dir, interviewer_image_path)
-                temp_storage_dir_path=f'uploads/{video_name_without_extension}/'
-                final_transcript_data=process_video_and_transcript(result,audioPath,temp_storage_dir_path)
-                #print(final_transcript_data)
-            # Loop through the data and save it to the database
+                temp_storage_dir_path = f'uploads/{video_name_without_extension}/'
+                final_transcript_data = process_video_and_transcript(result, audioPath, temp_storage_dir_path)
+                # print(final_transcript_data)
+                # Loop through the data and save it to the database
                 for entry in final_transcript_data:
                     label = list(entry.keys())[0]
                     if entry[label]['transcript_data']:
@@ -786,10 +793,12 @@ def get_timestamp_emotion(queue, candidate_id):
             video_name = os.path.basename(videoPath)
             # Remove the file extension if needed
             video_name_without_extension, extension = os.path.splitext(video_name)
-            #audio_emotions_interviewer = {}
-            #audio_emotions_candidate = {}
-            audio_emotions_interviewer = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/interviewer/audioclips/')
-            audio_emotions_candidate = analyze_audio_timestamps_clips(f'uploads/{video_name_without_extension}/candidate/audioclips/')
+            # audio_emotions_interviewer = {}
+            # audio_emotions_candidate = {}
+            audio_emotions_interviewer = analyze_audio_timestamps_clips(
+                f'uploads/{video_name_without_extension}/interviewer/audioclips/')
+            audio_emotions_candidate = analyze_audio_timestamps_clips(
+                f'uploads/{video_name_without_extension}/candidate/audioclips/')
             overall_timestamp_interviewer = analyze_timestamp_folder(
                 f'uploads/{video_name_without_extension}/interviewer/videoframes/')
             overall_timestamp_candidate = analyze_timestamp_folder(
@@ -956,20 +965,20 @@ def calculate_qna_confidence(facial_emotion_data):
 
     # Calculate the weighted sum of selected emotions
     if 'neutral' not in facial_emotion_data:
-        facial_emotion_data['neutral']=0
+        facial_emotion_data['neutral'] = 0
     if 'happy' not in facial_emotion_data:
-        facial_emotion_data['happy']=0
+        facial_emotion_data['happy'] = 0
     if 'surprise' not in facial_emotion_data:
-        facial_emotion_data['surprise']=0
+        facial_emotion_data['surprise'] = 0
 
     if 'angry' not in facial_emotion_data:
-        facial_emotion_data['angry']=0
+        facial_emotion_data['angry'] = 0
     if 'disgust' not in facial_emotion_data:
-        facial_emotion_data['disgust']=0
+        facial_emotion_data['disgust'] = 0
     if 'fear' not in facial_emotion_data:
-        facial_emotion_data['fear']=0   
+        facial_emotion_data['fear'] = 0
     if 'sad' not in facial_emotion_data:
-        facial_emotion_data['sad']=0  
+        facial_emotion_data['sad'] = 0
 
     weighted_sum = (
             facial_emotion_data['neutral'] * weight_neutral +
@@ -998,9 +1007,10 @@ def calculate_qna_confidence(facial_emotion_data):
     if total_score != 0.0:
         CL = (confidence_score / total_score) * 100
         NS = (nervousness_score / total_score) * 100
-      # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
+        # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
         return f"CS:{round(CL, 2)}%"
     return f"CS:{CL}"
+
 
 def calculate_qna_audio_confidence(facial_emotion_data):
     facial_emotion_data = facial_emotion_data.replace("'", "\"")
@@ -1016,20 +1026,20 @@ def calculate_qna_audio_confidence(facial_emotion_data):
 
     # Calculate the weighted sum of selected emotions
     if 'neutral' not in facial_emotion_data:
-        facial_emotion_data['neutral']=0
+        facial_emotion_data['neutral'] = 0
     if 'happy' not in facial_emotion_data:
-        facial_emotion_data['happy']=0
+        facial_emotion_data['happy'] = 0
     if 'surprise' not in facial_emotion_data:
-        facial_emotion_data['surprise']=0
+        facial_emotion_data['surprise'] = 0
 
     if 'angry' not in facial_emotion_data:
-        facial_emotion_data['angry']=0
+        facial_emotion_data['angry'] = 0
     if 'disgust' not in facial_emotion_data:
-        facial_emotion_data['disgust']=0
+        facial_emotion_data['disgust'] = 0
     if 'fear' not in facial_emotion_data:
-        facial_emotion_data['fear']=0   
+        facial_emotion_data['fear'] = 0
     if 'sad' not in facial_emotion_data:
-        facial_emotion_data['sad']=0  
+        facial_emotion_data['sad'] = 0
 
     weighted_sum = (
             facial_emotion_data['neutral'] * weight_neutral +
@@ -1052,13 +1062,15 @@ def calculate_qna_audio_confidence(facial_emotion_data):
 
     # Normalize the scores to percentages
     total_score = confidence_score + nervousness_score
-    CL='NA'
-    NS='NA'
-    if total_score!=0.0:
+    CL = 'NA'
+    NS = 'NA'
+    if total_score != 0.0:
         CL = (confidence_score / total_score) * 100
         NS = (nervousness_score / total_score) * 100
         return f"CS:{round(CL, 2)}%"
     return f"CS:{CL}"
+
+
 # Register the custom Jinja2 filter
 app.jinja_env.filters['emotion_scores'] = calculate_qna_confidence
 app.jinja_env.filters['emotion_scores_audio'] = calculate_qna_audio_confidence
@@ -1098,6 +1110,42 @@ def delete_route(item_id):
 
     return redirect(url_for('interview_analyzer.index'))
 
+
+def identify_text_analysis(paragraph):
+    words_data = text_analysis(paragraph)
+    weak_words = words_data['weak_words']
+    filler_words = words_data['filler_words']
+
+    highlighted_text = paragraph
+
+    for weak_word_data in weak_words:
+        weak_word = weak_word_data['word']
+        weak_word_lower = weak_word.lower()
+        weak_word_upper = weak_word.capitalize()
+
+        pattern = r'\b' + re.escape(weak_word_lower) + r'\b'
+        highlighted_text = re.sub(pattern, f'<span class="highlighted">{weak_word_lower}</span>', highlighted_text)
+
+        pattern = r'\b' + re.escape(weak_word_upper) + r'\b'
+        highlighted_text = re.sub(pattern, f'<span class="highlighted">{weak_word_upper}</span>',
+                                  highlighted_text)
+
+    for filler_word_data in filler_words:
+        filler_word = filler_word_data['word']
+        filler_word_lower = filler_word.lower()
+        filler_word_upper = filler_word.capitalize()
+
+        pattern = r'\b' + re.escape(filler_word_lower) + r'\b'
+        highlighted_text = re.sub(pattern, f'<span class="highlighted">{filler_word_lower}</span>', highlighted_text)
+
+        pattern = r'\b' + re.escape(filler_word_upper) + r'\b'
+        highlighted_text = re.sub(pattern, f'<span class="highlighted">{filler_word_upper}</span>', highlighted_text)
+
+    return highlighted_text
+    # return words_data['weak_words']
+
+
+app.jinja_env.filters['weak_word_identify'] = identify_text_analysis
 
 app.register_blueprint(
     products_blueprint, url_prefix='/smart-interview-assessment')

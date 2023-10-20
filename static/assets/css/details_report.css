@@ -795,3 +795,14 @@ select:focus {
 .add-extra-css{
 box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
 }
+.highlighted{
+  background-color: #d3a655;
+   color: white;
+   font-weight:bold;
+   border-radius:4px;
+   padding-right: 5px;
+    padding-left: 5px;
+}
+.accordion-button{
+display:inline!important;
+}
