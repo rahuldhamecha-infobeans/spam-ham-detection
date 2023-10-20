@@ -359,10 +359,15 @@ for (let i = 0; i < accordion.length; i++) {
 
                 <div class="percentage-wrapper">
                   <div class="interviewer">
+                    <p style="display:flex;flex-direction: column;">
                     <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
                       data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"></i>
+                      <br>
+                      <i class="fa fa-video-camera show-video-clip-interviewer" style="
+                    color: #b90015;font-size: 15px;" aria-hidden="true" title="Interviewer Timestamp clip (In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
+                    data-bs-target="#vclipmodel-int" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
                     <span>
                       Interviewer's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
                       <br />
@@ -374,23 +379,28 @@ for (let i = 0; i < accordion.length; i++) {
 
                   </div>
                   
-                  <div>
-                    <span><i class="fa fa-video-camera show-video-clip-interviewer" style="
-                    color: #b90015;font-size: 15px;" aria-hidden="true" title="Interviewer Timestamp clip" data-bs-toggle="modal"
+                  <!-- <div> -->
+                    <!-- <span><i class="fa fa-video-camera show-video-clip-interviewer" style="
+                    color: #b90015;font-size: 15px;" aria-hidden="true" title="Interviewer Timestamp clip (In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
                     data-bs-target="#vclipmodel-int" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span>
-                    <br>
+                    <br> -->
 
                   {% elif ((next_video_process.start_duration|int - 3) <= video_process.end_duration|int
                     <=((next_video_process.start_duration|int) + 3) and video_process.speaker=='candidate' and
                     video_process.start_duration !='0' ) %}
-                    <span><i class="fa fa-video-camera show-video-clip-candidate" style="
-                      color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip" data-bs-toggle="modal"
-                    data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span></div>
+                    <!-- <span><i class="fa fa-video-camera show-video-clip-candidate" style="
+                      color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip (In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
+                    data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span> --><!-- </div> -->
                     <div class="candidate">
+                      <p style="display:flex;flex-direction: column;">
                     <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
                       data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"></i>
+                      <br>
+                      <i class="fa fa-video-camera show-video-clip-candidate" style="
+                      color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip (In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
+                    data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
                     <span>
                       Candidate's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
                       <br />
@@ -417,14 +427,17 @@ for (let i = 0; i < accordion.length; i++) {
             
             {% elif index == list_length and video_process.speaker ==
             'candidate' %}
-            <span><i class="fa fa-video-camera show-video-clip-candidate" style="
-              color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip" data-bs-toggle="modal"
-            data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span></div>
+
             <div class="candidate">
+              <p style="display:flex;flex-direction: column;">
               <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
                 data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                 data-text-report="{{video_report.text_dur_report}}"
                 data-audio-report="{{video_report.audio_report}}"></i>
+                <br>
+                <i class="fa fa-video-camera show-video-clip-candidate" style="
+              color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip(In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
+            data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
               <span>
                 Candidate's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
                 <br />
