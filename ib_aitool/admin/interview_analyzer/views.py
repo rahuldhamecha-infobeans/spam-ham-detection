@@ -1093,13 +1093,25 @@ def get_timestamp_video_clip(video_process_id):
                 matching_file = os.path.join(path, filename)
                 break 
     return f'/{matching_file}'
-    
+
+
+def format_time_duration(value):
+    try:
+        # Try to convert the value to an integer
+        duration = int(value)
+    except (ValueError, TypeError):
+        # If it's not a valid integer, leave it as is
+        return value
+
+    # Format as a string with a leading zero if necessary
+    return f"{duration:02d}"
 
 
 # Register the custom Jinja2 filter
 app.jinja_env.filters['emotion_scores'] = calculate_qna_confidence
 app.jinja_env.filters['emotion_scores_audio'] = calculate_qna_audio_confidence
 app.jinja_env.filters['get_timestamp_vclip_url'] = get_timestamp_video_clip
+app.jinja_env.filters['format_duration'] = format_time_duration
 
 
 @app.route('/delete_route/<int:item_id>')
