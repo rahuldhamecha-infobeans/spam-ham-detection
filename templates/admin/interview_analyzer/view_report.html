@@ -352,7 +352,7 @@ for (let i = 0; i < accordion.length; i++) {
                     {% if video_process.interview_transcript=='NA' %}
                         Transcript Not Found
                     {% else %}
-                    {{video_process.interview_transcript }}
+                    {{video_process.interview_transcript|weak_word_identify|safe}}
                     {% endif %}
                   </button>
                 </h2>
@@ -419,7 +419,7 @@ for (let i = 0; i < accordion.length; i++) {
                   {% if video_process.interview_transcript=='NA' %}
                   Transcript Not Found
                 {% else %}
-                {{video_process.interview_transcript }}
+                {{video_process.interview_transcript|weak_word_identify|safe}}
                 {% endif %}
             
               </div>
@@ -456,7 +456,7 @@ for (let i = 0; i < accordion.length; i++) {
                 {% if video_process.interview_transcript=='NA' %}
                   Transcript Not Found
                 {% else %}
-                {{video_process.interview_transcript }}
+                {{video_process.interview_transcript|weak_word_identify|safe}}
                 {% endif %}
             </div>
           </div>
@@ -468,7 +468,7 @@ for (let i = 0; i < accordion.length; i++) {
               {% if video_process.interview_transcript=='NA' %}
               Transcript Not Found
             {% else %}
-            {{video_process.interview_transcript }}
+             {{video_process.interview_transcript|weak_word_identify|safe}}
             {% endif %}
             </div>
           </div>
