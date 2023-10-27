@@ -452,7 +452,7 @@ for (let i = 0; i < accordion.length; i++) {
                     {% endif %}
 
                     <span>
-                      Candidate's Score(Video) = <span style="color:{{colorval_frame_dur_report}};">{{ video_report.frame_dur_report | emotion_scores | float}}%</span>
+                      Candidate's Score(Video) = <span style="color:{{colorval_frame_dur_report}};">{{ video_report.frame_dur_report | emotion_scores|float }}%</span>
                       <br />
                       Candidate's Score(Text) = <span style="color:{{colorval_frame_dur_report}};">{{video_report.text_dur_report|emotion_scores|float }}%</span>
                       <br />
@@ -489,7 +489,7 @@ for (let i = 0; i < accordion.length; i++) {
               color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip(In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
             data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
               <span>
-                {% if video_report.frame_dur_report|emotion_scores > 50 %}
+                {% if video_report.frame_dur_report|emotion_scores|float > 50 %}
                   {% set colorval = 'green' %}
                 {% elif video_report.frame_dur_report|emotion_scores > 33 and video_report.frame_dur_report|emotion_scores < 50 %}
                   {% set colorval = 'orange' %}
