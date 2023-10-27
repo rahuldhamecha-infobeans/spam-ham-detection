@@ -368,13 +368,40 @@ for (let i = 0; i < accordion.length; i++) {
                       <i class="fa fa-video-camera show-video-clip-interviewer" style="
                     color: #b90015;font-size: 15px;" aria-hidden="true" title="Interviewer Timestamp clip (In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
                     data-bs-target="#vclipmodel-int" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
+
+                    {% if video_report.frame_dur_report|emotion_scores|int >= 50 %}
+                      {% set colorval_frame_dur_report = 'green' %}
+                    {% elif video_report.frame_dur_report|emotion_scores|int > 33 and video_report.frame_dur_report|emotion_scores|int < 50 %}
+                      {% set colorval_frame_dur_report = 'yellow' %}
+                    {% elif video_report.frame_dur_report|emotion_scores|int < 33 %}
+                      {% set colorval_frame_dur_report = 'red' %}
+                    {% endif %}
+
+                    {% if video_report.text_dur_report|emotion_scores|int > 50 %}
+                      {% set colorval_text_dur_report = 'green' %}
+                    {% elif video_report.text_dur_report|emotion_scores|int > 33 and video_report.text_dur_report|emotion_scores|int < 50 %}
+                      {% set colorval_text_dur_report = 'yellow' %}
+                    {% elif video_report.text_dur_report|emotion_scores|int < 33 %}
+                      {% set colorval_text_dur_report = 'red' %}
+                    {% endif %}
+
+                    {% if video_report.audio_report|emotion_scores|int > 50 %}
+                      {% set colorval_audio_report = 'green' %}
+                    {% elif video_report.audio_report|emotion_scores|int > 33 and video_report.audio_report|emotion_scores|int < 50 %}
+                      {% set colorval_audio_report = 'yellow' %}
+                    {% elif video_report.audio_report|emotion_scores|int < 33 %}
+                      {% set colorval_audio_report = 'red' %}
+                    {% endif %}
+
+
+
                     <span>
-                      Interviewer's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
+                      Interviewer's Score(Video) = <span style="color:{{colorval_frame_dur_report}};">{{video_report.frame_dur_report|emotion_scores }}%</span>
                       <br />
-                      Interviewer's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
+                      Interviewer's Score(Text) = <span style="color:{{colorval_text_dur_report}};">{{video_report.text_dur_report|emotion_scores }}%</span>
                     <br/>
                     
-                      Interviewer's Score(Audio) = {{video_report.audio_report|emotion_scores_audio }}
+                      Interviewer's Score(Audio) = <span style="color:{{colorval_audio_report}};">{{video_report.audio_report|emotion_scores_audio }}%</span>
                     </span>
 
                   </div>
@@ -416,10 +443,10 @@ for (let i = 0; i < accordion.length; i++) {
               data-bs-parent="#question_answer_accordion" aria-labelledby="heading_{{ index }}">
               <div class="accordion-body">
                 <i class="fa fa-commenting" aria-hidden="true" style="color: #228b22"></i>&nbsp;
-                  {% if video_process.interview_transcript=='NA' %}
+                {% if video_process.interview_transcript=='NA' %}
                   Transcript Not Found
                 {% else %}
-                {{video_process.interview_transcript|weak_word_identify|safe}}
+                  {{video_process.interview_transcript|weak_word_identify|safe}}
                 {% endif %}
             
               </div>
@@ -439,7 +466,15 @@ for (let i = 0; i < accordion.length; i++) {
               color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip(In Seconds): {{ video_process.start_duration|format_duration }}-{{ video_process.end_duration|format_duration }}" data-bs-toggle="modal"
             data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
               <span>
-                Candidate's Score(Video) = {{video_report.frame_dur_report|emotion_scores }}
+                {% if video_report.frame_dur_report|emotion_scores > 50 %}
+                  {% set colorval = 'green' %}
+                {% elif video_report.frame_dur_report|emotion_scores > 33 and video_report.frame_dur_report|emotion_scores < 50 %}
+                  {% set colorval = 'yellow' %}
+                {% elif video_report.frame_dur_report|emotion_scores < 33 %}
+                  {% set colorval = 'red' %}
+                {% endif %}
+                
+                Candidate's Score(Video) = <span style="color:{{colorval}};">{{video_report.frame_dur_report|emotion_scores }}</span>
                 <br />
                 Candidate's Score(Text) = {{video_report.text_dur_report|emotion_scores }}
                 <br />
