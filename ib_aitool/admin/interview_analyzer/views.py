@@ -1011,8 +1011,8 @@ def calculate_qna_confidence(facial_emotion_data):
         CL = (confidence_score / total_score) * 100
         NS = (nervousness_score / total_score) * 100
         # CS = ((facial_emotion_data['happy']*100) + (facial_emotion_data['neutral']*100)+(facial_emotion_data['surprise']*100))
-        return f"CS:{round(CL, 2)}%"
-    return f"CS:{CL}"
+        return f"{round(CL, 2)}"
+    return f"{CL}"
 
 
 def calculate_qna_audio_confidence(facial_emotion_data):
@@ -1070,8 +1070,8 @@ def calculate_qna_audio_confidence(facial_emotion_data):
     if total_score != 0.0:
         CL = (confidence_score / total_score) * 100
         NS = (nervousness_score / total_score) * 100
-        return f"CS:{round(CL, 2)}%"
-    return f"CS:{CL}"
+        return f"{round(CL, 2)}"
+    return f"{CL}"
 
 def get_timestamp_video_clip(video_process_id):
     vprocess=VideoProcess.query.get(video_process_id)
