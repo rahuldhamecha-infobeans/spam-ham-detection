@@ -593,8 +593,18 @@ def view_report(id):
     candidate = Candidate.query.get(id)
     data, overall = create_overall_data_by_candidate_id(id)
     analysis = get_text_analysis_data(data)
+    interviewer_data = VideoProcess.get_transcripts('Interviewer', id)
+
+    candidate_data = VideoProcess.get_transcripts('candidate', id)
+    interviewer_total_time_duration = calculate_total_duration(interviewer_data)      
+    candidate_total_time_duration = calculate_total_duration(candidate_data)  
     return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data,
-                           overall=overall, analysis_data=analysis)
+                           overall=overall, analysis_data=analysis,interviewer_total_time=interviewer_total_time_duration,candidate_total_time=candidate_total_time_duration)
+
+def calculate_total_duration(interviewer_data):
+    total_duration = sum((int(vp.end_duration) + 1 if int(vp.start_duration) != 0 else int(vp.end_duration)) - int(vp.start_duration) for vp in interviewer_data)
+    total_minutes, total_seconds = divmod(total_duration, 60)
+    return f"{total_minutes}:{total_seconds:02d} Minutes"
 
 
 def get_text_analysis_data(data):
@@ -1192,8 +1202,12 @@ def identify_text_analysis(paragraph):
     return highlighted_text
     # return words_data['weak_words']
 
+def convert_seconds_to_minute(sec):
+    minutes, seconds = divmod(int(sec), 60)
+    return f"{minutes:02d}:{seconds:02d}"
 
 app.jinja_env.filters['weak_word_identify'] = identify_text_analysis
+app.jinja_env.filters['seconds_to_minutes'] = convert_seconds_to_minute
 
 app.register_blueprint(
     products_blueprint, url_prefix='/smart-interview-assessment')
