@@ -377,7 +377,7 @@ for (let i = 0; i < accordion.length; i++) {
                       {% set colorval_frame_dur_report = '#b90015' %}
                     {% endif %}
 
-                    {% if video_report.text_dur_report|emotion_scores|int > 50 %}
+                    {% if video_report.text_dur_report|emotion_scores|int >= 50 %}
                       {% set colorval_text_dur_report = '#10982c' %}
                     {% elif video_report.text_dur_report|emotion_scores|int > 33 and video_report.text_dur_report|emotion_scores|int < 50 %}
                       {% set colorval_text_dur_report = '#d3a655' %}
@@ -385,7 +385,7 @@ for (let i = 0; i < accordion.length; i++) {
                       {% set colorval_text_dur_report = '#b90015' %}
                     {% endif %}
 
-                    {% if video_report.audio_report|emotion_scores_audio|float > 50 %}
+                    {% if video_report.audio_report|emotion_scores_audio|float >= 50 %}
                       {% set colorval_audio_report = '#10982c' %}
                     {% elif video_report.audio_report|emotion_scores_audio|float > 33 and video_report.audio_report|emotion_scores_audio|float < 50 %}
                       {% set colorval_audio_report = '#d3a655' %}
@@ -435,7 +435,7 @@ for (let i = 0; i < accordion.length; i++) {
                       {% set colorval_frame_dur_report = '#b90015' %}
                     {% endif %}
 
-                    {% if video_report.text_dur_report|emotion_scores|int > 50 %}
+                    {% if video_report.text_dur_report|emotion_scores|int >= 50 %}
                       {% set colorval_text_dur_report = '#10982c' %}
                     {% elif video_report.text_dur_report|emotion_scores|int > 33 and video_report.text_dur_report|emotion_scores|int < 50 %}
                       {% set colorval_text_dur_report = '#d3a655' %}
@@ -443,7 +443,7 @@ for (let i = 0; i < accordion.length; i++) {
                       {% set colorval_text_dur_report = '#b90015' %}
                     {% endif %}
 
-                    {% if video_report.audio_report|emotion_scores_audio|int > 50 %}
+                    {% if video_report.audio_report|emotion_scores_audio|int >= 50 %}
                       {% set colorval_audio_report = '#10982c' %}
                     {% elif video_report.audio_report|emotion_scores_audio|int > 33 and video_report.audio_report|emotion_scores_audio|int < 50 %}
                       {% set colorval_audio_report = '#d3a655' %}
@@ -456,7 +456,7 @@ for (let i = 0; i < accordion.length; i++) {
                       <br />
                       Candidate's Score(Text) = <span style="color:{{colorval_text_dur_report}};">{{video_report.text_dur_report|emotion_scores|float }}%</span>
                       <br />
-                      Candidate's Score(Audio) = <span style="color:{{colorval_audio_report}};">{{video_report.audio_report|emotion_scores_audio|float }}%</span>
+                      Candidate's Score(Audio)123 = <span style="color:{{colorval_audio_report}};">{{video_report.audio_report|emotion_scores_audio|float }}%</span>
                     </span>
 
 
@@ -500,7 +500,7 @@ for (let i = 0; i < accordion.length; i++) {
                       {% set colorval_frame_dur_report = '#b90015' %}
                     {% endif %}
 
-                    {% if video_report.text_dur_report|emotion_scores|int > 50 %}
+                    {% if video_report.text_dur_report|emotion_scores|int >= 50 %}
                       {% set colorval_text_dur_report = '#10982c' %}
                     {% elif video_report.text_dur_report|emotion_scores|int > 33 and video_report.text_dur_report|emotion_scores|int < 50 %}
                       {% set colorval_text_dur_report = '#d3a655' %}
@@ -508,7 +508,7 @@ for (let i = 0; i < accordion.length; i++) {
                       {% set colorval_text_dur_report = '#b90015' %}
                     {% endif %}
 
-                    {% if video_report.audio_report|emotion_scores_audio|int > 50 %}
+                    {% if video_report.audio_report|emotion_scores_audio|int >= 50 %}
                       {% set colorval_audio_report = '#10982c' %}
                     {% elif video_report.audio_report|emotion_scores_audio|int > 33 and video_report.audio_report|emotion_scores_audio|int < 50 %}
                       {% set colorval_audio_report = '#d3a655' %}
@@ -522,7 +522,7 @@ for (let i = 0; i < accordion.length; i++) {
                 Candidate's Score(Text) =  <span style="color:{{colorval_text_dur_report}};">{{video_report.text_dur_report|emotion_scores }}</span>
                 <br />
 
-                Candidate's Score(Audio) = <span style="color:{{colorval_audio_report}};">{{video_report.audio_report|emotion_scores_audio }}</span>
+                Candidate's Score(Audio)1 = <span style="color:{{colorval_audio_report}};">{{video_report.audio_report|emotion_scores_audio }}</span>
               </span>
 
             </div>
