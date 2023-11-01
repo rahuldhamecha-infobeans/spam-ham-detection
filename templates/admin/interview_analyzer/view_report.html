@@ -265,13 +265,13 @@ for (let i = 0; i < accordion.length; i++) {
     <div class="col-md-6 stretch-card grid-margin">
       <div class="report-container">
         <h3 class="report-title">Interviewer's Score</h3>
-        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Interviewer Overall Graph Report " data-bs-toggle="modal"
           data-bs-target="#graphmodal" data-video-report="{{candidate.overall_interviewer_video_report}}"
           data-text-report="{{candidate.overall_interviewer_text_report}}"
           data-audio-report="{{candidate.overall_interviewer_audio_report}}"></i>
       </div>
       <div class="card bg-gradient-success card-img-holder text-white">
-        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Confidence Calculation Formula" data-bs-toggle="modal"
           data-bs-target="#confidenceLevel" style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"></i>
         <div class="card-body">
 
@@ -303,7 +303,7 @@ for (let i = 0; i < accordion.length; i++) {
     <div class="col-md-6 stretch-card grid-margin">
       <div class="report-container">
         <h3 class="report-title">Candidate's Score</h3>
-        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+        <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Candidate Overall Graph Report " data-bs-toggle="modal"
           data-bs-target="#graphmodal" data-video-report="{{candidate.overall_candidate_video_report}}"
           data-text-report="{{candidate.overall_candidate_text_report}}"
           data-audio-report="{{candidate.overall_candidate_audio_report}}"></i>
@@ -369,13 +369,13 @@ for (let i = 0; i < accordion.length; i++) {
                 <div class="percentage-wrapper">
                   <div class="interviewer">
                     <p style="display:flex;flex-direction: column;">
-                    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+                    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Interviewer Graph Report " data-bs-toggle="modal"
                       data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"></i>
                       <br>
                       <i class="fa fa-video-camera show-video-clip-interviewer" style="
-                    color: #b90015;font-size: 15px;" aria-hidden="true" title="Interviewer Timestamp clip (Minutes:Seconds): {{ video_process.start_duration|seconds_to_minutes }}-{{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
+                    color: #b90015;font-size: 15px; cursor: pointer;" aria-hidden="true" time="{{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}" title="Interviewer Timestamp (Minutes:Seconds) : {{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
                     data-bs-target="#vclipmodel-int" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
 
                     {% if video_report.frame_dur_report|emotion_scores|int >= 50 %}
@@ -427,13 +427,13 @@ for (let i = 0; i < accordion.length; i++) {
                     data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></span> --><!-- </div> -->
                     <div class="candidate">
                       <p style="display:flex;flex-direction: column;">
-                    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+                    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Candidate Graph Report" data-bs-toggle="modal"
                       data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                       data-text-report="{{video_report.text_dur_report}}"
                       data-audio-report="{{video_report.audio_report}}"></i>
                       <br>
-                      <i class="fa fa-video-camera show-video-clip-candidate" style="
-                      color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip (Minutes:Seconds): {{ video_process.start_duration|seconds_to_minutes }}-{{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
+                      <i class="fa fa-video-camera show-video-clip-candidate " style="
+                      color: #10982c; font-size: 15px; cursor: pointer;" aria-hidden="true" time="{{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}" title="Candidate Timestamp  (Minutes:Seconds) : {{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
                     data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
                     
                     {% if video_report.frame_dur_report|emotion_scores|int >= 50 %}
@@ -492,13 +492,13 @@ for (let i = 0; i < accordion.length; i++) {
 
             <div class="candidate">
               <p style="display:flex;flex-direction: column;">
-              <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Check Graph" data-bs-toggle="modal"
+              <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Candidate Graph Report" data-bs-toggle="modal"
                 data-bs-target="#graphmodal" data-video-report="{{video_report.frame_dur_report}}"
                 data-text-report="{{video_report.text_dur_report}}"
                 data-audio-report="{{video_report.audio_report}}"></i>
                 <br>
                 <i class="fa fa-video-camera show-video-clip-candidate" style="
-              color: #10982c; font-size: 15px;" aria-hidden="true" title="Candidate Timestamp clip(Minutes:Seconds): {{ video_process.start_duration|seconds_to_minutes }}-{{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
+              color: #10982c; font-size: 15px;cursor: pointer;" aria-hidden="true" time="{{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}"  title="Candidate Timestamp (Minutes:Seconds) : {{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
             data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
 
                 {% if video_report.frame_dur_report|emotion_scores|int >= 50 %}
@@ -575,10 +575,11 @@ for (let i = 0; i < accordion.length; i++) {
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
+        <span class="heading" id="graph-h2-head">
+        Graph Report</span> 
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-
-      <div class="modal-body">
+      <div class="modal-body">             
         <div class="chart-wrapper video_report_wrapper">
           <canvas id="video_report_canvas"></canvas>
           <div id="chart-text">Video Analysis</div>
@@ -600,6 +601,7 @@ for (let i = 0; i < accordion.length; i++) {
   <div class="modal-dialog">
     <div class="modal-content" style="width: 73%;margin: 0 auto;">
       <div class="modal-header">
+        <span class="heading" id="itime">Interviewer Timestamp </span>
         <button type="button" class="btn-close" id="closeModalButton-interviewer" data-bs-dismiss="modal"></button>
       </div>
 
@@ -614,6 +616,7 @@ for (let i = 0; i < accordion.length; i++) {
   <div class="modal-dialog">
     <div class="modal-content"style="width: 73%;margin: 0 auto;">
       <div class="modal-header">
+        <span class="heading" id="ctime">Candidate Timestamp </span>
         <button type="button" class="btn-close" id="closeModalButton-candidate" data-bs-dismiss="modal"></button>
       </div>
 
@@ -628,10 +631,13 @@ for (let i = 0; i < accordion.length; i++) {
 <div class="modal" id="confidenceLevel">
   <div class="modal-dialog">
     <div class="modal-content">
+      
       <div class="modal-header">
+        <span class="heading">
+          Confidence Level</span> 
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-       <span>
+<!--        <span>
       <div class="css-5277k6" style="flex-direction: row;
     -webkit-box-align: center;
     align-items: center;
@@ -642,7 +648,7 @@ for (let i = 0; i < accordion.length; i++) {
     background: linear-gradient( 71.49deg, rgb(55, 55, 66) -9.87%, rgb(103, 103, 117) 79.01% );
     color: rgb(4, 3, 72);
     padding: 2%;margin-top:-6%"><span style="padding:1%;color:#fff;font-weight: 500;font-size: 20px;">Logic Used to calculate Confidence Level</span></div>
-    </span>
+    </span> -->
       <div class="modal-body">
         <div>
 
