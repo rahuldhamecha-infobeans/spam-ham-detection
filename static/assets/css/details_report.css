@@ -832,3 +832,27 @@ li:before {
   color: #EA1B3D;
   margin: 0 30px 0 0;
 }
+
+.modal-header{
+  display: block;
+  padding:0;
+  position: relative;
+}
+
+.modal-header .heading {
+  background: linear-gradient( 71.49deg, rgb(55, 55, 66) -9.87%, rgb(103, 103, 117) 79.01% );
+  padding: 2%;
+  color: #fff;
+  font-weight: 500;
+  font-size: 20px;
+  text-align: center;
+  width: 100%;
+  float: left;
+}
+
+.modal-header .btn-close{
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  margin: 0 !important;
+}

@@ -1,6 +1,11 @@
 $(function () {
   generated_chart = "";
   $(document).on("click", ".fa-info-circle", function () {
+
+    var title = $(this).attr("title");
+    console.log("Icon Title: " + title);
+    // Replace the text content of the <h2> element with the title
+    $("#graph-h2-head").text(title);
     if (generated_chart) {
       for (const key in Chart.instances) {
         Chart.instances[key].destroy();
@@ -12,7 +17,10 @@ $(function () {
   });
 
   $(document).on("click", ".show-video-clip-interviewer", function () {
-    console.log("dsadsad")
+    var time = $(this).attr("title");
+    console.log("Icon Title: " + time);
+    // Replace the text content of the <h2> element with the title
+    $("#itime").text(time);
     var videoClipURL = $(this).data("video-clip");
     console.log(videoClipURL)
    // Create a video element
@@ -38,7 +46,10 @@ $(function () {
     });
 
   $(document).on("click", ".show-video-clip-candidate", function () {
-    console.log("dsadsad")
+    var time = $(this).attr("title");
+    console.log("Icon Time: " + time);
+    // Replace the text content of the <h2> element with the title
+    $("#ctime").text(time);
     var videoClipURL = $(this).data("video-clip");
     console.log(videoClipURL)
    // Create a video element
