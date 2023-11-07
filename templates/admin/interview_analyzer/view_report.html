@@ -1,3 +1,59 @@
+<style>
+.info-box {
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+    border-radius: 0.25rem;
+    background-color: #fff;
+    display: -ms-flexbox;
+    display: flex;
+    margin-bottom: 1rem;
+    min-height: 80px;
+    padding: 0.5rem;
+    position: relative;
+    width: 100%;
+}
+.info-box .info-box-icon {
+    border-radius: 0.25rem;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -ms-flexbox;
+    display: flex;
+    font-size: 1.875rem;
+    -ms-flex-pack: center;
+    justify-content: center;
+    text-align: center;
+    width: 70px;
+}
+.bg-info, .bg-info>a {
+    color: #fff!important;
+}
+.bg-info {
+    background-color: #17a2b8!important;
+}
+.info-box .info-box-content {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -ms-flex-pack: center;
+    justify-content: center;
+    line-height: 1.8;
+    -ms-flex: 1;
+    flex: 1;
+    padding: 0 10px;
+    overflow: hidden;
+}
+.info-box .info-box-text, .info-box .progress-description {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.info-box .info-box-number {
+    display: block;
+    margin-top: 0.25rem;
+    font-weight: 700;
+}
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.js"></script>
 {% extends 'layouts/admin/dashboard/base.html' %}
@@ -61,7 +117,7 @@
       <div class="card-body">
           <div class="col-md mb-4 mb-md-0">
             <div class="accordion mt-3" id="question_answer_accordion">
-              <div class="card accordion-item-sidebar"> 
+              <div class="card accordion-item-sidebar">
               <h3 class="accordion-header" id="">Total Time Duration: {{interviewer_total_time}}</h3>
             </div>
             </div>
@@ -131,7 +187,7 @@
                          {% for key,words in analysis_data %}
                             {% if key == 'Candidate Analysis' %}
             <div class="accordion mt-3" id="question_answer_accordion">
-              <div class="card accordion-item-sidebar"> 
+              <div class="card accordion-item-sidebar">
                 <h3 class="accordion-header" id="">Total Time Duration: {{candidate_total_time}}</h3>
               </div>
             </div>
@@ -262,6 +318,72 @@ for (let i = 0; i < accordion.length; i++) {
           <i class="fa fa-download"></i> Download Report
         </button></a> -->
     </div>
+
+    <!--start-->
+
+     <section class="content">
+      <div class="container-fluid">
+        <h5 class="mb-2">OverAll Insights</h5>
+        <div class="row">
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-info"><i class="fa fa-question-circle"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Total Questions</span>
+                <span class="info-box-number">20</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-success"><i class="fa fa-text-height"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Technical Questions</span>
+                <span class="info-box-number">15</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-warning"><i class="fa fa-comments-o"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Technical Discussion</span>
+                <span class="info-box-number">3 : 20</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-danger"><i class="fa fa-eercast"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">OverAl Discussion</span>
+                <span class="info-box-number">5 : 30</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+        </div>
+      </div>
+
+        <!-- /.row -->
+     </section>
+    <!--end-->
+
     <div class="col-md-6 stretch-card grid-margin">
       <div class="report-container">
         <h3 class="report-title">Interviewer's Score</h3>
@@ -317,7 +439,7 @@ for (let i = 0; i < accordion.length; i++) {
           {% set OCVC = overall.overall_candidate_confidence['CL'] %}
           <!-- Overall Candidate Text Confidence -->
           {% set OCTC = overall.overall_candidate_confidence_text['CL'] %}
-          
+
           {% set OCAC = overall.overall_candidate_confidence_audio['CL'] %}
           <p class="font-weight-normal mb-3 box-p-tag">
             Confidence Level (CL) - <small>{{ ((OCVC + OCTC) / 2) | round(2) }}%</small>
@@ -362,6 +484,7 @@ for (let i = 0; i < accordion.length; i++) {
                         Transcript Not Found
                     {% else %}
                     {{video_process.interview_transcript|weak_word_identify|safe}}
+                     {{video_process.interview_transcript|identify_technical_question|safe}}
                     {% endif %}
                   </button>
                 </h2>
@@ -407,12 +530,12 @@ for (let i = 0; i < accordion.length; i++) {
                       <br />
                       Interviewer's Score(Text) = <span style="color:{{colorval_text_dur_report}};">{{video_report.text_dur_report|emotion_scores|float }}%</span>
                     <br/>
-                    
+
                       Interviewer's Score(Audio) = <span style="color:{{colorval_audio_report}};">{{video_report.audio_report|emotion_scores_audio|float }}%</span>
                     </span>
 
                   </div>
-                  
+
                   <!-- <div> -->
                     <!-- <span><i class="fa fa-video-camera show-video-clip-interviewer" style="
                     color: #b90015;font-size: 15px;" aria-hidden="true" title="Interviewer Timestamp clip (Minutes:Seconds): {{ video_process.start_duration|seconds_to_minutes }}-{{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
@@ -435,7 +558,7 @@ for (let i = 0; i < accordion.length; i++) {
                       <i class="fa fa-video-camera show-video-clip-candidate " style="
                       color: #10982c; font-size: 15px; cursor: pointer;" aria-hidden="true" time="{{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}" title="Candidate Timestamp  (Minutes:Seconds) : {{ video_process.start_duration|seconds_to_minutes }} - {{ video_process.end_duration|seconds_to_minutes }}" data-bs-toggle="modal"
                     data-bs-target="#vclipmodel-cand" data-video-clip="{{video_report.video_process_id|get_timestamp_vclip_url }}"></i></p>
-                    
+
                     {% if video_report.frame_dur_report|emotion_scores|int >= 50 %}
                       {% set colorval_frame_dur_report = '#10982c' %}
                     {% elif video_report.frame_dur_report|emotion_scores|int > 33 and video_report.frame_dur_report|emotion_scores|int < 50 %}
@@ -483,10 +606,10 @@ for (let i = 0; i < accordion.length; i++) {
                 {% else %}
                   {{video_process.interview_transcript|weak_word_identify|safe}}
                 {% endif %}
-            
+
               </div>
             </div>
-            
+
             {% elif index == list_length and video_process.speaker ==
             'candidate' %}
 
@@ -576,10 +699,10 @@ for (let i = 0; i < accordion.length; i++) {
     <div class="modal-content">
       <div class="modal-header">
         <span class="heading" id="graph-h2-head">
-        Graph Report</span> 
+        Graph Report</span>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">             
+      <div class="modal-body">
         <div class="chart-wrapper video_report_wrapper">
           <canvas id="video_report_canvas"></canvas>
           <div id="chart-text">Video Analysis</div>
@@ -631,10 +754,10 @@ for (let i = 0; i < accordion.length; i++) {
 <div class="modal" id="confidenceLevel">
   <div class="modal-dialog">
     <div class="modal-content">
-      
+
       <div class="modal-header">
         <span class="heading">
-          Confidence Level</span> 
+          Confidence Level</span>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 <!--        <span>
