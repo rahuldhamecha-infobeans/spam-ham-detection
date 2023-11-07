@@ -43,7 +43,17 @@ from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 import plotly.io as pio
 import re
+import pickle
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+import string
 
+# Load the model and vectorizer
+tfidf = pickle.load(open(os.path.join(os.path.dirname(
+    __file__), 'models', 'vectorizer.pkl'), 'rb'))
+question_technical_identification_model = pickle.load(open(os.path.join(os.path.dirname(
+    __file__), 'models', 'technical-questions-model.pkl'), 'rb'))
 
 @products_blueprint.route('/')
 @login_required
@@ -1206,7 +1216,57 @@ def convert_seconds_to_minute(sec):
     minutes, seconds = divmod(int(sec), 60)
     return f"{minutes:02d}:{seconds:02d}"
 
+
+def transform_text(text):
+    # ex: text = "Hi how are you"
+    text = text.lower()
+    # hi how are you
+    text = nltk.word_tokenize(text)
+    # ['hi', 'how', 'are', 'you']
+
+    y = []
+    # Below loop is used to remove the special character for text
+    for i in text:
+        if i.isalnum():
+            y.append(i)
+
+    text = y[:]  # cloning to text, it is inmutable
+    y.clear()
+
+    # Remove punctuation
+    for i in text:
+        if i not in stopwords.words('english') and i not in string.punctuation:
+            y.append(i)
+
+    text = y[:]
+    y.clear()
+
+    # Stemming
+    ps = PorterStemmer()
+    for i in text:
+        y.append(ps.stem(i))
+
+    return " ".join(y)
+def identify_technical_question(interview_transcript):
+    # Preprocess input text using the loaded vectorizer
+    transformed = transform_text(interview_transcript)  # Assuming you have a working transform_text function
+
+    # Vectorize the preprocessed input
+    vector_input = tfidf.transform([transformed])
+
+    # Make predictions using the loaded and trained model
+    predictions = question_technical_identification_model.predict(vector_input)
+
+    # Interpret the prediction
+    if predictions == 1:
+        highlighted_text = f'<i class="fa fa-text-height" aria-hidden="true" style="float:right;color:red;border-style: outset;"' \
+                           f'title="Technical Question"></i>'
+        return highlighted_text
+    else:
+        return ""
+
 app.jinja_env.filters['weak_word_identify'] = identify_text_analysis
+app.jinja_env.filters['identify_technical_question'] = identify_technical_question
 app.jinja_env.filters['seconds_to_minutes'] = convert_seconds_to_minute
 
 app.register_blueprint(
