@@ -36,14 +36,14 @@ Assessment {% endblock %} {% block body_block %}
 <div class="row">
   <div class="col-xl-12">
     <div class="card css-4vhwja">
-      <h6 class="css-b6ndjn">Import from file</h6>
-      <h6 class="css-1jekfck">Upload the Video file for Smart Interview Assessment.</h6>
+      <h6 class="css-b6ndjn">Import Transcript</h6>
+      <h6 class="css-1jekfck">Upload the Transcript file for Smart Interview Assessment.</h6>
       <div>
         <div class="card-body dropzone">
 
           <div class="container center ">
             <form id="upload-form" enctype="multipart/form-data" method="post"
-              action="{{ url_for('interview_analyzer.interview_video_upload') }}">
+              action="{{ url_for('interview_analyzer.interview_transcript_upload') }}">
               <div class="container center ">
                 <div class="row">
                   <div class="col-md-12 col-md-offset-3 center">
@@ -51,16 +51,16 @@ Assessment {% endblock %} {% block body_block %}
                       <label class="btn" for="file"> <i
                           class="material-icons d-flex justify-content-center align-items-center gap-2"
                           style="font-size:150px;color:#ea1d3b">cloud_upload</i></label>
-                      <p id="namefile">Click the icon to upload the file (mp4)</p>
-                      <input class="input_text" type="text" id="candidate_name" name="candidate_name"
-                        class="form-control" placeholder="Enter Interviewer Name" required />
+                      <p id="namefile">Click the icon to upload the Transcript Txt file</p>
+                      <input class="input_text" type="text" id="interview_title" name="interview_title"
+                        class="form-control" placeholder="Enter Interview Title" required />
 
-                      <input hidden="true" type="file" name="file" id="file" required accept="video/*" />
+                      <input hidden="true" type="file" name="file" id="file" required accept=".txt" />
                       </br></br>
                       <div class="row">
                         <div class="col-md-12 center">
                           <!--the defauld disabled btn and the actual one shown only if the three fields are valid-->
-                          <button class="btn btn-primary upload_video_btn" type="submit">Submit</button>
+                          <button class="btn btn-primary upload_transcript_video_btn" type="submit">Submit</button>
                         </div>
                       </div>
                     </div>
@@ -111,12 +111,12 @@ Assessment {% endblock %} {% block body_block %}
             })
           });
 
-          $(document).on('click', '.upload_video_btn', function () {
-            var name = document.getElementById('candidate_name').value;
+          $(document).on('click', '.upload_transcript_video_btn', function () {
+            var name = document.getElementById('interview_title').value;
             var fileInput = document.getElementById('file');
             var file = fileInput.files[0]; // Get the first selected file (if any)
             if (!file) {
-              alert("Please upload the video!");
+              alert("Please upload the Transcript!");
             }
             if (name !== '' && file) {
               $('.loader_wrapper').removeClass('d-none');

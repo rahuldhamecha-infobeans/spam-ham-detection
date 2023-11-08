@@ -1,0 +1,210 @@
+{% extends 'layouts/admin/dashboard/base.html' %} {% block page_title %} Smart
+Interview Assessment {% endblock %} {% block page_body_title %} Report | Smart
+Interview Assessment {% endblock %} {% block head_styles %}
+
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='assets/css/details_report.css') }}"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='admin/assets/js/single-report.js') }}"></script>
+
+{% endblock %} {% block body_block %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="report_header">
+      <h2 class="m-4 text-center">
+        <u>Interview Report of ABC</u>
+      </h2>
+    </div>
+
+    <div class="col-md-6 stretch-card grid-margin">
+  <div class="card bg-gradient-success card-img-holder text-white">
+     <i
+        class="fa fa-info-circle icon-css"
+        aria-hidden="true"
+        title="Check Graph"
+        data-bs-toggle="modal"
+        data-bs-target="#confidenceLevel"
+        style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"
+      ></i>
+    <div class="card-body">
+
+      <img
+        src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+        class="card-img-absolute"
+        alt="circle-image"
+      />
+
+
+      <p class="font-weight-normal mb-3 box-p-tag">
+        <!-- Confidence Level (CL) - <small>2323</small> -->
+        <i class="mdi mdi-diamond mdi-24px float-right"></i>
+      </p>
+      <p class="percentage-font">
+        <span
+          >Text Analysis:
+          44%</span
+        >
+      </p>
+    </div>
+  </div>
+</div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <h4>Conversation Analysis</h4>
+        </div>
+        <div class="card-body">
+          <div class="col-md mb-4 mb-md-0">
+            <div class="accordion mt-3" id="question_answer_accordion">
+              {% for i in range(report_data|length - 1) %}
+              {% set next = i+1 %}
+              {% if i is even or i ==0 %}
+              
+              <div class="card accordion-item">
+                <h2 class="accordion-header" id="heading_{{i}}">
+                  <button
+                    type="button"
+                    class="accordion-button collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#accordion_{{i}}"
+                    aria-expanded="false"
+                    aria-controls="accordion_{{i}}"
+                  >
+                    <i
+                      class="fa fa-commenting"
+                      aria-hidden="true"
+                      style="color: #aa142d"
+                    ></i
+                    >&nbsp;{{report_data[i]['speaker'] }} : {{ report_data[i]['interview_transcript'] }}
+                  </button>
+                </h2>
+
+                <div class="percentage-wrapper">
+                  <div class="interviewer">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Check Graph"
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report=""
+                      data-text-report=""
+                      data-audio-report=""
+                    ></i>
+                    <span>
+                    Interviewer's Score(Text) = {{report_data[i]['text_dur_report']|emotion_scores|float }}%
+                    </span>
+
+                  </div>
+
+                  <div class="candidate">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Check Graph"
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report=""
+                      data-text-report=""
+                      data-audio-report=""
+                    ></i>
+                    <span>
+                    Candidate's Score(Text) ={{report_data[next]['text_dur_report']|emotion_scores|float }}%
+                    </span>
+
+                  </div>
+                </div>
+                <div
+                  id="accordion_{{i}}"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#question_answer_accordion"
+                  aria-labelledby="heading_{{i}}"
+                >
+                  <div class="accordion-body">
+                    <i
+                      class="fa fa-commenting"
+                      aria-hidden="true"
+                      style="color: #228b22"
+                    ></i
+                    >&nbsp; {{report_data[next]['speaker'] }} : {{ report_data[next]['interview_transcript'] }}
+                  </div>
+                </div>
+
+              </div>
+              {% endif %}
+              {# Check if it's the last entry and an odd index #}
+              {% if next == report_data|length-1 and next is even %}
+              <div class="card accordion-item">
+                <h2 class="accordion-header" id="heading_{{next}}">
+                  <button
+                    type="button"
+                    class="accordion-button collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#accordion_{{next}}"
+                    aria-expanded="false"
+                    aria-controls="accordion_{{next}}"
+                  >
+                    <i
+                      class="fa fa-commenting"
+                      aria-hidden="true"
+                      style="color: #aa142d"
+                    ></i
+                    >&nbsp;{{report_data[next]['speaker'] }}  : {{ report_data[next]['interview_transcript'] }}
+                  </button>
+                </h2>
+
+                <div class="percentage-wrapper">
+                  <div class="interviewer">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Check Graph"
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report=""
+                      data-text-report=""
+                      data-audio-report=""
+                    ></i>
+                    <span>
+                    Interviewer's Score(Text) = {{report_data[next]['text_dur_report']|emotion_scores|float }}%
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+              {% endif %}
+              {% endfor %}
+            </div>
+    
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

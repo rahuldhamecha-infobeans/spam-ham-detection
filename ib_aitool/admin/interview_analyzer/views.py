@@ -9,7 +9,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from ib_aitool.admin.decorators import has_permission
 from ib_aitool.database.models.CandidateModel import Candidate
+from ib_aitool.database.models.TranscriptModel import Transcript
 from ib_aitool.database.models.VideoProcessModel import VideoProcess
+from ib_aitool.database.models.TranscriptProcessModel import TranscriptProcess
+
 import math
 from moviepy.editor import VideoFileClip
 from ib_aitool.database import db
@@ -27,7 +30,7 @@ from ib_aitool.admin.interview_analyzer.generate_video_transcript import generat
     extract_question_timestamps, save_frames_from_video, save_highest_count_videoframe, \
     classify_images_and_generate_timestamp, get_audioclip_timestamps,crop_and_save_video_timestamps
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report, \
-    generate_and_save_overall_video_report
+    generate_and_save_overall_video_report,get_text_sentiments
 from jinja2 import Environment
 import shutil
 
@@ -65,6 +68,18 @@ def fetch_candidate_list():
     #     added_by=current_user.id).order_by('id')
     return render_template('admin/interview_analyzer/candidate_list.html', candidates=candidates)
 
+@products_blueprint.route('/fetch-transcript-list')
+def fetch_transcript_list():
+    if str(current_user.role()) == 'SuperAdmin':
+        # If the current user is a superadmin, list all candidates
+        transcripts = Transcript.query.order_by(Transcript.id).all()
+    else:
+        # If the current user is not a superadmin, list candidates added by them
+        transcripts = Transcript.query.filter_by(added_by=current_user.id).order_by(Transcript.id).all()
+
+    # candidates = Candidate.query.filter_by(
+    #     added_by=current_user.id).order_by('id')
+    return render_template('admin/interview_analyzer/transcript_list.html', transcripts=transcripts)
 
 def convert_save_audio_file(video_path, dir_path, audio_mp3):
     try:
@@ -121,6 +136,33 @@ def upload_video():
         return file_url
     return None
 
+def upload_transcript():
+    current_date = datetime.now()
+    current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
+    interview_title = request.form.get('interview_title')
+    interview_title = interview_title.lower().replace(' ', '_')
+
+    if 'file' not in request.files:
+        return None
+
+    file = request.files['file']
+    if file.filename == '':
+        return None
+    if file:
+        directory = 'transcripts'
+        dir_path = os.path.join(app.config['UPLOAD_FOLDER'], directory)
+
+        filename, file_extension = os.path.splitext(file.filename)
+        new_file_name = interview_title + '_' + str(current_time) + file_extension
+        isExist = os.path.exists(path=dir_path)
+        if not isExist:
+            os.makedirs(dir_path)
+        file_path = os.path.join(dir_path, new_file_name)
+        file.save(file_path)
+        file_url = url_for('get_file_url', dir=directory, name=new_file_name)
+        return file_url
+    return None
+
 
 @products_blueprint.route('/upload_video_file')
 @login_required
@@ -128,6 +170,11 @@ def upload_video():
 def interview_video_upload_file():
     return render_template('admin/interview_analyzer/upload_video_file.html')
 
+@products_blueprint.route('/upload_transcript_file')
+@login_required
+@has_permission('Interview Analyzer')
+def interview_transcript_upload_file():
+    return render_template('admin/interview_analyzer/upload_transcript_file.html')
 
 @products_blueprint.route('upload-video', methods=['POST'])
 @login_required
@@ -163,6 +210,32 @@ def interview_video_upload():
             candidate = Candidate(
                 name=name, interview_video=video_url, interview_audio=audio_output_path, added_by=current_user.id)
             db.session.add(candidate)
+            db.session.commit()
+            message = 'Candidate Added Successfully.'
+        else:
+            message = 'Please Provide Video and Name.'
+
+        return redirect(url_for('interview_analyzer.index'))
+    raise Exception('Invalid Method')
+
+@products_blueprint.route('upload-transcript', methods=['POST'])
+@login_required
+@has_permission('Interview Analyzer')
+def interview_transcript_upload():
+    if request.method == 'POST':
+        title = request.form.get('interview_title')
+        transcript_url = upload_transcript()
+        # print(video_url)
+        if transcript_url.startswith('/'):
+            transcript_url = transcript_url[1:]
+        else:
+            transcript_url = transcript_url
+        message = ''
+
+        if title and transcript_url:
+            transcript = Transcript(
+                name=title, transcript=transcript_url, added_by=current_user.id)
+            db.session.add(transcript)
             db.session.commit()
             message = 'Candidate Added Successfully.'
         else:
@@ -601,6 +674,28 @@ def view_report(id):
     return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data,
                            overall=overall, analysis_data=analysis,interviewer_total_time=interviewer_total_time_duration,candidate_total_time=candidate_total_time_duration)
 
+@products_blueprint.route('/view-transcript-reports/<id>')
+@login_required
+@has_permission('Interview Analyzer')
+def view_transcript_report(id):
+    tdata = TranscriptProcess.get_transcripts(id)
+    return render_template('admin/interview_analyzer/view_transcript_report.html',  report_data=tdata)
+
+def extract_main_conversation(filename):
+    main_conversation = []  # To store the main conversation lines
+
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        is_transcript = False
+
+        for line in lines:
+            if line.startswith("Transcript"):
+                is_transcript = True
+            elif is_transcript and not line.strip().startswith(("Attendees", "This editable transcript", "Meeting ended")):
+                main_conversation.append(line.strip())
+
+    return main_conversation
+
 def calculate_total_duration(interviewer_data):
     total_duration = sum((int(vp.end_duration) + 1 if int(vp.start_duration) != 0 else int(vp.end_duration)) - int(vp.start_duration) for vp in interviewer_data)
     total_minutes, total_seconds = divmod(total_duration, 60)
@@ -917,6 +1012,28 @@ def run_tasks():
         final_result = False
 
     return jsonify({'result': final_result})
+
+
+@products_blueprint.route('/analyze_transcript', methods=['GET', 'POST'])
+def analyze_transcript():
+    transcript_id = request.json.get('transcript_id')
+    transcript_data = Transcript.query.get(transcript_id)
+    main_conversation=[]
+    if transcript_data.transcript:
+        main_conversation = extract_main_conversation(transcript_data.transcript)   
+    for line in main_conversation:
+        speaker, interview_transcript = line.split(': ', 1)  # Split at the first ": "
+        transcript_emotions=get_text_sentiments(interview_transcript)
+        if transcript_emotions:
+            transcript_emotions_data=transcript_emotions
+        else:
+            transcript_emotions_data={'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.0, 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+                       
+        transcript_process = TranscriptProcess(tid=transcript_id,speaker=speaker, interview_transcript=interview_transcript,text_dur_report=transcript_emotions_data,added_by=transcript_data.added_by,created_at=datetime.utcnow(),)
+        db.session.add(transcript_process)
+        transcript_data.transcript_analysis_status = 'completed'
+    db.session.commit()     
+    return jsonify({'result': True})
 
 
 @products_blueprint.route('/view-video/<id>')
