@@ -1,59 +1,3 @@
-<style>
-.info-box {
-    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-    border-radius: 0.25rem;
-    background-color: #fff;
-    display: -ms-flexbox;
-    display: flex;
-    margin-bottom: 1rem;
-    min-height: 80px;
-    padding: 0.5rem;
-    position: relative;
-    width: 100%;
-}
-.info-box .info-box-icon {
-    border-radius: 0.25rem;
-    -ms-flex-align: center;
-    align-items: center;
-    display: -ms-flexbox;
-    display: flex;
-    font-size: 1.875rem;
-    -ms-flex-pack: center;
-    justify-content: center;
-    text-align: center;
-    width: 70px;
-}
-.bg-info, .bg-info>a {
-    color: #fff!important;
-}
-.bg-info {
-    background-color: #17a2b8!important;
-}
-.info-box .info-box-content {
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    -ms-flex-pack: center;
-    justify-content: center;
-    line-height: 1.8;
-    -ms-flex: 1;
-    flex: 1;
-    padding: 0 10px;
-    overflow: hidden;
-}
-.info-box .info-box-text, .info-box .progress-description {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.info-box .info-box-number {
-    display: block;
-    margin-top: 0.25rem;
-    font-weight: 700;
-}
-</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.js"></script>
 {% extends 'layouts/admin/dashboard/base.html' %}
@@ -331,7 +275,7 @@ for (let i = 0; i < accordion.length; i++) {
 
               <div class="info-box-content">
                 <span class="info-box-text">Total Questions</span>
-                <span class="info-box-number">20</span>
+                <span class="info-box-number">{{overall_questions_count}}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -344,7 +288,7 @@ for (let i = 0; i < accordion.length; i++) {
 
               <div class="info-box-content">
                 <span class="info-box-text">Total Technical Questions</span>
-                <span class="info-box-number">15</span>
+                <span class="info-box-number">{{technical_question_count}}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -353,11 +297,11 @@ for (let i = 0; i < accordion.length; i++) {
           <!-- /.col -->
           <div class="col-md-3 col-sm-6 col-12">
             <div class="info-box">
-              <span class="info-box-icon bg-warning"><i class="fa fa-comments-o" style="color:#fff"></i></span>
+              <span class="info-box-icon bg-warning"><i class="fa fa-commenting" style="color:#fff"></i></span>
 
               <div class="info-box-content">
                 <span class="info-box-text">Technical Discussion (In Min)</span>
-                <span class="info-box-number">3 : 20</span>
+                <span class="info-box-number">{{ interviewer_total_tech_time }}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
@@ -370,7 +314,7 @@ for (let i = 0; i < accordion.length; i++) {
 
               <div class="info-box-content">
                 <span class="info-box-text">OverAll Discussion (In Min)</span>
-                <span class="info-box-number">5 : 30</span>
+                <span class="info-box-number">{{overall_discussion}}</span>
               </div>
               <!-- /.info-box-content -->
             </div>
