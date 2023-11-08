@@ -5,7 +5,7 @@ from ib_aitool.database.models.VideoProcessModel import VideoReport
 import subprocess
 from ib_aitool import app
 from ib_tool import BASE_DIR, mail
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Markup
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Markup, session
 from flask_login import login_required, current_user
 from ib_aitool.admin.decorators import has_permission
 from ib_aitool.database.models.CandidateModel import Candidate
@@ -606,16 +606,42 @@ def view_report(id):
     interviewer_data = VideoProcess.get_transcripts('Interviewer', id)
 
     candidate_data = VideoProcess.get_transcripts('candidate', id)
-    interviewer_total_time_duration = calculate_total_duration(interviewer_data)      
-    candidate_total_time_duration = calculate_total_duration(candidate_data)  
+    interviewer_total_time_duration = calculate_total_duration(interviewer_data)
+    interviewer_total_tech_time_duration = calculate_total_tech_duration(interviewer_data)
+    candidate_total_time_duration = calculate_total_duration(candidate_data)
+    time_strings = [interviewer_total_time_duration, candidate_total_time_duration]
+    overall_discussion = parse_and_sum_times(time_strings)
+    technical_question_count = get_technical_question_count(interviewer_data)
+    overall_questions_count = len(interviewer_data)
     return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data,
-                           overall=overall, analysis_data=analysis,interviewer_total_time=interviewer_total_time_duration,candidate_total_time=candidate_total_time_duration)
+                           overall=overall, analysis_data=analysis,interviewer_total_time=interviewer_total_time_duration,candidate_total_time=candidate_total_time_duration, interviewer_total_tech_time=interviewer_total_tech_time_duration,overall_discussion=overall_discussion, technical_question_count=technical_question_count, overall_questions_count=overall_questions_count)
+
 
 def calculate_total_duration(interviewer_data):
     total_duration = sum((int(vp.end_duration) + 1 if int(vp.start_duration) != 0 else int(vp.end_duration)) - int(vp.start_duration) for vp in interviewer_data)
     total_minutes, total_seconds = divmod(total_duration, 60)
     return f"{total_minutes}:{total_seconds:02d} Minutes"
 
+
+def parse_and_sum_times(time_strings):
+    total_minutes = 0
+    for time_str in time_strings:
+        # Remove "Minutes" and any leading/trailing spaces
+        time_str = time_str.replace("Minutes", "").strip()
+
+        # Split the time string by ":" and convert the parts to integers
+        parts = time_str.split(':')
+        if len(parts) == 2:
+            hours, minutes = map(int, parts)
+            total_minutes += hours * 60 + minutes
+
+    # Calculate the total hours and minutes
+    total_hours, total_remainder_minutes = divmod(total_minutes, 60)
+
+    # Format the total time as "hh:mm"
+    total_time = f"{total_hours:02d}:{total_remainder_minutes:02d} Minutes"
+
+    return total_time
 
 def get_text_analysis_data(data):
     all_text = []
@@ -1121,7 +1147,7 @@ def get_timestamp_video_clip(video_process_id):
         for filename in os.listdir(path):
             if filename.startswith(str(vp_id) + "__"):
                 matching_file = os.path.join(path, filename)
-                break 
+                break
     return f'/{matching_file}'
 
 
@@ -1247,6 +1273,7 @@ def transform_text(text):
         y.append(ps.stem(i))
 
     return " ".join(y)
+
 def identify_technical_question(interview_transcript):
     # Preprocess input text using the loaded vectorizer
     transformed = transform_text(interview_transcript)  # Assuming you have a working transform_text function
@@ -1264,6 +1291,57 @@ def identify_technical_question(interview_transcript):
         return highlighted_text
     else:
         return ""
+
+
+def calculate_total_tech_duration(interviewer_data):
+    total_duration = 0  # Initialize the total duration outside the loop
+    for vp in interviewer_data:
+        transformed = transform_text(vp.interview_transcript)  # Assuming you have a working transform_text function
+        # Vectorize the preprocessed input
+        vector_input = tfidf.transform([transformed])  # Assuming you've defined and fitted tfidf
+        # Make predictions using the loaded and trained model
+        predictions = question_technical_identification_model.predict(vector_input)
+        if predictions == 1 and vp.interview_transcript != 'NA':
+            if int(vp.start_duration) != 0:
+                total_duration += (int(vp.end_duration) - int(vp.start_duration) + 1)
+            else:
+                total_duration += int(vp.end_duration) - int(vp.start_duration)
+
+    total_minutes, total_seconds = divmod(total_duration, 60)
+    return f"{total_minutes}:{total_seconds:02d} Minutes"
+
+
+def get_technical_question_count(interviewer_data):
+    total_technical_questions = 0  # Initialize the total duration outside the loop
+    for vp in interviewer_data:
+        transformed = transform_text(vp.interview_transcript)  # Assuming you have a working transform_text function
+        # Vectorize the preprocessed input
+        vector_input = tfidf.transform([transformed])  # Assuming you've defined and fitted tfidf
+        # Make predictions using the loaded and trained model
+        predictions = question_technical_identification_model.predict(vector_input)
+        if predictions == 1 and vp.interview_transcript != 'NA':
+            total_technical_questions = total_technical_questions+1
+    return total_technical_questions
+
+
+def identify_technical_question(interview_transcript):
+    # Preprocess input text using the loaded vectorizer
+    transformed = transform_text(interview_transcript)  # Assuming you have a working transform_text function
+
+    # Vectorize the preprocessed input
+    vector_input = tfidf.transform([transformed])
+
+    # Make predictions using the loaded and trained model
+    predictions = question_technical_identification_model.predict(vector_input)
+
+    # Interpret the prediction
+    if predictions == 1:
+        highlighted_text = f'<i class="fa fa-text-height" aria-hidden="true" style="float:right;color:red;border-style: outset;"' \
+                           f'title="Technical Question"></i>'
+        return highlighted_text
+    else:
+        return ""
+
 
 app.jinja_env.filters['weak_word_identify'] = identify_text_analysis
 app.jinja_env.filters['identify_technical_question'] = identify_technical_question
