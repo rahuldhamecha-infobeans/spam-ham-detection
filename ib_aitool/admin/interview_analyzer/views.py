@@ -1174,13 +1174,19 @@ app.jinja_env.filters['format_duration'] = format_time_duration
 def delete_route(item_id):
     try:
         candidate = Candidate.query.get(item_id)
+
+        if candidate is None:
+            return "Candidate not found", 404
+
         video_url = candidate.interview_video
         video_pdf = candidate.report_url
         video_audio = candidate.interview_audio
         video_name = os.path.basename(video_url)
+
         # Remove the file extension if needed
         video_name_without_extension, extension = os.path.splitext(video_name)
         video_name_without_extension = f'uploads/{video_name_without_extension}'
+
         # Delete the item from each table
         with db.session.begin_nested():
             db.session.query(VideoReport).filter(VideoReport.video_id == item_id).delete()
@@ -1188,14 +1194,17 @@ def delete_route(item_id):
             db.session.query(Candidate).filter(Candidate.id == item_id).delete()
 
         # Commit the transaction
-        if os.path.exists(video_url):
-            os.remove(video_url)
-            os.remove(video_pdf)
-            os.remove(video_audio)
-            if os.path.exists(video_name_without_extension):
-                shutil.rmtree(video_name_without_extension)
-
         db.session.commit()
+
+        # Check if file paths exist and then delete the files
+        if video_url and os.path.exists(video_url):
+            os.remove(video_url)
+        if video_pdf and os.path.exists(video_pdf):
+            os.remove(video_pdf)
+        if video_audio and os.path.exists(video_audio):
+            os.remove(video_audio)
+        if video_name_without_extension and os.path.exists(video_name_without_extension):
+            shutil.rmtree(video_name_without_extension)
 
     except Exception as e:
         # Handle any exceptions that may occur during deletion
@@ -1327,13 +1336,14 @@ def get_technical_question_count(interviewer_data):
 def identify_technical_question(interview_transcript):
     # Preprocess input text using the loaded vectorizer
     transformed = transform_text(interview_transcript)  # Assuming you have a working transform_text function
+    if len(transformed) >= 8:
+        # Vectorize the preprocessed input
+        vector_input = tfidf.transform([transformed])
 
-    # Vectorize the preprocessed input
-    vector_input = tfidf.transform([transformed])
-
-    # Make predictions using the loaded and trained model
-    predictions = question_technical_identification_model.predict(vector_input)
-
+        # Make predictions using the loaded and trained model
+        predictions = question_technical_identification_model.predict(vector_input)
+    else:
+        predictions = 0
     # Interpret the prediction
     if predictions == 1:
         highlighted_text = f'<i class="fa fa-text-height" aria-hidden="true" style="float:right;color:red;border-style: outset;"' \

@@ -735,8 +735,16 @@ for (let i = 0; i < accordion.length; i++) {
           <p style="font-weight: bolder;
     font-style: italic;
     border-style: inset;
-    padding: 1%;">Weighted Sum / Confidence Level  = (neutral * weight_neutral) + (happy * weight_happy) + (surprise * weight_surprise)</p>
+    padding: 1%;">Weighted Sum = (neutral * weight_neutral) + (happy * weight_happy) + (surprise * weight_surprise) </br>
+            Other Emotions Sum = (angry * weight_angry) + (disgust * weight_disgust) + (fear * weight_fear) + (sad * weight_sad)</br>
+    nervousness_score = other_emotions_sum</br>
+    confidence_score = weighted_sum</br>
+    total_score = confidence_score + nervousness_score</p>
 
+           <p style="font-weight: bolder;
+    font-style: italic;
+    border-style: inset;
+    padding: 1%;"> CL = (confidence_score / total_score) * 100</p>
           <p>
             The Confidence Level represents the cumulative emotional intensity of the selected emotions. It is equal to
             the weighted sum of the selected emotions' percentages.
