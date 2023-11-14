@@ -9,6 +9,7 @@ class TranscriptProcess(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tid = db.Column(db.Integer)
     speaker  = db.Column(db.String(255))
+    speaker_type =db.Column(db.String(255))
     interview_transcript = db.Column(db.Text)
     text_dur_report = db.Column(db.Text)
     added_by = db.Column(db.Integer)
@@ -17,11 +18,12 @@ class TranscriptProcess(db.Model):
     def __str__(self):
         return str(self.interview_transcript)
 
-    def __init__(self, tid, interview_transcript, text_dur_report,added_by, created_at,speaker):
+    def __init__(self, tid, interview_transcript, text_dur_report,added_by, created_at,speaker,speaker_type):
         self.tid = tid
         self.interview_transcript = interview_transcript
         self.text_dur_report = text_dur_report
         self.speaker = speaker
+        self.speaker_type = speaker_type
         self.added_by = added_by
         self.created_at = created_at
 
@@ -39,4 +41,9 @@ class TranscriptProcess(db.Model):
             return transcript_data
         else:
             return None
-
+    def get_transcripts_by_speaker_type(transcript_id,speaker_type):
+        transcript_data = TranscriptProcess.query.filter_by(tid=transcript_id,speaker_type=speaker_type).all()
+        if transcript_data:
+            return transcript_data
+        else:
+            return None

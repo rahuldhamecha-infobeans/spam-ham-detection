@@ -47,34 +47,145 @@
     </tr>
     {% endfor %} {% else %}
     <tr>
-      <td colspan="4">No Candidates Found.</td>
+      <td colspan="4">No Transcripts Found.</td>
     </tr>
     {% endif %}
   </tbody>
 </table>
+<div class="modal" id="confirmation_modal_transcript">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Please confirm Which one is  Interviewer.</h3>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
 
-
+      <div class="modal-body">
+        <div class="attendees_content"></div>
+        <div class="confirmation-success d-none">
+          <h2>Thank you for the confirmation.</h2>
+          <p>We are now analyzing the video, The process will take a while, so why not take a break and enjoy a cup of coffee?</p>
+          <div class="loader_wrapper_modal">
+            <div class="loader">
+              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                style="margin: auto; display: block" width="200px" height="200px" viewBox="0 0 100 100"
+                preserveAspectRatio="xMidYMid">
+                <circle cx="30" cy="50" fill="#373450" r="20">
+                  <animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30"
+                    begin="-0.5s"></animate>
+                </circle>
+                <circle cx="70" cy="50" fill="#ea1b3d" r="20">
+                  <animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30" begin="0s">
+                  </animate>
+                </circle>
+                <circle cx="30" cy="50" fill="#373450" r="20">
+                  <animate attributeName="cx" repeatCount="indefinite" dur="1s" keyTimes="0;0.5;1" values="30;70;30"
+                    begin="-0.5s"></animate>
+                  <animate attributeName="fill-opacity" values="0;0;1;1" calcMode="discrete" keyTimes="0;0.499;0.5;1" dur="1s"
+                    repeatCount="indefinite"></animate>
+                </circle>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 
 $(document).ready(function() {
-// Attach a click event handler to links with the 'analyze-this' class
-    $('.analyze-this-transcript').click(function(event) {
+
+  $(".analyze-this-transcript").click(function (event) {
+      event.preventDefault();
+      $(".loader_wrapper").removeClass("d-none");
+
+      var transcriptId = $(this).data('transcript');
+      console.log(transcriptId)
+      $.ajax({
+        url: '{{ url_for('interview_analyzer.confirm_transcript_interviewer') }}',
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ transcript_id: transcriptId }),
+        success: function (response) {
+          if (response) {
+            var res = JSON.parse(response);
+            console.log(res)
+            if (res.success) {
+              $(".loader_wrapper").addClass("d-none");
+                        // Clear existing content
+               $("#confirmation_modal_transcript").find(".attendees_content").html("");
+
+                var attendees = res.attendees;
+                var buttonWrapper = $("<div>", { class: "button_wrapper" });
+
+                // Loop through response and create links
+                attendees.forEach(function (attendee) {
+                  var linkElement = $("<a>", {
+                    href: '#',
+                    class: "btn btn-outline-dark attendee-btn",
+                    text: attendee,
+                    transcript_id: transcriptId,
+                    transcript_attendee: attendee
+                  });
+
+                  buttonWrapper.append(linkElement);
+                });
+
+                // Replace the content of .attendees_content with the new button wrapper
+                $("#confirmation_modal_transcript").find(".attendees_content").replaceWith(buttonWrapper);
+              /* $("#confirmation_modal_transcript").find(".attendees_content").html("dsadsadsd"); */
+              $("#confirmation_modal_transcript").modal("show");
+              //reload_candidate_list();
+            }
+          }
+        },
+      });
+    });
+
+    $(document).on("click", "#confirmation_modal_transcript .btn-close", function (e) {
+      e.preventDefault();
+      $("#confirmation_modal_transcript").modal("hide");
+    });
+
+  // Attach a click event handler to links with the 'analyze-this' class
+    $(document).on("click", "#confirmation_modal_transcript .attendee-btn", function (event) {
         event.preventDefault(); // Prevent the default link behavior
         // Disable the link
-        $(this).css({"pointer-events": "none", "opacity": "0.6"});
-        $(this).text("Analyzing");
         // Get the candidate ID from the 'data-candidate' attribute
-        var transcriptId = $(this).data('transcript');
+        var transcriptId = $(this).attr('transcript_id');
+        var transcript_attendee = $(this).attr('transcript_attendee');
         // Perform your AJAX request here
-        $.ajax({
+        console.log(transcriptId,transcript_attendee)
+
+
+        $('.analyze-this-transcript').each(function (e, t) {
+          if (jQuery(t).data('transcript') == transcriptId) {
+            $(t).css({ "pointer-events": "none", opacity: "0.6" });
+            $(t).text("Analyzing");
+          } else {
+            $(t).prop('disabled', true)
+          }
+        })
+   
+      $("#confirmation_modal_transcript .confirmation-success").removeClass("d-none");
+      $('#confirmation_modal_transcript .button_wrapper').hide()
+      $('#confirmation_modal_transcript .modal-header').html("")
+         $.ajax({
         url: '{{ url_for('interview_analyzer.analyze_transcript') }}', // Replace with your actual AJAX endpoint URL
         type: 'POST', // or 'GET', depending on your requirements
         contentType: 'application/json', // Set the content type to JSON
-        data: JSON.stringify({ transcript_id: transcriptId }), // Convert data to JSON format
+        data: JSON.stringify({ transcript_id: transcriptId ,interviewer:transcript_attendee}), // Convert data to JSON format
         success: function(response) {
             // Handle the AJAX response here
             console.log('AJAX success sdsads', response);
             alert("Transcript Analysis Complete!")
+            location.reload(true)
+            $(".loader_wrapper").addClass("d-none");
             reload_transcript_list();
             // You can update the UI or do other operations with the response data
         },
