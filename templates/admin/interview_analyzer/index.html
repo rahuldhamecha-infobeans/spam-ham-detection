@@ -21,10 +21,19 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <h4 style="color: #000;margin:0px">Smart Interview Assessment</h4>
           <!-- Button with file input and icon -->
-            <a href="{{ url_for('interview_analyzer.interview_video_upload_file') }}"><button class="file-upload-button css-1ikvom0"><i class="fas fa-upload"></i> Import from file</button></a>
-        </div>
-        <br><br>
+            <div>
+            <a href="{{ url_for('interview_analyzer.interview_transcript_upload_file') }}"><button class="file-upload-button css-1ikvom0"><i class="fas fa-upload"></i> Import Google Meet Transcript</button></a>
+            <a href="{{ url_for('interview_analyzer.interview_video_upload_file') }}"><button class="file-upload-button css-1ikvom0"><i class="fas fa-upload"></i> Import Video from file</button></a>
+            </div>
+          </div>
+        <div class="mainList">
+        <h5 style="color: #000;margin-top: 30px;">Video Interviews</h5>
         <div class="table_div"></div>
+        </div>
+        <div>
+        <h5 style="color: #000;margin-top: 30px;">Meet Transcripts</h5>
+        <div class="table_div_transcript"></div>
+      </div>
       </div>
     </div>
   </div>
@@ -45,8 +54,20 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
     });
   }
 
+  function reload_transcript_list() {
+    $.ajax({
+      type: "GET",
+      url: '{{ url_for('interview_analyzer.fetch_transcript_list') }}',
+      dataType: "html",
+      success: function (response) {
+        $(".table_div_transcript").html(response);
+      },
+    });
+  }
+
   $(document).ready(function () {
     reload_candidate_list();
+    reload_transcript_list();
     $(document).on('click','.gr_loader',function(e){
         e.preventDefault()
       $('.loader_wrapper').removeClass('d-none')
@@ -73,9 +94,11 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
 
   setInterval(function() {
     reload_candidate_list();
+    reload_transcript_list();
   }, 420000);
 
 </script>
+
 {% endblock %} {% block head_styles %}
 <link
   rel="stylesheet"

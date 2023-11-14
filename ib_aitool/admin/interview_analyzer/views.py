@@ -9,7 +9,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from ib_aitool.admin.decorators import has_permission
 from ib_aitool.database.models.CandidateModel import Candidate
+from ib_aitool.database.models.TranscriptModel import Transcript
 from ib_aitool.database.models.VideoProcessModel import VideoProcess
+from ib_aitool.database.models.TranscriptProcessModel import TranscriptProcess
+
 import math
 from moviepy.editor import VideoFileClip
 from ib_aitool.database import db
@@ -27,7 +30,7 @@ from ib_aitool.admin.interview_analyzer.generate_video_transcript import generat
     extract_question_timestamps, save_frames_from_video, save_highest_count_videoframe, \
     classify_images_and_generate_timestamp, get_audioclip_timestamps,crop_and_save_video_timestamps
 from ib_aitool.admin.interview_analyzer.save_video_analysis_data import save_videots_report, \
-    generate_and_save_overall_video_report
+    generate_and_save_overall_video_report,get_text_sentiments
 from jinja2 import Environment
 import shutil
 
@@ -75,6 +78,18 @@ def fetch_candidate_list():
     #     added_by=current_user.id).order_by('id')
     return render_template('admin/interview_analyzer/candidate_list.html', candidates=candidates)
 
+@products_blueprint.route('/fetch-transcript-list')
+def fetch_transcript_list():
+    if str(current_user.role()) == 'SuperAdmin':
+        # If the current user is a superadmin, list all candidates
+        transcripts = Transcript.query.order_by(Transcript.id).all()
+    else:
+        # If the current user is not a superadmin, list candidates added by them
+        transcripts = Transcript.query.filter_by(added_by=current_user.id).order_by(Transcript.id).all()
+
+    # candidates = Candidate.query.filter_by(
+    #     added_by=current_user.id).order_by('id')
+    return render_template('admin/interview_analyzer/transcript_list.html', transcripts=transcripts)
 
 def convert_save_audio_file(video_path, dir_path, audio_mp3):
     try:
@@ -131,6 +146,33 @@ def upload_video():
         return file_url
     return None
 
+def upload_transcript():
+    current_date = datetime.now()
+    current_time = int(current_date.strftime('%Y%m%d%H%M%S'))
+    interview_title = request.form.get('interview_title')
+    interview_title = interview_title.lower().replace(' ', '_')
+
+    if 'file' not in request.files:
+        return None
+
+    file = request.files['file']
+    if file.filename == '':
+        return None
+    if file:
+        directory = 'transcripts'
+        dir_path = os.path.join(app.config['UPLOAD_FOLDER'], directory)
+
+        filename, file_extension = os.path.splitext(file.filename)
+        new_file_name = interview_title + '_' + str(current_time) + file_extension
+        isExist = os.path.exists(path=dir_path)
+        if not isExist:
+            os.makedirs(dir_path)
+        file_path = os.path.join(dir_path, new_file_name)
+        file.save(file_path)
+        file_url = url_for('get_file_url', dir=directory, name=new_file_name)
+        return file_url
+    return None
+
 
 @products_blueprint.route('/upload_video_file')
 @login_required
@@ -138,6 +180,11 @@ def upload_video():
 def interview_video_upload_file():
     return render_template('admin/interview_analyzer/upload_video_file.html')
 
+@products_blueprint.route('/upload_transcript_file')
+@login_required
+@has_permission('Interview Analyzer')
+def interview_transcript_upload_file():
+    return render_template('admin/interview_analyzer/upload_transcript_file.html')
 
 @products_blueprint.route('upload-video', methods=['POST'])
 @login_required
@@ -173,6 +220,32 @@ def interview_video_upload():
             candidate = Candidate(
                 name=name, interview_video=video_url, interview_audio=audio_output_path, added_by=current_user.id)
             db.session.add(candidate)
+            db.session.commit()
+            message = 'Candidate Added Successfully.'
+        else:
+            message = 'Please Provide Video and Name.'
+
+        return redirect(url_for('interview_analyzer.index'))
+    raise Exception('Invalid Method')
+
+@products_blueprint.route('upload-transcript', methods=['POST'])
+@login_required
+@has_permission('Interview Analyzer')
+def interview_transcript_upload():
+    if request.method == 'POST':
+        title = request.form.get('interview_title')
+        transcript_url = upload_transcript()
+        # print(video_url)
+        if transcript_url.startswith('/'):
+            transcript_url = transcript_url[1:]
+        else:
+            transcript_url = transcript_url
+        message = ''
+
+        if title and transcript_url:
+            transcript = Transcript(
+                name=title, transcript=transcript_url, added_by=current_user.id)
+            db.session.add(transcript)
             db.session.commit()
             message = 'Candidate Added Successfully.'
         else:
@@ -617,6 +690,65 @@ def view_report(id):
                            overall=overall, analysis_data=analysis,interviewer_total_time=interviewer_total_time_duration,candidate_total_time=candidate_total_time_duration, interviewer_total_tech_time=interviewer_total_tech_time_duration,overall_discussion=overall_discussion, technical_question_count=technical_question_count, overall_questions_count=overall_questions_count)
 
 
+@products_blueprint.route('/view-transcript-reports/<id>')
+@login_required
+@has_permission('Interview Analyzer')
+def view_transcript_report(id):
+    tdata = TranscriptProcess.get_transcripts(id)
+    transcript_data = Transcript.query.get(id)
+    interviewer_ovrall_report_dict_text = {}
+    candidate_ovrall_report_dict_text = {}
+        # Calculate and store the values for the interviewer text analysis
+    overall_interviewer_confidence_text, CS, NS, CL = calculate_overall_confidence(
+    transcript_data.overall_interviewer_transcript_report)
+    interviewer_ovrall_report_dict_text['overall_confidence'] = overall_interviewer_confidence_text
+    interviewer_ovrall_report_dict_text['CS'] = CS
+    interviewer_ovrall_report_dict_text['NS'] = NS
+    interviewer_ovrall_report_dict_text['CL'] = CL
+
+    # Calculate and store the values for the candidate text
+    overall_candidate_confidence_text, CS, NS, CL = calculate_overall_confidence(
+        transcript_data.overall_candidate_transcript_report)
+    candidate_ovrall_report_dict_text['overall_confidence'] = overall_candidate_confidence_text
+    candidate_ovrall_report_dict_text['CS'] = CS
+    candidate_ovrall_report_dict_text['NS'] = NS
+    candidate_ovrall_report_dict_text['CL'] = CL
+
+    analysis=get_transcript_text_analysis_data(tdata)
+
+    return render_template('admin/interview_analyzer/view_transcript_report.html',analysis_data=analysis, transcript_data=transcript_data ,report_data=tdata,overall_interviewer_rprt=interviewer_ovrall_report_dict_text,overall_candidate_rprt=candidate_ovrall_report_dict_text)
+
+def extract_main_conversation(filename):
+    main_conversation = []  # To store the main conversation lines
+
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        is_transcript = False
+
+        for line in lines:
+            if line.startswith("Transcript"):
+                is_transcript = True
+            elif is_transcript and not line.strip().startswith(("Attendees", "This editable transcript", "Meeting ended")):
+                main_conversation.append(line.strip())
+
+    return main_conversation
+
+@products_blueprint.route('/confirm_transcript_interviewer', methods=['POST'])
+def confirm_transcript_interviewer():
+    id = request.json.get('transcript_id')
+    transcript_data = Transcript.query.get(id)
+    filename=transcript_data.transcript
+    attendees = []  # To store the list of attendees
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        for line in lines:
+            if line.startswith("Attendees"):
+                attendees = [name.strip() for name in lines[lines.index(line) + 1].split(',')]
+    if attendees:
+        return json.dumps({'success': 1, 'attendees': attendees})
+    else:
+        return json.dumps({'success': attendees})
+
 def calculate_total_duration(interviewer_data):
     total_duration = sum((int(vp.end_duration) + 1 if int(vp.start_duration) != 0 else int(vp.end_duration)) - int(vp.start_duration) for vp in interviewer_data)
     total_minutes, total_seconds = divmod(total_duration, 60)
@@ -665,6 +797,28 @@ def get_text_analysis_data(data):
             ('Interviewer Analysis', text_analysis(final_text))]
     return data
 
+
+def get_transcript_text_analysis_data(transcript_process_data):
+    all_text = []
+    text = []
+    final_text = ''
+    text_string = ''
+    for trns_data in transcript_process_data:
+        if trns_data.speaker_type == 'interviewer':
+            all_text.append(trns_data.interview_transcript)
+
+        if trns_data.speaker_type == 'candidate':
+            text.append(trns_data.interview_transcript)
+
+    if len(all_text) > 0:
+        final_text = " ".join(all_text)
+
+    if len(text) > 0:
+        text_string = " ".join(text)
+
+    data = [('Candidate Analysis', text_analysis(text_string)),
+            ('Interviewer Analysis', text_analysis(final_text))]
+    return data
 
 def is_directory_not_empty(directory_path):
     return len(os.listdir(directory_path)) > 0
@@ -954,6 +1108,76 @@ def run_tasks():
 
     return jsonify({'result': final_result})
 
+
+@products_blueprint.route('/analyze_transcript', methods=['GET', 'POST'])
+def analyze_transcript():
+    transcript_id = request.json.get('transcript_id')
+    interviewer = request.json.get('interviewer')
+    transcript_data = Transcript.query.get(transcript_id)
+    transcript_data.interviewer = interviewer
+    db.session.commit() 
+    main_conversation=[]
+    if transcript_data.transcript:
+        main_conversation = extract_main_conversation(transcript_data.transcript)   
+    for line in main_conversation:
+        speaker, interview_transcript = line.split(': ', 1)  # Split at the first ": "
+        transcript_emotions=get_text_sentiments(interview_transcript)
+        if transcript_emotions:
+            transcript_emotions_data=transcript_emotions
+        else:
+            transcript_emotions_data={'angry': 0.0, 'disgust': 0.0, 'fear': 0.0, 'happy': 0.0, 'sad': 0.0, 'surprise': 0.0, 'neutral': 0.0}
+        transcript_interviewer=  transcript_data.interviewer    
+        trans_interviewer=None
+        if transcript_interviewer==speaker and transcript_interviewer!=None:
+            trans_interviewer ='interviewer'
+        else:
+            trans_interviewer ='candidate'
+        
+        transcript_process = TranscriptProcess(tid=transcript_id,speaker=speaker,speaker_type=trans_interviewer, interview_transcript=interview_transcript,text_dur_report=transcript_emotions_data,added_by=transcript_data.added_by,created_at=datetime.utcnow(),)
+        db.session.add(transcript_process)
+        transcript_data.transcript_analysis_status = 'completed'
+    db.session.commit()
+    save_overall_interviewer_candidate_trnascript_report(transcript_id)     
+    return jsonify({'result': True})
+
+def save_overall_interviewer_candidate_trnascript_report(tid):
+    interviewer_data = TranscriptProcess.get_transcripts_by_speaker_type(tid,'interviewer')
+    candidate_data = TranscriptProcess.get_transcripts_by_speaker_type(tid,'candidate')
+    interviewer_report = calculate_overall_transcript_report(interviewer_data)
+    candidate_report = calculate_overall_transcript_report(candidate_data)
+    transcript_data = Transcript.query.get(tid)
+    transcript_data.overall_interviewer_transcript_report = interviewer_report
+    transcript_data.overall_candidate_transcript_report = candidate_report
+    db.session.commit()
+    return True
+
+def calculate_overall_transcript_report(data):
+    data_report_count = len(data)
+    o_text_report = {
+        "angry": 0,
+        "disgust": 0,
+        "fear": 0,
+        "happy": 0,
+        "sad": 0,
+        "surprise": 0,
+        "neutral": 0
+    }
+    for ireport in data:
+        text_sentiment_report_json = ireport.text_dur_report  # Already a dictionary, no need to load it.
+        # Replace single quotes with double quotes
+        text_sentiment_report_json = text_sentiment_report_json.replace("'", "\"")
+        itext_sentiment_report = json.loads(text_sentiment_report_json) 
+        
+        o_text_report["angry"] += itext_sentiment_report['angry'] 
+        o_text_report["disgust"] += itext_sentiment_report['disgust'] 
+        o_text_report["fear"] += itext_sentiment_report['fear'] 
+        o_text_report["happy"] += itext_sentiment_report['happy'] 
+        o_text_report["sad"] += itext_sentiment_report['sad'] 
+        o_text_report["surprise"] += itext_sentiment_report['surprise'] 
+        o_text_report["neutral"] += itext_sentiment_report['neutral']
+
+    text_sentiments_result = {key: round(value / data_report_count, 2) for key, value in o_text_report.items()}
+    return text_sentiments_result
 
 @products_blueprint.route('/view-video/<id>')
 @login_required

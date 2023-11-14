@@ -1,0 +1,516 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.3/js/bootstrap.js"></script>
+{% extends 'layouts/admin/dashboard/base.html' %}
+{% block page_title %} Smart Interview Assessment {% endblock %}
+{% block page_body_title %}
+  <!-- Create a container for the button and title -->
+<div class="title-container">
+  <div class="header">
+    <h4 style="visibility: hidden;">Report | Smart Interview Assessment</h4>
+    <a href="#menu-toggle" class="added-css added-css1 btn btn-secondary float-right" id="menu-toggle" style="background: #373742"><i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights</a>
+  </div>
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+
+      <button class="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeMedium css-vnbyu8" id="menu-toggle-out" tabindex="0" type="button" aria-label="Toggle Insights"><svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 4L10 7L-3.93402e-07 7L-3.0598e-07 9L10 9L10 12L14 8L10 4ZM16 16L18 16L18 -7.86805e-07L16 -6.99382e-07L16 16Z" fill="#EA1B3D"></path></svg><span class="MuiTouchRipple-root css-w0pj6f"></span></button>
+      <script>
+
+    $("#menu-toggle-out").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+
+      if ($("#wrapper").hasClass("toggled")) {
+        $(".container").css("margin-left", "10px");
+        $(".container").css("width", "60%");
+        $(".added-css").css("margin-right", "39.6%");
+         $(".added-css").css("transition", "margin-right 0.5s ease-in-out, transform 0.5s ease-in-out");
+          $(".added-css1").css("display", "none");
+        $(".icon").addClass("fa-arrow-circle-right");
+
+        var element = document.querySelector('.added-css');
+
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-right icon fa-lg" aria-hidden="true"></i> Outsights';
+}
+      } else {
+        $(".container").css("margin-left", "");
+        $(".added-css").css("margin-right", "");
+        $(".container").css("width", "");
+        $(".added-css1").css("display", "");
+        $(".icon").removeClass("fa-arrow-circle-right");
+        var element = document.querySelector('.added-css');
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights';
+}
+      }
+    });
+
+    </script>
+    <span>
+      <div class="css-5277k6 "><span class="MuiButton-startIcon MuiButton-iconSizeMedium css-1l6c7y9"><div class="MuiBox-root css-1l29ab3"><svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;"><path d="M1.2 3.6H1.37143C2.03143 3.6 2.57143 4.14 2.57143 4.8V10.8C2.57143 11.46 2.03143 12 1.37143 12H1.2C0.54 12 0 11.46 0 10.8V4.8C0 4.14 0.54 3.6 1.2 3.6ZM6 0C6.66 0 7.2 0.54 7.2 1.2V10.8C7.2 11.46 6.66 12 6 12C5.34 12 4.8 11.46 4.8 10.8V1.2C4.8 0.54 5.34 0 6 0ZM10.8 6.85714C11.46 6.85714 12 7.39714 12 8.05714V10.8C12 11.46 11.46 12 10.8 12C10.14 12 9.6 11.46 9.6 10.8V8.05714C9.6 7.39714 10.14 6.85714 10.8 6.85714Z" fill="#fff"></path></svg></div></span><span class="space-icon" style="padding:1%;color:#fff;font-weight: 500;font-size: 20px;">Analytics</span><span class="MuiTouchRipple-root css-w0pj6f"></span></div>
+    </span>
+<!--      <button class="css-5277k6 MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-disableElevation css-jjm1e4" tabindex="0" type="button"><span class="MuiButton-startIcon MuiButton-iconSizeMedium css-1l6c7y9"><div class="MuiBox-root css-1l29ab3"><svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;"><path d="M1.2 3.6H1.37143C2.03143 3.6 2.57143 4.14 2.57143 4.8V10.8C2.57143 11.46 2.03143 12 1.37143 12H1.2C0.54 12 0 11.46 0 10.8V4.8C0 4.14 0.54 3.6 1.2 3.6ZM6 0C6.66 0 7.2 0.54 7.2 1.2V10.8C7.2 11.46 6.66 12 6 12C5.34 12 4.8 11.46 4.8 10.8V1.2C4.8 0.54 5.34 0 6 0ZM10.8 6.85714C11.46 6.85714 12 7.39714 12 8.05714V10.8C12 11.46 11.46 12 10.8 12C10.14 12 9.6 11.46 9.6 10.8V8.05714C9.6 7.39714 10.14 6.85714 10.8 6.85714Z" fill="#6966FD"></path></svg></div></span>Analytics<span class="MuiTouchRipple-root css-w0pj6f"></span></button>-->
+
+<div class="tabs">
+  <div class="tab-2">
+    <label for="tab2-1">Interviewer</label>
+    <input id="tab2-1" name="tabs-two" type="radio" checked="checked">
+    <div>
+      <div class="card-body">
+          <div class="col-md mb-4 mb-md-0">
+            <div class="accordion mt-3" id="question_answer_accordion">
+              <div class="card accordion-item-sidebar"> 
+              <h3 class="accordion-header" id="">Total Time Duration: {{interviewer_total_time}}</h3>
+            </div>
+            </div>
+
+             {% if analysis_data %}
+                         {% for key,words in analysis_data %}
+                             {% if key == 'Interviewer Analysis' %}
+            <div class="accordion mt-3" id="question_answer_accordion">
+             <div class="card accordion-item-sidebar">
+                <h2 class="accordion-header" id="heading_{{ index }}">
+
+                  <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                    data-bs-target="#accordion1" aria-expanded="false" aria-controls="accordion1">
+                    <i class="fa fa-history" aria-hidden="true" style="color: #aa142d"></i>&nbsp;
+                      Weak Words <span class="badge btn-danger words_rounded" style="margin-left: 74%;"> {{ words['weak_words'] | count }}</span>
+                  </button>
+                </h2>
+                <div id="accordion1" class="accordion-collapse collapse show add-extra-css"
+                  data-bs-parent="#question_answer_accordion" aria-labelledby="heading_{{ index }}">
+                  <div class="accordion-body">
+                    {% for weak in words['weak_words'] %}
+                                <span class="badge btn-danger words_rounded" style="font-size:14px;text-transform: none;line-height:1; border-radius: 20px !important;background-color: #676775;color: #fff;"><span style="background-color: #fff;border-radius: 50%;padding: 2px 10px;height: 5px;color:#373742;">{{ weak['count'] }}</span> {{ weak['word'] }}</span>
+                            {% endfor %}
+
+                    </div>
+                  </div>
+              </div>
+            </div>
+
+
+              <div class="accordion mt-3" id="question_answer_accordion">
+             <div class="card accordion-item-sidebar">
+                <h2 class="accordion-header" id="heading_{{ index }}">
+
+                  <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                    data-bs-target="#accordion2" aria-expanded="false" aria-controls="accordion2">
+                    <i class="fa fa-map-signs" aria-hidden="true" style="color: #aa142d"></i>&nbsp;
+                      Filler Words  <span class="badge btn-danger words_rounded" style="margin-left: 75%;">{{ words['filler_words'] | count }}</span>
+                  </button>
+                </h2>
+            <div id="accordion2" class="accordion-collapse collapse add-extra-css"
+              data-bs-parent="#question_answer_accordion" aria-labelledby="heading_{{ index }}">
+              <div class="accordion-body">
+
+                 {% for filler in words['filler_words'] %}
+                            <span class="badge btn-danger words_rounded" style="font-size:14px;text-transform: none;line-height:1; border-radius: 20px !important;background-color: #676775;color: #fff;"><span style="background-color: #fff;border-radius: 50%;padding: 2px 10px;height: 5px;color:#373742;">{{ filler['count'] }}</span> {{ filler['word'] }}</span>
+                        {% endfor %}
+              </div>
+            </div>
+        </div>
+
+      </div>
+             {% endif %}
+            {% endfor %}
+ {% endif %}
+    </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-2">
+    <label for="tab2-2">Candidate</label>
+    <input id="tab2-2" name="tabs-two" type="radio">
+    <div>
+      <div class="card-body">
+          <div class="col-md mb-4 mb-md-0">
+             {% if analysis_data %}
+                         {% for key,words in analysis_data %}
+                            {% if key == 'Candidate Analysis' %}
+            <div class="accordion mt-3" id="question_answer_accordion">
+              <div class="card accordion-item-sidebar"> 
+                <h3 class="accordion-header" id="">Total Time Duration: {{candidate_total_time}}</h3>
+              </div>
+            </div>
+            <div class="accordion mt-3" id="question_answer_accordion">
+              <div class="card accordion-item-sidebar">
+                  <h2 class="accordion-header" id="heading_{{ index }}">
+
+                    <button type="button" class="accordion-button" data-bs-toggle="collapse"
+                      data-bs-target="#accordion3" aria-expanded="false" aria-controls="accordion3">
+                      <i class="fa fa-history" aria-hidden="true" style="color: #aa142d"></i>&nbsp;
+                        Weak Words <span class="badge btn-danger words_rounded" style="margin-left: 74%;"> {{ words['weak_words'] | count }}</span>
+                    </button>
+                  </h2>
+                <div id="accordion3" class="accordion-collapse collapse show add-extra-css"
+                  data-bs-parent="#question_answer_accordion" aria-labelledby="heading_{{ index }}">
+                  <div class="accordion-body">
+                  {% for weak in words['weak_words'] %}
+                              <span class="badge btn-danger words_rounded" style="font-size:14px;text-transform: none;line-height:1; border-radius: 20px !important;background-color: #676775;color: #fff;"><span style="background-color: #fff;border-radius: 50%;padding: 2px 10px;height: 5px;color:#373742;">{{ weak['count'] }}</span> {{ weak['word'] }}</span>
+                          {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+
+              <div class="accordion mt-3" id="question_answer_accordion">
+             <div class="card accordion-item-sidebar">
+                <h2 class="accordion-header" id="heading_{{ index }}">
+
+                  <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                    data-bs-target="#accordion4" aria-expanded="false" aria-controls="accordion4">
+                    <i class="fa fa-map-signs" aria-hidden="true" style="color: #aa142d"></i>&nbsp;
+                    Filler Words <span class="badge btn-danger words_rounded" style="margin-left: 75%;">{{ words['filler_words'] | count }}</span>
+                  </button>
+                </h2>
+            <div id="accordion4" class="accordion-collapse collapse add-extra-css"
+              data-bs-parent="#question_answer_accordion" aria-labelledby="heading_{{ index }}">
+              <div class="accordion-body">
+                 {% for filler in words['filler_words'] %}
+                            <span class="badge btn-danger words_rounded" style="font-size:14px;text-transform: none;line-height:1; border-radius: 20px !important;background-color: #676775;color: #fff;"><span style="background-color: #fff;border-radius: 50%;padding: 2px 10px;height: 5px;color:#373742;">{{ filler['count'] }}</span> {{ filler['word'] }}</span>
+                        {% endfor %}
+              </div>
+            </div>
+        </div>
+
+      </div>
+            {% endif %}
+            {% endfor %}
+
+ {% endif %}
+          </div>
+      </div>
+    </div>
+
+
+    </div>
+    <!-- /#sidebar-wrapper -->
+  </div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+
+      if ($("#wrapper").hasClass("toggled")) {
+        $(".container").css("margin-left", "10px");
+        $(".container").css("width", "60%");
+        $(".added-css").css("margin-right", "39.6%");
+        $(".added-css1").css("display", "none");
+         $(".added-css").css("transition", "margin-right 0.5s ease-in-out, transform 0.5s ease-in-out");
+        $(".icon").addClass("fa-arrow-circle-right");
+        var element = document.querySelector('.added-css');
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-right icon fa-lg" aria-hidden="true"></i> Outsights';
+}
+      } else {
+        $(".container").css("margin-left", "");
+        $(".added-css").css("margin-right", "");
+        $(".container").css("width", "");
+        $(".icon").removeClass("fa-arrow-circle-right");
+        var element = document.querySelector('.added-css');
+        $(".added-css1").css("display", "");
+        if (element) {
+  element.innerHTML = '<i class="fa fa-arrow-circle-left icon fa-lg" aria-hidden="true"></i> Insights';
+}
+      }
+    });
+  });
+
+  const accordion = document.getElementsByClassName("content-container");
+
+for (let i = 0; i < accordion.length; i++) {
+  accordion[i].addEventListener("click", function () {
+    this.classList.toggle("active");
+    console.log(this);
+  });
+}
+
+</script>
+  </div>
+   {% endblock %} {% block head_styles %}
+
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<link
+  href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+<link
+  href="{{ url_for('static', filename='assets/css/details_report.css') }}"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='admin/assets/js/single-report.js') }}"></script>
+
+{% endblock %} {% block body_block %}
+<div class="container">
+  <div class="row mb-4">
+    <div class="report_header">
+      <h2 class="m-4 text-center">
+        <u>Interview Report of {{ transcript_data.name }}</u>
+      </h2>
+    </div>
+
+<div class="col-md-6 stretch-card grid-margin">
+  <div class="report-container">
+    <h3 class="report-title">Interviewer's Score</h3>
+    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Interviewer Overall Graph Report " data-bs-toggle="modal"
+      data-bs-target="#graphmodal" data-video-report=""
+      data-text-report="{{ transcript_data.overall_interviewer_transcript_report }}"
+      data-audio-report=""></i>
+  </div>
+  <div class="card bg-gradient-success card-img-holder text-white">
+    <!--      <i
+          class="fa fa-info-circle icon-css"
+          aria-hidden="true"
+          title="Check Graph"
+          data-bs-toggle="modal"
+          data-bs-target="#confidenceLevel"
+          style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"
+        ></i> -->
+    <div class="card-body">
+
+      <img
+        src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+        class="card-img-absolute"
+        alt="circle-image"
+      />
+          <!-- Overall Interviewer Text Confidence -->
+          {% set OITCL = overall_interviewer_rprt['CL'] %}
+      <p class="font-weight-normal mb-3 box-p-tag">
+        Transcript Text Analysis Score : {{OITCL|round(2)}}%
+        <i class="mdi mdi-diamond mdi-24px float-right"></i>
+      </p>
+<!--       <p class="percentage-font">
+        <span>Interviewer Analysis:
+          {{OITCL|round(2)}}%</span>
+      </p> -->
+    </div>
+  </div>
+</div>
+<div class="col-md-6 stretch-card grid-margin">
+  <div class="report-container">
+    <h3 class="report-title">Candidate's Score</h3>
+    <i class="fa fa-info-circle icon-css" aria-hidden="true" title="Candidate Overall Graph Report " data-bs-toggle="modal"
+      data-bs-target="#graphmodal" data-video-report=""
+      data-text-report="{{transcript_data.overall_candidate_transcript_report}}"
+      data-audio-report=""></i>
+  </div>
+  <div class="card bg-gradient-success card-img-holder text-white">
+    <!--      <i
+          class="fa fa-info-circle icon-css"
+          aria-hidden="true"
+          title="Check Graph"
+          data-bs-toggle="modal"
+          data-bs-target="#confidenceLevel"
+          style="position: absolute; top: 0; right: 0; margin: 10px;z-index:999"
+        ></i> -->
+    <div class="card-body">
+
+      <img
+        src="{{ url_for('static', filename='assets/images/dashboard/circle.svg') }}"
+        class="card-img-absolute"
+        alt="circle-image"
+      />
+          <!-- Overall Interviewer Text Confidence -->
+          {% set OCTCL = overall_candidate_rprt['CL'] %}
+      <p class="font-weight-normal mb-3 box-p-tag">
+        Transcript Text Analysis Score : {{OCTCL|round(2)}}%
+        <i class="mdi mdi-diamond mdi-24px float-right"></i>
+      </p>
+  <!--     <span>Candidate Analysis:
+          {{OCTCL|round(2)}}%</span>
+      </p> -->
+    </div>
+  </div>
+</div>
+  </div>
+
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <h4>Conversation Analysis</h4>
+        </div>
+        <div class="card-body">
+          <div class="col-md mb-4 mb-md-0">
+            <div class="accordion mt-3" id="question_answer_accordion">
+              {% for i in range(report_data|length - 1) %}
+              {% set next = i+1 %}
+              {% if (i is odd or i ==0) and report_data[i]['speaker_type']=='interviewer' %}
+              
+              <div class="card accordion-item">
+                <h2 class="accordion-header" id="heading_{{i}}">
+                  <button
+                    type="button"
+                    class="accordion-button collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#accordion_{{i}}"
+                    aria-expanded="false"
+                    aria-controls="accordion_{{i}}"
+                  >
+                    <i
+                      class="fa fa-commenting"
+                      aria-hidden="true"
+                      style="color: #aa142d"
+                    ></i
+                    >&nbsp;{{report_data[i]['speaker'] }} : {{ report_data[i]['interview_transcript']|weak_word_identify|safe }}
+                  </button>
+                </h2>
+
+                <div class="percentage-wrapper">
+                  <div class="interviewer">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Interviewer Graph Report "
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report=""
+                      data-text-report="{{report_data[i]['text_dur_report']}}"
+                      data-transcript-text="{{ report_data[i]['interview_transcript'] }}"
+                    ></i>
+                    <span>
+                    Interviewer's Score ( {{report_data[i]['speaker'] }} )  = {{report_data[i]['text_dur_report']|emotion_scores|float }}%
+                    </span>
+
+                  </div>
+
+                  <div class="candidate">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Candidate Graph Report "
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report=""
+                      data-text-report="{{report_data[next]['text_dur_report']}}"
+                      data-transcript-text="{{ report_data[next]['interview_transcript'] }}"
+                    ></i>
+                    <span>
+                    Candidate's Score ( {{report_data[next]['speaker'] }} )  ={{report_data[next]['text_dur_report']|emotion_scores|float }}%
+                    </span>
+
+                  </div>
+                </div>
+                <div
+                  id="accordion_{{i}}"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#question_answer_accordion"
+                  aria-labelledby="heading_{{i}}"
+                >
+                  <div class="accordion-body">
+                    <i
+                      class="fa fa-commenting"
+                      aria-hidden="true"
+                      style="color: #228b22"
+                    ></i
+                    >&nbsp; {{report_data[next]['speaker'] }} : {{ report_data[next]['interview_transcript']|weak_word_identify|safe }}
+                  </div>
+                </div>
+
+              </div>
+              {% endif %}
+              {# Check if it's the last entry and an odd index #}
+              {% if next == report_data|length-1 and next is odd and report_data[next]['speaker_type'] =='interviewer' %}
+              <div class="card accordion-item">
+                <h2 class="accordion-header" id="heading_{{next}}">
+                  <button
+                    type="button"
+                    class="accordion-button collapsed"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#accordion_{{next}}"
+                    aria-expanded="false"
+                    aria-controls="accordion_{{next}}"
+                  >
+                    <i
+                      class="fa fa-commenting"
+                      aria-hidden="true"
+                      style="color: #aa142d"
+                    ></i
+                    >&nbsp;{{report_data[next]['speaker'] }}  : {{ report_data[next]['interview_transcript']|weak_word_identify|safe }}
+                  </button>
+                </h2>
+
+                <div class="percentage-wrapper">
+                  <div class="interviewer">
+                    <i
+                      class="fa fa-info-circle icon-css"
+                      aria-hidden="true"
+                      title="Interviewer Graph Report"
+                      data-bs-toggle="modal"
+                      data-bs-target="#graphmodal"
+                      data-video-report=""
+                      data-text-report="{{report_data[next]['text_dur_report']}}"
+                      data-audio-report=""
+                      data-transcript-text="{{ report_data[next]['interview_transcript'] }}"
+                    ></i>
+                    <span>
+                    Interviewer's Score(Text) = {{report_data[next]['text_dur_report']|emotion_scores|float }}%
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+              {% endif %}
+              {% endfor %}
+            </div>
+    
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- The Modal -->
+<div class="modal" id="graphmodal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="heading" id="graph-h2-head">
+        Graph Report</span> 
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">      
+        <div class="chart-wrapper video_report_wrapper">
+          <canvas id="video_report_canvas"></canvas>
+          <div id="chart-text">Video Analysis</div>
+        </div>       
+        <div class="chart-wrapper text_report_wrapper">
+          <canvas id="text_report_canvas"></canvas>
+          <div id="chart-text">Text Analysis</div>
+        </div>
+        <!-- <div class="chart-wrapper">
+            <canvas id="audio_report_canvas"></canvas>
+            <div id="chart-text">Center Text</div>
+          </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

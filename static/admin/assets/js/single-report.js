@@ -11,7 +11,7 @@ $(function () {
         Chart.instances[key].destroy();
       }
     }
-
+  
     createDoughnutChart($(this), "video-report");
     createDoughnutChart($(this), "text-report");
   });
@@ -81,7 +81,9 @@ $(function () {
 
 
 function createDoughnutChart(target, targetClass) {
+  if(target.data(targetClass) !=""){
   const reportData = JSON.parse(target.data(targetClass).replaceAll("'", '"'));
+  console.log(reportData,'dsadsads')
   const chartData = getChartData(reportData);
   const isEmpty = Object.values(reportData).every((x) => x === 0 || x === "0");
 
@@ -100,6 +102,7 @@ function createDoughnutChart(target, targetClass) {
       options: getChartOptions(),
     });
   }
+}
 }
 
 function getChartData(chartData) {
