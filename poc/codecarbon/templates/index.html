@@ -1,0 +1,79 @@
+{% extends 'layouts/base.html' %}
+
+{% block page_title %}
+Code Carbon Report
+{% endblock %}
+
+{% block body_block %}
+<section class="contact-form-wrap section">
+    <div class="container-fluid">
+        <div class="row pl-5 pr-5 pt-5 pb-2" id="body">
+            <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
+                <h2 class="mb-4 heading-align">InfoBeans : Code Carbon Report</h2>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 title-heading-justify">
+                <form action="{{ url_for('codecarbon.index') }}" class="form w-100" method="get" id="form_data">
+                    <select name="codecarbon_project" class="form-control border-1 rounded" id="codecarbon_project">
+                        <option value="">All</option>
+                        {% for name in project_names %}
+                            <option value="{{ name }}" {% if selected_project == name %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+        <div class="row pl-5 pr-5 pt-1 pb-2" id="body">
+                <div class="col-lg-6 col-md-6 col-sm-12 text-left">
+                    <p class="m-0 p-0">Power Consumption Across All Experiments : {{ total_power_consumed }} kWh</p>
+                    <p  class="m-0 p-0">Carbon Equivalent Across All Experiments : {{ total_carbon }} kg</p>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 text-left">
+                    <p class="m-0 p-0">Last Run Power Consumption : {{ last_power_consumed }} kWh</p>
+                    <p  class="m-0 p-0">Last Run Carbon Equivalent : {{ last_carbon }} kg</p>
+                </div>
+                <div class="table table-bordered table-responsive mt-4">
+                    <table class="table table-bordered table-responsive mt-4">
+                        <thead>
+                            <th>#</th>
+                            <th>Date Time</th>
+                            <th>Project Name</th>
+                            <th>Carbon Emissions</th>
+                            <th>Power Consumption</th>
+                            <th>OS</th>
+                            <th>Python Version</th>
+                            <th>Code Carbon Version</th>
+                            <th>CPU Count</th>
+                            <th>CPU Model</th>
+                        </thead>
+                        <tbody>
+                            {% for project in data_frames %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ project['timestamp']|strftime }}</td>
+                                    <td>{{ project['project_name'] }}</td>
+                                    <td>{{ "{:.2f}".format(project['emissions']) }} kg</td>
+                                    <td>{{ "{:.2f}".format(project['energy_consumed']) }} kWh</td>
+                                    <td>{{ project['os'] }}</td>
+                                    <td>{{ project['python_version'] }}</td>
+                                    <td>{{ project['codecarbon_version'] }}</td>
+                                    <td>{{ project['cpu_count'] }}</td>
+                                    <td>{{ project['cpu_model'] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+    $(document).ready(function(){
+        $('#codecarbon_project').on('change',function(){
+            $('#form_data').submit();
+        });
+    });
+</script>
+{% endblock %}

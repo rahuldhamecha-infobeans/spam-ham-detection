@@ -8,6 +8,7 @@ from poc.objectdetection.views import object_detection_blueprint
 from poc.imageclassification.views import image_classification_blueprint
 from poc.maskdetection.views import mask_classification_blueprint
 from poc.emailvalidator.views import email_validator_blueprint
+from poc.codecarbon.views import codecarbon_blueprint
 from flask_login import login_required
 
 
@@ -31,5 +32,8 @@ app.register_blueprint(email_validator_blueprint,
                        url_prefix='/email-validator')
 app.register_blueprint(textclassification_blueprint,
                        url_prefix='/text-classificationbycategory')
+
+app.register_blueprint(codecarbon_blueprint,url_prefix='/codecarbon')
+
 if __name__ == '__main__':
     app.run(debug=True)
