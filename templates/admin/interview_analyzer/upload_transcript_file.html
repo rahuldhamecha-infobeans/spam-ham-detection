@@ -2,6 +2,8 @@
 Interview Assessment {% endblock %} {% block page_body_title %} Smart Interview
 Assessment {% endblock %} {% block body_block %}
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <style>
   .center {
     text-align: center;
@@ -34,9 +36,21 @@ Assessment {% endblock %} {% block body_block %}
   }
 </style>
 <div class="row">
+
   <div class="col-xl-12">
     <div class="card css-4vhwja">
-      <h6 class="css-b6ndjn">Import Transcript</h6>
+     <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h4 style="color: #000;margin:0px">Import Transcript</h4>
+          <!-- Button with file input and icon -->
+            <div>
+            <button class="file-upload-button css-1ikvom0" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
+            </div>
+          </div>
+      <script>
+function goBack() {
+  window.history.back();
+}
+</script>
       <h6 class="css-1jekfck">Upload the Transcript file for Smart Interview Assessment.</h6>
       <div>
         <div class="card-body dropzone">
