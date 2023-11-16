@@ -22,6 +22,7 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
           <h4 style="color: #000;margin:0px">Smart Interview Assessment</h4>
           <!-- Button with file input and icon -->
             <div>
+            <button class="file-upload-button css-1ikvom0" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
             <a href="{{ url_for('interview_analyzer.interview_transcript_upload_file') }}"><button class="file-upload-button css-1ikvom0"><i class="fas fa-upload"></i> Import Google Meet Transcript</button></a>
             <a href="{{ url_for('interview_analyzer.interview_video_upload_file') }}"><button class="file-upload-button css-1ikvom0"><i class="fas fa-upload"></i> Import Video from file</button></a>
             </div>
@@ -163,6 +164,11 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
     </svg>
   </div>
 </div>
-
+<script>
+function goBack() {
+  var baseURL = window.location.protocol + '//' + window.location.host;
+  window.location.href = baseURL;
+}
+</script>
 {% endblock %}
 
