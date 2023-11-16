@@ -269,7 +269,59 @@ for (let i = 0; i < accordion.length; i++) {
         <u>Interview Transcript Report of {{ transcript_data.name }}</u>
       </h2>
     </div>
+    <!--start-->
 
+    <section class="content">
+      <div class="container-fluid">
+        <h5 class="mb-2">OverAll Insights</h5>
+        <div class="row">
+          <div class="col-md-4 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-info"><i class="fa fa-question-circle" style="color:#fff"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Total Questions</span>
+                <span class="info-box-number">{{overall_questions_count}}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-4 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-success"><i class="fa fa-text-height" style="color:#fff"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">Total Technical Questions</span>
+                <span class="info-box-number">{{technical_question_count}}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+
+          <!-- /.col -->
+          <div class="col-md-4 col-sm-6 col-12">
+            <div class="info-box">
+              <span class="info-box-icon bg-danger"><i class="fa fa-eercast" style="color:#fff"></i></span>
+
+              <div class="info-box-content">
+                <span class="info-box-text">OverAll Discussion (In Min)</span>
+                <span class="info-box-number">{{overall_discussion}}</span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
+        </div>
+      </div>
+
+        <!-- /.row -->
+     </section>
+    <!--end-->
 <div class="col-md-6 stretch-card grid-margin">
   <div class="report-container">
     <h3 class="report-title">Interviewer's Score</h3>
@@ -374,6 +426,7 @@ for (let i = 0; i < accordion.length; i++) {
                       style="color: #aa142d"
                     ></i
                     >&nbsp;{{report_data[i]['speaker'] }} : {{ report_data[i]['interview_transcript']|weak_word_identify|safe }}
+                    {{report_data[i]['interview_transcript']|identify_technical_question|safe}}
                   </button>
                 </h2>
 
@@ -448,6 +501,7 @@ for (let i = 0; i < accordion.length; i++) {
                       style="color: #aa142d"
                     ></i
                     >&nbsp;{{report_data[next]['speaker'] }}  : {{ report_data[next]['interview_transcript']|weak_word_identify|safe }}
+                    {{report_data[next]['interview_transcript']|identify_technical_question|safe}}
                   </button>
                 </h2>
 
