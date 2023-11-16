@@ -715,8 +715,30 @@ def view_transcript_report(id):
     candidate_ovrall_report_dict_text['CL'] = CL
 
     analysis=get_transcript_text_analysis_data(tdata)
+    interviewer_data= TranscriptProcess.get_transcripts_by_speaker_type(id,'interviewer')
+    overall_questions_count = len(interviewer_data)
+    technical_question_count = get_technical_question_count(interviewer_data)
+    # Usage example
+    meeting_total_duration = extract_meeting_end_time(transcript_data.transcript)
+    return render_template('admin/interview_analyzer/view_transcript_report.html',analysis_data=analysis,overall_questions_count=overall_questions_count,overall_discussion=meeting_total_duration,technical_question_count=technical_question_count, transcript_data=transcript_data ,report_data=tdata,overall_interviewer_rprt=interviewer_ovrall_report_dict_text,overall_candidate_rprt=candidate_ovrall_report_dict_text)
 
-    return render_template('admin/interview_analyzer/view_transcript_report.html',analysis_data=analysis, transcript_data=transcript_data ,report_data=tdata,overall_interviewer_rprt=interviewer_ovrall_report_dict_text,overall_candidate_rprt=candidate_ovrall_report_dict_text)
+def extract_meeting_end_time(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        meeting_end_time = "None"
+
+        for line in lines:
+            if line.startswith("Meeting ended after"):
+                # Extracting the time information
+                meeting_end_time = line.split("after ")[1].split(" ")[0]
+                break  # Exit the loop once the meeting end time is found
+    time_components = meeting_end_time.split(':')
+    
+    # Calculate total minutes and seconds
+    total_seconds = int(time_components[0]) * 3600 + int(time_components[1]) * 60 + int(time_components[2])
+    minutes, seconds = divmod(total_seconds, 60)
+
+    return f"{minutes}:{seconds:02}"
 
 def extract_main_conversation(filename):
     main_conversation = []  # To store the main conversation lines
