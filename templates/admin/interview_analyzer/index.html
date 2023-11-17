@@ -30,10 +30,6 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
         <h5 style="color: #000;margin-top: 30px;">Video Interviews</h5>
         <div class="table_div"></div>
         </div>
-        <div>
-        <h5 style="color: #000;margin-top: 30px;">Meet Transcripts</h5>
-        <div class="table_div_transcript"></div>
-      </div>
       </div>
     </div>
   </div>
@@ -54,20 +50,9 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
     });
   }
 
-  function reload_transcript_list() {
-    $.ajax({
-      type: "GET",
-      url: '{{ url_for('interview_analyzer.fetch_transcript_list') }}',
-      dataType: "html",
-      success: function (response) {
-        $(".table_div_transcript").html(response);
-      },
-    });
-  }
 
   $(document).ready(function () {
     reload_candidate_list();
-    reload_transcript_list();
     $(document).on('click','.gr_loader',function(e){
         e.preventDefault()
       $('.loader_wrapper').removeClass('d-none')
@@ -94,7 +79,6 @@ Interview Assessment {% endblock %} {% block page_body_title %}  {% endblock %} 
 
   setInterval(function() {
     reload_candidate_list();
-    reload_transcript_list();
   }, 420000);
 
 </script>

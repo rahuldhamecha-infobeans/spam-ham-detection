@@ -12,6 +12,7 @@ from ib_aitool.database.models.CandidateModel import Candidate
 from ib_aitool.database.models.TranscriptModel import Transcript
 from ib_aitool.database.models.VideoProcessModel import VideoProcess
 from ib_aitool.database.models.TranscriptProcessModel import TranscriptProcess
+from ib_aitool.database.models.MasterTableModel import MasterTable
 
 import math
 from moviepy.editor import VideoFileClip
@@ -73,23 +74,10 @@ def fetch_candidate_list():
     else:
         # If the current user is not a superadmin, list candidates added by them
         candidates = Candidate.query.filter_by(added_by=current_user.id).order_by(Candidate.id).all()
+        master_entries = MasterTable.query.filter_by(added_by=current_user.id).order_by(MasterTable.id).all()
 
-    # candidates = Candidate.query.filter_by(
-    #     added_by=current_user.id).order_by('id')
-    return render_template('admin/interview_analyzer/candidate_list.html', candidates=candidates)
+    return render_template('admin/interview_analyzer/candidate_list.html', candidates=candidates,master_entries=master_entries)
 
-@products_blueprint.route('/fetch-transcript-list')
-def fetch_transcript_list():
-    if str(current_user.role()) == 'SuperAdmin':
-        # If the current user is a superadmin, list all candidates
-        transcripts = Transcript.query.order_by(Transcript.id).all()
-    else:
-        # If the current user is not a superadmin, list candidates added by them
-        transcripts = Transcript.query.filter_by(added_by=current_user.id).order_by(Transcript.id).all()
-
-    # candidates = Candidate.query.filter_by(
-    #     added_by=current_user.id).order_by('id')
-    return render_template('admin/interview_analyzer/transcript_list.html', transcripts=transcripts)
 
 def convert_save_audio_file(video_path, dir_path, audio_mp3):
     try:
@@ -221,6 +209,10 @@ def interview_video_upload():
                 name=name, interview_video=video_url, interview_audio=audio_output_path, added_by=current_user.id)
             db.session.add(candidate)
             db.session.commit()
+            # Create a MasterTable instance and associate candidate and transcript IDs
+            new_master = MasterTable(candidate_table_id=candidate.id, transcript_table_id=None,type='video',added_by=current_user.id)
+            db.session.add(new_master)
+            db.session.commit()
             message = 'Candidate Added Successfully.'
         else:
             message = 'Please Provide Video and Name.'
@@ -246,6 +238,9 @@ def interview_transcript_upload():
             transcript = Transcript(
                 name=title, transcript=transcript_url, added_by=current_user.id)
             db.session.add(transcript)
+            db.session.commit()
+            new_master = MasterTable(candidate_table_id=None, transcript_table_id=transcript.id,type='transcript',added_by=current_user.id)
+            db.session.add(new_master)
             db.session.commit()
             message = 'Candidate Added Successfully.'
         else:
@@ -1419,38 +1414,65 @@ app.jinja_env.filters['format_duration'] = format_time_duration
 @app.route('/delete_route/<int:item_id>')
 def delete_route(item_id):
     try:
-        candidate = Candidate.query.get(item_id)
+        master_entry = MasterTable.master_table_data(item_id)
+        if master_entry and master_entry.type == 'video':
+            candidate = Candidate.query.get(master_entry.candidate_table_id)
 
-        if candidate is None:
-            return "Candidate not found", 404
+            if candidate is None:
+                return "Candidate not found", 404
 
-        video_url = candidate.interview_video
-        video_pdf = candidate.report_url
-        video_audio = candidate.interview_audio
-        video_name = os.path.basename(video_url)
+            video_url = candidate.interview_video
+            video_pdf = candidate.report_url
+            video_audio = candidate.interview_audio
+            video_name = os.path.basename(video_url)
 
-        # Remove the file extension if needed
-        video_name_without_extension, extension = os.path.splitext(video_name)
-        video_name_without_extension = f'uploads/{video_name_without_extension}'
+            # Remove the file extension if needed
+            video_name_without_extension, extension = os.path.splitext(video_name)
+            video_name_without_extension = f'uploads/{video_name_without_extension}'
 
-        # Delete the item from each table
-        with db.session.begin_nested():
-            db.session.query(VideoReport).filter(VideoReport.video_id == item_id).delete()
-            db.session.query(VideoProcess).filter(VideoProcess.vid == item_id).delete()
-            db.session.query(Candidate).filter(Candidate.id == item_id).delete()
+            # Delete the item from each table
+            with db.session.begin_nested():
+                db.session.query(VideoReport).filter(VideoReport.video_id == master_entry.candidate_table_id).delete()
+                db.session.query(VideoProcess).filter(VideoProcess.vid == master_entry.candidate_table_id).delete()
+                db.session.query(MasterTable).filter(MasterTable.candidate_table_id == master_entry.candidate_table_id).delete()
+                db.session.query(Candidate).filter(Candidate.id == master_entry.candidate_table_id).delete()
+                
 
-        # Commit the transaction
-        db.session.commit()
+            # Commit the transaction
+            db.session.commit()
 
-        # Check if file paths exist and then delete the files
-        if video_url and os.path.exists(video_url):
-            os.remove(video_url)
-        if video_pdf and os.path.exists(video_pdf):
-            os.remove(video_pdf)
-        if video_audio and os.path.exists(video_audio):
-            os.remove(video_audio)
-        if video_name_without_extension and os.path.exists(video_name_without_extension):
-            shutil.rmtree(video_name_without_extension)
+            # Check if file paths exist and then delete the files
+            if video_url and os.path.exists(video_url):
+                os.remove(video_url)
+            if video_pdf and os.path.exists(video_pdf):
+                os.remove(video_pdf)
+            if video_audio and os.path.exists(video_audio):
+                os.remove(video_audio)
+            if video_name_without_extension and os.path.exists(video_name_without_extension):
+                shutil.rmtree(video_name_without_extension)
+        elif master_entry and master_entry.type == 'transcript':
+            transcript = Transcript.query.get(master_entry.transcript_table_id)
+            if transcript is None:
+                return "Transcript not found", 404
+            transcript_url = transcript.transcript
+            transcript_name = os.path.basename(transcript_url)
+
+            # Remove the file extension if needed
+            transcript_name_without_extension, extension = os.path.splitext(transcript_name)
+            transcript_name_without_extension = f'uploads/{transcript_name_without_extension}'
+
+                        # Delete the item from each table
+            with db.session.begin_nested():
+                db.session.query(TranscriptProcess).filter(TranscriptProcess.tid == master_entry.transcript_table_id).delete()
+                db.session.query(MasterTable).filter(MasterTable.transcript_table_id == master_entry.transcript_table_id).delete()
+                db.session.query(Transcript).filter(Transcript.id == master_entry.transcript_table_id).delete()
+            # Commit the transaction
+            db.session.commit()
+            # Check if file paths exist and then delete the files
+            if transcript_url and os.path.exists(transcript_url):
+                os.remove(transcript_url)
+            if transcript_name_without_extension and os.path.exists(transcript_name_without_extension):
+                shutil.rmtree(transcript_name_without_extension)
 
     except Exception as e:
         # Handle any exceptions that may occur during deletion
