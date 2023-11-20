@@ -9,6 +9,7 @@
     <th>Name</th>
     <th>Added By</th>
     <th>Report Generated</th>
+    <th>File Type</th>
     <th>Action</th>
   </thead>
   <tbody>
@@ -33,6 +34,10 @@
         <span class="badge generated">YES</span>
         {% else %}
         <span class="badge not_generated">NO</span>
+        {% endif %}
+      </td>
+      <td>{% if master_entry.type =='video' %}
+        <i class="fa fa-play-circle-o" style="font-size:36px;"></i>
         {% endif %}
       </td>
       <td>
@@ -197,7 +202,10 @@
         <span class="badge not_generated">NO</span>
         {% endif %}
       </td>
-
+      <td>{% if master_entry.type =='transcript' %}
+        <i class="fa fa-file-text" style="font-size:32px;"></i>
+        {% endif %}
+      </td>
       <td>
         <a
         target="_blank"
