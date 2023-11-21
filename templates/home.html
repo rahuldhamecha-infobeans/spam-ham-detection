@@ -109,6 +109,9 @@ endblock %} {% block body_block %}
   $(document).ready(function () {
   $('#dtBasicExample').DataTable();
   $('.dataTables_length').addClass('bs-select');
+ columns: [
+        { data: 'Action', orderable: false }, // Disable sorting for this column
+    ]
 });
 </script>
 
