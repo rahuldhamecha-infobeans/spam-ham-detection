@@ -71,6 +71,7 @@ def fetch_candidate_list():
     if str(current_user.role()) == 'SuperAdmin':
         # If the current user is a superadmin, list all candidates
         candidates = Candidate.query.order_by(Candidate.id).all()
+        master_entries = MasterTable.query.order_by(MasterTable.id).all()
     else:
         # If the current user is not a superadmin, list candidates added by them
         candidates = Candidate.query.filter_by(added_by=current_user.id).order_by(Candidate.id).all()
