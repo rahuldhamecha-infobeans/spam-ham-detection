@@ -6,6 +6,7 @@ from ib_aitool.database.models.EmployeeModel import Employee, EmployeeAttendance
 from ib_aitool.admin.attendance_managment.forms import EmployeeForm
 from ib_aitool.admin.decorators import has_permission
 from ib_aitool import app
+from ib_tool import BASE_DIR
 from ib_aitool.database import db
 from datetime import datetime,date
 import os
@@ -131,6 +132,10 @@ def images_list():
 def delete_image(id):
     image = EmployeeImage.query.get(id)
     if image:
+        im_full_path = BASE_DIR+image.image_url
+        if os.path.exists(im_full_path):
+            os.remove(im_full_path)
+
         db.session.delete(image)
         db.session.commit()
         return Response('Image Delete Successfully.')
@@ -145,6 +150,9 @@ def delete_employee(id):
         images = employee.images()
         if images:
             for image in images:
+                im_full_path = BASE_DIR+image.image_url
+                if os.path.exists(im_full_path):
+                    os.remove(im_full_path)
                 db.session.delete(image)
         attendance = employee.attendance()
         if attendance:
