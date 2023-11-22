@@ -166,7 +166,7 @@ def employee_train_model():
     if not isExist:
         os.makedirs(dir_path)
 
-    file_path = os.path.join(dir_path, 'attendance_model.h5')
+    file_path = os.path.join(dir_path, 'attendance_model.joblib')
     train("uploads/employees", model_save_path=file_path, n_neighbors=2)
     return make_response({'status': 'Model Trained Successfully.'}, 200)
 
@@ -223,7 +223,7 @@ def init_webcam(camera):
 def thread_start():
     global camera_instance, is_camera_on,ajax_load
     process_this_frame = 59
-    model_path = os.path.join(app.config['UPLOAD_FOLDER'], 'models', 'attendance_model.h5')
+    model_path = os.path.join(app.config['UPLOAD_FOLDER'], 'models', 'attendance_model.joblib')
     if is_camera_on and camera_instance.camera is not None:
         while True:
             ret, frame = camera_instance.camera.read()

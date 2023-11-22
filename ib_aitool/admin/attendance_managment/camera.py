@@ -24,7 +24,7 @@ class Camera:
 
                     img = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
                     process_this_frame = process_this_frame + 1
-                    model_path = os.path.join(app.config['UPLOAD_FOLDER'],'models','attendance_model.h5')
+                    model_path = os.path.join(app.config['UPLOAD_FOLDER'],'models','attendance_model.joblib')
                     if process_this_frame % 30 == 0:
                         predictions = predict(img, model_path=model_path)
                         if predictions:

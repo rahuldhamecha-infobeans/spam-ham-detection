@@ -1,9 +1,11 @@
 import cv2
 import math
+import json
 from sklearn import neighbors
 import os
 import os.path
 import pickle
+from joblib import load,dump
 from PIL import Image, ImageDraw, ImageFont
 import face_recognition
 from face_recognition.face_recognition_cli import image_files_in_folder
@@ -45,14 +47,16 @@ def train(train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree
             print("Chose n_neighbors automatically:", n_neighbors)
 
     # Create and train the model
-    knn_clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, algorithm=knn_algo, weights='distance')
+    if os.path.exists(model_save_path):
+        knn_clf = load(model_save_path)
+    else:
+        knn_clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, algorithm=knn_algo, weights='distance')
+
     knn_clf.fit(X, y)
 
     # Save the trained model
     if model_save_path is not None:
-        with open(model_save_path, 'wb') as f:
-            pickle.dump(knn_clf, f)
-            app.logger.debug('Model Trained Successfully.')
+        dump(knn_clf,model_save_path)
 
     return knn_clf
 
@@ -63,8 +67,7 @@ def predict(X_frame, knn_clf=None, model_path=None, distance_threshold=0.5):
 
     # Load a trained KNN model (if one was passed in)
     if knn_clf is None:
-        with open(model_path, 'rb') as f:
-            knn_clf = pickle.load(f)
+        knn_clf = load(model_path)
 
     X_face_locations = face_recognition.face_locations(X_frame)
 
