@@ -676,14 +676,18 @@ def view_report(id):
 
     candidate_data = VideoProcess.get_transcripts('candidate', id)
     interviewer_total_time_duration = calculate_total_duration(interviewer_data)
-    interviewer_total_tech_time_duration = calculate_total_tech_duration(interviewer_data)
+    total_idiscussion,interviewer_total_tech_time_duration = calculate_total_tech_duration(interviewer_data)
+    total_cdiscussion,candidate_total_tech_time_duration = calculate_total_tech_duration(candidate_data)
+    total_technical_discussion=total_idiscussion+total_cdiscussion
+    total_minutes, total_seconds = divmod(total_technical_discussion, 60)
+    total_technical_discussion_string=f"{total_minutes}:{total_seconds:02d} Minutes"
     candidate_total_time_duration = calculate_total_duration(candidate_data)
     time_strings = [interviewer_total_time_duration, candidate_total_time_duration]
     overall_discussion = parse_and_sum_times(time_strings)
     technical_question_count = get_technical_question_count(interviewer_data)
     overall_questions_count = len(interviewer_data)
     return render_template('admin/interview_analyzer/view_report.html', candidate=candidate, report_data=data,
-                           overall=overall, analysis_data=analysis,interviewer_total_time=interviewer_total_time_duration,candidate_total_time=candidate_total_time_duration, interviewer_total_tech_time=interviewer_total_tech_time_duration,overall_discussion=overall_discussion, technical_question_count=technical_question_count, overall_questions_count=overall_questions_count)
+                           overall=overall, analysis_data=analysis,interviewer_total_time=interviewer_total_time_duration,candidate_total_time=candidate_total_time_duration, interview_total_tech_time=total_technical_discussion_string,overall_discussion=overall_discussion, technical_question_count=technical_question_count, overall_questions_count=overall_questions_count)
 
 
 @products_blueprint.route('/view-transcript-reports/<id>')
@@ -1586,7 +1590,7 @@ def calculate_total_tech_duration(interviewer_data):
                 total_duration += int(vp.end_duration) - int(vp.start_duration)
 
     total_minutes, total_seconds = divmod(total_duration, 60)
-    return f"{total_minutes}:{total_seconds:02d} Minutes"
+    return total_duration,f"{total_minutes}:{total_seconds:02d} Minutes"
 
 
 def get_technical_question_count(interviewer_data):
