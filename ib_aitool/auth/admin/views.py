@@ -46,7 +46,7 @@ def agent_login():
             next = request.args.get('next')
 
             if next == None or not next[0] == '/':
-                next = url_for('dashboard.index')
+                next = url_for('home_page')
 
             return redirect(next)
         else:
