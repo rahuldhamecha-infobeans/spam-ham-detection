@@ -82,6 +82,7 @@ class EmployeeImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     image_url = db.Column(db.Text, nullable=True, default=None)
     employee_id = db.Column(db.Integer, nullable=True, default=0)
+    is_image_trained = db.Column(db.Text,nullable=True,default='No')
 
     def __str__(self):
         return str(self.name)
