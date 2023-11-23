@@ -15,6 +15,7 @@ class Camera:
     def generated_frames(self):
         camera = self.camera
         process_this_frame = 29
+
         if camera is not None:
             while True:
                 success, frame = camera.read()

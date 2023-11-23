@@ -193,13 +193,14 @@ def start_camera(camera_type):
     global camera_instance, is_camera_on, opened_camera
     if camera_instance and camera_instance.camera != None:
         release_camera()
-    is_camera_on = True
     camera_instance = Camera(type=camera_type)
-    opened_camera = camera_type
+    if camera_instance is not None:
+        is_camera_on = True
+        opened_camera = camera_type
 
-    thread = threading.Thread(target=thread_start, name='Attendance Thread')
-    thread.start()
-    thread.join(1)
+        thread = threading.Thread(target=thread_start, name='Attendance Thread')
+        thread.start()
+        thread.join(1)
     return redirect(url_for('attendance.index'))
 
 
@@ -220,11 +221,12 @@ def stop_camera(camera_type):
 
 
 def init_webcam(camera):
-    while True:
-        frame = camera.generated_frames()
-        if frame is not None:
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    if camera is not None:
+        while True:
+            frame = camera.generated_frames()
+            if frame is not None:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 
 
