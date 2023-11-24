@@ -60,11 +60,7 @@
     <div>
       <div class="card-body">
           <div class="col-md mb-4 mb-md-0">
-            <div class="accordion mt-3" id="question_answer_accordion">
-              <div class="card accordion-item-sidebar"> 
-              <h3 class="accordion-header" id="">Total Time Duration: {{interviewer_total_time}}</h3>
-            </div>
-            </div>
+
 
              {% if analysis_data %}
                          {% for key,words in analysis_data %}
@@ -130,11 +126,7 @@
              {% if analysis_data %}
                          {% for key,words in analysis_data %}
                             {% if key == 'Candidate Analysis' %}
-            <div class="accordion mt-3" id="question_answer_accordion">
-              <div class="card accordion-item-sidebar"> 
-                <h3 class="accordion-header" id="">Total Time Duration: {{candidate_total_time}}</h3>
-              </div>
-            </div>
+
             <div class="accordion mt-3" id="question_answer_accordion">
               <div class="card accordion-item-sidebar">
                   <h2 class="accordion-header" id="heading_{{ index }}">
