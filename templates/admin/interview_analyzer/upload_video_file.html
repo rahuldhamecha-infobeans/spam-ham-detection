@@ -127,13 +127,20 @@ function goBack() {
             var name = document.getElementById('candidate_name').value;
             var fileInput = document.getElementById('file');
             var file = fileInput.files[0]; // Get the first selected file (if any)
+
             if (!file) {
               alert("Please upload the video!");
+            } else {
+              var fileName = file.name;
+              var fileExtension = fileName.split('.').pop().toLowerCase(); // Get the file extension
+
+              if (fileExtension !== 'mp4') {
+                alert("Please upload a MP4 file.");
+              } else if (name !== '') {
+                $('.loader_wrapper').removeClass('d-none');
+              }
             }
-            if (name !== '' && file) {
-              $('.loader_wrapper').removeClass('d-none');
-            }
-          })
+          });
 
           setInterval(function () {
             reload_candidate_list();
