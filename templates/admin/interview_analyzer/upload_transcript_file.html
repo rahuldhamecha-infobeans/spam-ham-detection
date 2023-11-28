@@ -131,6 +131,12 @@ function goBack() {
             var file = fileInput.files[0]; // Get the first selected file (if any)
             if (!file) {
               alert("Please upload the Transcript!");
+            }else {
+              var fileName = file.name;
+              var fileExtension = fileName.split('.').pop().toLowerCase(); // Get the file extension
+              if (fileExtension !== 'txt') {
+                alert("Please upload only txt file.");
+              }
             }
             if (name !== '' && file) {
               $('.loader_wrapper').removeClass('d-none');

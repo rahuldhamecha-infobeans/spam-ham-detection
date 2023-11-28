@@ -125,6 +125,8 @@ def upload_video():
         dir_path = os.path.join(app.config['UPLOAD_FOLDER'], directory)
 
         filename, file_extension = os.path.splitext(file.filename)
+        if file_extension !='.mp4':
+            return None
         new_file_name = candidate_name + '_' + str(current_time) + file_extension
         isExist = os.path.exists(path=dir_path)
         if not isExist:
@@ -152,6 +154,8 @@ def upload_transcript():
         dir_path = os.path.join(app.config['UPLOAD_FOLDER'], directory)
 
         filename, file_extension = os.path.splitext(file.filename)
+        if file_extension !='.txt':
+            return None
         new_file_name = interview_title + '_' + str(current_time) + file_extension
         isExist = os.path.exists(path=dir_path)
         if not isExist:
@@ -183,6 +187,8 @@ def interview_video_upload():
         name = request.form.get('candidate_name')
         video_url = upload_video()
         # print(video_url)
+        if video_url ==None:
+            return redirect(url_for('interview_analyzer.interview_video_upload_file'))
         if video_url.startswith('/'):
             video_url = video_url[1:]
         else:
@@ -229,6 +235,8 @@ def interview_transcript_upload():
         title = request.form.get('interview_title')
         transcript_url = upload_transcript()
         # print(video_url)
+        if transcript_url ==None:
+            return redirect(url_for('interview_analyzer.interview_transcript_upload_file'))
         if transcript_url.startswith('/'):
             transcript_url = transcript_url[1:]
         else:
