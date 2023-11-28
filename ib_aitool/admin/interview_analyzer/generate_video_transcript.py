@@ -139,6 +139,8 @@ def save_highest_count_videoframe(image_dir, output_dir):
                 if lowest_count_image_type_b is None or type_b_count < lowest_count_image_type_b[1]:
                     lowest_count_image_type_b = (filename, type_b_count)
 
+    if lowest_count_image_type_a == None or lowest_count_image_type_b ==None:
+        return False
     # Determine which type has the highest count
     if type_a_count > type_b_count:
             #interviewer image

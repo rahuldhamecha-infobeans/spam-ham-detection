@@ -574,6 +574,9 @@ $(document).ready(function() {
               $('#confirmation_modal .btn-failed').show()
               $("#confirmation_modal").modal("show");
               //reload_candidate_list();
+            }else{
+              alert("Video quality is poor. Please upload a different video for re-analysis.")
+              location.reload(true)
             }
           }
         },
