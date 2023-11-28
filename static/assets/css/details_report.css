@@ -380,15 +380,15 @@ div#chart-text {
 }
 
 #sidebar-wrapper {
-  margin-top: -4.6%;
   z-index: 1000;
-  position: fixed;
-  right: 250px;
+  right: 0px;
   width: 0;
   height: 100%;
-  margin-right: -250px;
   overflow-y: auto;
-
+   top: 77px;
+    bottom: 0;
+    position: fixed;
+    overflow-y: scroll;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -473,6 +473,7 @@ div#chart-text {
   }
   #wrapper.toggled #sidebar-wrapper {
     width: 40%;
+    padding-bottom:40px;
   }
   #page-content-wrapper {
     padding: 20px;
@@ -482,6 +483,36 @@ div#chart-text {
     position: relative;
     margin-left: 0;
   }
+}
+
+@media only screen and (max-width:1500px){
+.overall_insight_row .col-md-3{
+width:50%;
+}
+#graphmodal .modal-dialog{
+width:80%;
+margin:0 auto;
+}
+}
+
+@media only screen and (max-width:1350px){
+
+#graphmodal .modal-body{
+flex-direction:column;
+}}
+
+@media only screen and (max-width:992px){
+.overall_insight_row .col-md-3{
+width:100%;
+}
+
+
+
+}
+.overall_insight_container{
+    padding: 0 !important;
+    margin-bottom: 30px;
+    margin-top: 20px;
 }
 
 * New styles to align the button to the right */ .title-container {
