@@ -1609,7 +1609,7 @@ def get_technical_question_count(interviewer_data):
 def identify_technical_question(interview_transcript):
     # Preprocess input text using the loaded vectorizer
     transformed = transform_text(interview_transcript)  # Assuming you have a working transform_text function
-    if len(transformed) >= 8:
+    if len(transformed) >= 10:
         # Vectorize the preprocessed input
         vector_input = tfidf.transform([transformed])
 
