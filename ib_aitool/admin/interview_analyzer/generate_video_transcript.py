@@ -124,7 +124,7 @@ def save_highest_count_videoframe(image_dir, output_dir):
             image = cv2.imread(image_path)
             average_pixel_value = image.mean()
 
-            threshold = 150  # Example threshold
+            threshold = 130  # Example threshold
 
             if average_pixel_value > threshold:
                 type_a_count += 1
