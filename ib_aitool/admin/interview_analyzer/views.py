@@ -52,6 +52,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 import string
+from ib_aitool.admin.interview_analyzer.run import remove_bg
 
 # Load the model and vectorizer
 tfidf = pickle.load(open(os.path.join(os.path.dirname(
@@ -924,6 +925,8 @@ def confirm_interviewer():
         videoPath = data.interview_video
         video_name = os.path.basename(videoPath)
         video_name_without_extension, extension = os.path.splitext(video_name)
+
+
         output_folder = f'uploads/{video_name_without_extension}/two-minutes-videoframes/'
         output_directory_path = f'uploads/{video_name_without_extension}/final-frames/'
 
@@ -934,6 +937,7 @@ def confirm_interviewer():
             timestamp.append({'start': 30, 'end': 150})
             save_two_minutes_frame(videoPath, timestamp, output_folder)  # save two minutes frames
             finalize_interviewer_saved = save_highest_count_videoframe(output_folder, output_directory_path)
+
             if finalize_interviewer_saved:
                 return json.dumps({'success': 1, 'image': output_directory_path + 'interviewer.jpg'})
             else:
@@ -944,6 +948,7 @@ def save_two_minutes_frame(videoPath, timestamp, output_folder):
     os.makedirs(output_folder, exist_ok=True)
     cap = cv2.VideoCapture(videoPath)
     frame_count = 0
+
     start_time = int(timestamp[0]['start'])
     end_time = int(timestamp[0]['end'])
     cap.set(cv2.CAP_PROP_POS_MSEC, (start_time * 1000))
@@ -958,6 +963,12 @@ def save_two_minutes_frame(videoPath, timestamp, output_folder):
 
         # Skip frames to maintain one frame per second
         cap.set(cv2.CAP_PROP_POS_MSEC, frame_count * frame_interval_ms)
+
+    video_name = os.path.basename(videoPath)
+    video_name_without_extension, extension = os.path.splitext(video_name)
+    bg_remove_full_path = os.path.join(BASE_DIR, 'uploads', video_name_without_extension,
+                                       'two-minutes-videoframes')
+    remove_bg(bg_remove_full_path)
 
     cap.release()
 
